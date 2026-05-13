@@ -1,0 +1,3 @@
+# The Master's Workshop (Item Logic Stress Test)
+
+The Master vanished mid-experiment, leaving the workshop’s greatest invention dead on its cradle. As a field mechanic called in by the guild, the protagonist must navigate a single dense workshop scene full of weapons, armor, consumables, valuables, keys, readable clues, static machinery, and combination parts. The core task is to repair the Broken Transmitter with the Copper Antenna, then install the resulting Fixed Transmitter into the Master’s Prototype with a charged Energy Cell. Optional challenges test combat, equipment, loot tracking, hidden items, and in-place item updates such as polishing the Rusty Hammer into a Balanced Steel Hammer.

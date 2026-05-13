@@ -1,0 +1,3 @@
+# The Echo Archive (Riddle-Test)
+
+A professional safecracker enters Silas Vance's underground Echo Archive for a guild contract, only to be sealed inside by a paranoid mechanical vault. The Archive is a chain of puzzle rooms: gear balances, sound-indexed locks, corrosive retrieval tests, generator repairs, and a final switch console that punishes guessing. To survive, the player must find four Chronos Keys, restore power, decipher Vance's diary clues, obtain the master blueprint, and escape before the air supply fails.
