@@ -50,8 +50,8 @@ The visual immersion in these adventures is made possible by state-of-the-art AI
 
 ## ⚖️ License & AI Content
 
-*   **Repository License:** The content of this repository is licensed under the [MIT License](LICENSE).
-*   **AI-Generated Content:** Content produced by AI models (text and images) is subject to the terms of the respective providers. Images generated with Black Forest Labs' FLUX models are typically available for use under their specific open or commercial licenses.
+*   **Repository License:** All files in this repository (adventure blueprints, packaged adventures, concepts, documentation, and assets) are licensed under the [Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0)](LICENSE). You are free to share and adapt the material for non-commercial purposes, provided that appropriate credit is given. See the [LICENSE](LICENSE) file for the full legal text.
+*   **AI-Generated Content:** Content produced by AI models (text and images) is subject to the terms of the respective providers. Images generated with Black Forest Labs' FLUX models are typically available for use under their specific open or commercial licenses, but the surrounding adventure material in this repository remains under CC BY-NC 4.0.
 
 ---
 *Weave your own stories. Explore the infinite.*
