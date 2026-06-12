@@ -1,3 +1,0 @@
-# Escape from the Concrete Tomb
-
-Subject 42 awakens in a damp concrete cellar with no memory of how they arrived. The crackling intercom of 'The Monitor'—an aging, glitching corporate AI—taunts them through the speaker, demanding they prove 'optimal survivability'. After cobbling together a bypass tool from a frayed wire and rusty pliers, Subject 42 escapes the cellar into The Sub-Level: a brutalist labyrinth of decaying test chambers. To win freedom, they must navigate flooded archives, crawl through Maintenance Shaft B, evade automated Sentinels, barter with the maimed Subject 14 hiding in the vents, and ultimately reach the Overseer Core to upload a virus and shut the Monitor down—triggering the surface elevator to daylight.
