@@ -38,14 +38,14 @@ The authoritative identity of an adventure is `adventure.origin_id` inside
    * A new adventure gets a directory named after its title (override with `--slug`).
    * An existing adventure (same `origin_id`) replaces its directory completely, so
      removed assets disappear as well. Its `README.md` is kept.
+   * Overlong asset file names (over 80 characters, typically from repeated exports)
+     are shortened and their references in `adventure.adv` are updated, so paths stay
+     well below the 260-character limit on Windows.
    * `library.json` is regenerated from all directories.
 3. Review the diff, then commit and push. That is the release - there is no other step.
 
 After editing a directory by hand, regenerate the index with
 `python scripts/add_adventure.py --rebuild`.
-
-> **Windows:** some asset names are long. Clone with
-> `git clone -c core.longpaths=true https://github.com/jschm42/taleweaver-adventures`.
 
 ## 🚀 How to Use
 

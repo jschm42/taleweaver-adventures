@@ -16,6 +16,7 @@ Standard library only.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -32,6 +33,8 @@ INDEX_SCHEMA = 1
 # Generous sanity cap; the app enforces its own download limit.
 MAX_UNPACKED_BYTES = 500 * 1024 * 1024
 SLUG_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+# Longest asset file name kept as-is; see _short_name().
+MAX_ASSET_NAME = 80
 
 
 class AdventureError(Exception):
@@ -82,6 +85,52 @@ def read_bundle(bundle: Path) -> tuple[dict, dict[str, bytes]]:
         if not adventure.get(key):
             raise AdventureError(f"{BLUEPRINT} in {bundle} has no adventure.{key}")
     return adventure, files
+
+
+def _short_name(name: str) -> str:
+    """Shorten an overlong asset file name; short names are returned unchanged.
+
+    Repeated exports append the entity key again and again
+    (``object_8b81_goblin-ledger_goblin-ledger_goblin-ledger_..._e0eb5ae1.jpg``). Such
+    names break git checkouts and the importer on Windows (260-character paths), so
+    consecutive duplicate segments are collapsed first; a name still over the limit keeps
+    a readable prefix plus a hash of the original, which keeps it unique.
+    """
+    if len(name) <= MAX_ASSET_NAME:
+        return name
+    stem, dot, suffix = name.rpartition(".")
+    if not dot:
+        stem, suffix = name, ""
+    segments = stem.split("_")
+    collapsed = "_".join(s for i, s in enumerate(segments) if i == 0 or s != segments[i - 1])
+    candidate = f"{collapsed}{dot}{suffix}"
+    if len(candidate) <= MAX_ASSET_NAME:
+        return candidate
+    digest = hashlib.sha256(name.encode("utf-8")).hexdigest()[:8]
+    room = MAX_ASSET_NAME - len(digest) - len(dot) - len(suffix) - 1
+    return f"{collapsed[:room].rstrip('_-')}_{digest}{dot}{suffix}"
+
+
+def shorten_asset_names(files: dict[str, bytes]) -> tuple[dict[str, bytes], int]:
+    """Rename overlong assets and rewrite their references in the blueprint.
+
+    Asset names carry a random/hash part, so a plain text replacement of the old file
+    name inside ``adventure.adv`` only ever hits references to that file.
+    """
+    renames: dict[str, str] = {}
+    for member in files:
+        folder, _, filename = member.rpartition("/")
+        short = _short_name(filename)
+        if member != BLUEPRINT and short != filename:
+            renames[member] = f"{folder}/{short}"
+    if len(set(renames.values()) | (set(files) - set(renames))) != len(files):
+        raise AdventureError("shortening asset names would make two of them collide")
+    blueprint = files[BLUEPRINT].decode("utf-8")
+    for old, new in renames.items():
+        blueprint = blueprint.replace(old.rpartition("/")[2], new.rpartition("/")[2])
+    renamed = {renames.get(name, name): data for name, data in files.items()}
+    renamed[BLUEPRINT] = blueprint.encode("utf-8")
+    return renamed, len(renames)
 
 
 def _read_adventure(source_dir: Path) -> dict:
@@ -192,8 +241,11 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.bundle:
             adventure, files = read_bundle(args.bundle)
+            files, shortened = shorten_asset_names(files)
             target = install(adventure, files, args.slug)
             print(f"unpacked {len(files)} files -> {target.name}/ ({adventure['title']} v{adventure['version']})")
+            if shortened:
+                print(f"shortened {shortened} overlong asset name(s) and updated {BLUEPRINT}")
         count = write_index()
     except AdventureError as exc:
         print(f"error: {exc}", file=sys.stderr)
