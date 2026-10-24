@@ -19,18 +19,27 @@ Design notes
 * **Idempotent.** When the only difference would be the timestamp, nothing is
   written and the script exits 0.  Re-running a release never produces an empty
   ``chore(catalog)`` commit.
-* **Ruleset-friendly.** ``main`` requires a pull request, so the change lands as
-  an auto-merged PR from a short-lived ``catalog/*`` branch instead of a direct
-  push.  This is deliberately *not* punching a bypass hole into the branch
-  protection.
-* **Auditable.** No secrets are printed.  Every API call goes through ``gh``,
-  which uses the ambient ``GH_TOKEN``.
+* **Two publish methods.**
+  ``--method push`` (used by the release workflow) commits ``catalog.json`` and
+  pushes it straight to the default branch over SSH, authenticated by a
+  write-enabled **deploy key**.  The repository ruleset lists ``DeployKey`` in
+  ``bypass_actors`` with ``bypass_mode: always``, so the key is not subject to
+  the ``pull_request`` rule, ``require_extra_approval_for_unattributed_changes``
+  or the Copilot review rule — and the ruleset itself stays untouched.
+  ``--method pr`` keeps the older path (short-lived ``catalog/*`` branch plus an
+  auto-merged PR) as a fallback for setups without a deploy key.
+* **Auditable.** No secrets are printed.  The API reads go through ``gh`` using
+  the ambient ``GH_TOKEN``; the push goes through ``git`` using the ambient
+  ``GIT_SSH_COMMAND`` (the workflow sets it up from a secret).
 
 Usage
 -----
-    # apply (fetch main, merge, PR + auto-merge) — used by the workflow
+    # apply by pushing with the deploy key (used by the workflow)
     scripts/sync_catalog.py --repo jschm42/taleweaver-adventures \\
-        --slug kitchen-crisis --entry dist/catalog-entry.json
+        --slug kitchen-crisis --entry dist/catalog-entry.json --method push
+
+    # apply through an auto-merged PR (fallback, no deploy key needed)
+    scripts/sync_catalog.py --repo ... --entry ... --method pr
 
     # plan only: fetch, merge, print.  Zero writes.
     scripts/sync_catalog.py ... --dry-run
@@ -297,6 +306,120 @@ def publish_via_pull_request(
     return pr_url
 
 
+# --- git plumbing (deploy-key push) -------------------------------------------
+
+
+def _git(*args: str, cwd: str | None = None) -> str:
+    """Run ``git`` and return stdout.
+
+    ``stderr`` is never echoed wholesale: only its last line is used in the
+    error message, so a failing SSH handshake cannot spill key material into the
+    log.
+    """
+    proc = subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True)
+    if proc.returncode != 0:
+        detail = (proc.stderr or proc.stdout).strip().splitlines()
+        raise SyncError(f"git {args[0]} failed: {detail[-1] if detail else 'unknown error'}")
+    return proc.stdout
+
+
+def _git_identity() -> list[str]:
+    """``-c`` overrides so the commit has a stable, honest author/committer."""
+    name = os.environ.get("CATALOG_SYNC_NAME") or "taleweaver-catalog-sync"
+    email = os.environ.get("CATALOG_SYNC_EMAIL") or "taleweaver-catalog-sync@users.noreply.github.com"
+    return ["-c", f"user.name={name}", "-c", f"user.email={email}"]
+
+
+def publish_via_git_push(
+    repo: str,
+    branch: str,
+    entry: dict[str, Any],
+    *,
+    remote_url: str | None = None,
+    attempts: int = 3,
+) -> tuple[str | None, list[str]]:
+    """Commit the merged ``catalog.json`` and push it to ``branch`` directly.
+
+    Authenticated by whatever ``GIT_SSH_COMMAND`` points at — in the release
+    workflow that is the repository's write-enabled deploy key, which the
+    ruleset lists as a bypass actor, so the push is allowed without a PR.
+
+    Returns ``(commit_message, changed_fields)``; ``(None, [])`` when the
+    catalog already matches (another run won the race, nothing to push).
+
+    The merge is recomputed from the freshly cloned branch on every attempt, so
+    a concurrently advanced ``main`` is picked up rather than turned into a
+    non-fast-forward rejection.  Raises :class:`SyncError` after ``attempts``.
+    """
+    remote = remote_url or os.environ.get("CATALOG_PUSH_URL") or f"git@github.com:{repo}.git"
+    slug = str(entry.get("slug") or "")
+    version = str(entry.get("version") or "")
+    message = f"chore(catalog): {slug} {version}"
+    attempts = max(1, attempts)
+    last_error = "unknown error"
+
+    for attempt in range(1, attempts + 1):
+        workdir = tempfile.mkdtemp(prefix="catalog-sync.")
+        clone_dir = os.path.join(workdir, "repo")
+        try:
+            _git("clone", "--quiet", "--depth", "1", "--branch", branch, remote, clone_dir)
+            catalog_path = pathlib.Path(clone_dir) / "catalog.json"
+            try:
+                current = json.loads(catalog_path.read_text(encoding="utf-8"))
+            except (OSError, ValueError) as exc:
+                raise SyncError(f"cannot read catalog.json from {remote} ({branch}): {exc}") from exc
+
+            merged, changed = merge_entry(current, entry)
+            if not changed:
+                print(
+                    f"catalog.json on {branch} already matches {slug} {version} "
+                    f"(attempt {attempt}/{attempts}) - nothing to push"
+                )
+                return None, []
+            changes = diff_summary(current, merged, slug)
+
+            catalog_path.write_text(
+                json.dumps(merged, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+            )
+            _git("add", "catalog.json", cwd=clone_dir)
+            _git(*_git_identity(), "commit", "-m", message, cwd=clone_dir)
+
+            push = subprocess.run(
+                ["git", "push", "--quiet", "origin", f"HEAD:{branch}"],
+                cwd=clone_dir,
+                capture_output=True,
+                text=True,
+            )
+            if push.returncode != 0:
+                # Almost always: main moved between clone and push. Retry with a
+                # fresh clone instead of failing a release on a lost race.
+                detail = (push.stderr or push.stdout).strip().splitlines()
+                last_error = detail[-1] if detail else f"exit {push.returncode}"
+                print(
+                    f"::warning::catalog push rejected (attempt {attempt}/{attempts}): "
+                    f"{last_error} - retrying on a fresh clone"
+                )
+                continue
+
+            # Read back over the network: "push exited 0" is not evidence that
+            # the default branch now carries this commit.
+            local_sha = _git("rev-parse", "HEAD", cwd=clone_dir).strip()
+            remote_sha = _git("ls-remote", remote, f"refs/heads/{branch}").split()[0]
+            if remote_sha != local_sha:
+                raise SyncError(
+                    f"catalog commit {local_sha[:8]} was pushed but {branch} reports "
+                    f"{remote_sha[:8]} - the push did not land"
+                )
+            print(f"pushed {local_sha[:8]} to {branch} via {remote.split('@')[-1]}")
+            return message, changes
+        finally:
+            shutil.rmtree(workdir, ignore_errors=True)
+
+    raise SyncError(
+        f"git push of catalog.json to {branch} failed after {attempts} attempt(s): {last_error}"
+    )
+
+
 # --- CLI ----------------------------------------------------------------------
 
 
@@ -311,6 +434,27 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--branch", default="main", help="target branch (default: main)")
     parser.add_argument("--catalog", type=pathlib.Path, help="offline mode: local catalog.json to merge into")
     parser.add_argument("--run-id", default=os.environ.get("GITHUB_RUN_ID", "local"), help="run id for the branch name")
+    parser.add_argument(
+        "--method",
+        choices=("pr", "push"),
+        default="pr",
+        help=(
+            "how to publish: 'push' commits catalog.json and pushes it straight to the "
+            "target branch over SSH (deploy key, ruleset bypass actor); 'pr' opens and "
+            "auto-merges a catalog/* pull request (default, needs pull-requests: write)"
+        ),
+    )
+    parser.add_argument(
+        "--remote-url",
+        default=os.environ.get("CATALOG_PUSH_URL"),
+        help="git remote used by --method push (default: git@github.com:<repo>.git, or CATALOG_PUSH_URL)",
+    )
+    parser.add_argument(
+        "--attempts",
+        type=int,
+        default=3,
+        help="how often --method push retries on a lost race against the target branch (default: 3)",
+    )
     parser.add_argument("--dry-run", action="store_true", help="merge and print only; never write")
     parser.add_argument("--print", dest="print_document", action="store_true", help="print the merged document")
     return parser
@@ -354,6 +498,24 @@ def main(argv: list[str] | None = None) -> int:
         if not args.repo:
             print("error: --repo is required unless --catalog is given", file=sys.stderr)
             return 1
+
+        if args.method == "push" and not args.dry_run:
+            # The git path is self-contained: it merges against the branch it
+            # just cloned, so the contents API is only needed for reporting.
+            message, push_changes = publish_via_git_push(
+                args.repo,
+                args.branch,
+                entry,
+                remote_url=args.remote_url,
+                attempts=args.attempts,
+            )
+            if message is None:
+                # Another run already wrote the same values; not an error.
+                _report(slug, version, False, [], False, target=f"{args.repo}@{args.branch}")
+                return 0
+            _report(slug, version, True, push_changes, False, target=f"{args.repo}@{args.branch}")
+            print(f"catalog.json updated on {args.branch} by direct push ({message})")
+            return 0
 
         current, blob_sha, _ = fetch_catalog(args.repo, args.branch)
         merged, changed = merge_entry(current, entry)

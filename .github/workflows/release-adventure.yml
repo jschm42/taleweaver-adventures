@@ -22,19 +22,32 @@ name: Release Adventure
 #   uploaded, deleted, committed or merged - so this is safe to point at an
 #   already published tag.
 #
-# Why the catalog is synced through a pull request
-# ------------------------------------------------
+# How the catalog is synced (deploy key, no pull request)
+# ------------------------------------------------------
 # `catalog.json` is what clients verify downloads against, so it must carry the
 # sha256/size of the asset as published - not of a legacy build.  The workflow
 # therefore writes the verified values back after the upload.
 #
-# `main` is protected by the "TaleWeaver-Adventures Ruleset", which requires a
-# pull request for every change.  A direct `git push`/contents-API write with the
-# workflow token would be rejected, and bypassing the ruleset for the bot is the
-# wrong trade.  `scripts/sync_catalog.py` therefore opens a one-commit PR from a
-# short-lived `catalog/*` branch and merges it (0 approvals required, so this is
-# fully automatic but still auditable).  If the merge is blocked, the job fails
-# loudly instead of leaving the catalog silently stale.
+# `main` is protected by the "TaleWeaver-Adventures Ruleset" (rules: deletion,
+# non_fast_forward, pull_request, copilot_code_review).  Its `pull_request` rule
+# has `require_extra_approval_for_unattributed_changes: true`, so a PR opened by
+# `GITHUB_TOKEN` - an unattributed, bot-authored change - needs a *human*
+# approval before it can merge.  An auto-merged catalog PR therefore cannot work
+# with this ruleset and only `pull-requests: write` (`sync_catalog.py --method
+# pr`) would not fix it; it would need the ruleset to be weakened.
+#
+# The ruleset's `bypass_actors` already lists `DeployKey` with
+# `bypass_mode: always`.  So the catalog write is a plain `git push` to `main`
+# over SSH, authenticated by a write-enabled deploy key
+# (`secrets.CATALOG_DEPLOY_KEY`): the deploy key bypasses every rule of that
+# ruleset, the ruleset itself stays exactly as it is, and no third permission
+# (`pull-requests: write`, Actions bypass, admin token) is needed.
+#
+# The push is still a normal fast-forward commit on top of `main`, authored by
+# `taleweaver-catalog-sync`, so the change is auditable in `git log` like any
+# other.  Setup for the key is described in README -> "Catalog sync".  If the
+# key is missing or the push is rejected, the job fails loudly instead of
+# leaving the catalog silently stale.
 
 on:
   push:
@@ -56,15 +69,17 @@ on:
         default: false
         type: boolean
 
-# Only the scopes needed: releases + assets (contents) and the catalog PR.
+# Only the scope needed: releases + assets (contents).  The catalog write does not
+# go through this token - it is an SSH push with the catalog deploy key - so
+# `pull-requests: write` is not required (and would not help: see the ruleset
+# note at the top).
 permissions:
   contents: write
-  pull-requests: write
 
 # One release at a time, repo-wide.  A per-ref group would let two tag pushes run
-# in parallel and race each other on the catalog branch/PR, so the lock is
-# intentionally global.  Never cancel a release midway: a half-uploaded release
-# is worse than a queue.
+# in parallel and race each other on `catalog.json`, so the lock is intentionally
+# global.  Never cancel a release midway: a half-uploaded release is worse than a
+# queue.
 concurrency:
   group: release-adventure
   cancel-in-progress: false
@@ -535,7 +550,7 @@ jobs:
                 echo "- upload no cover (adventure has none)"
               fi
               echo "- delete stale cover assets: ${STALE_COVERS:-none}"
-              echo "- merge the verified values into \`catalog.json\` on the default branch via an auto-merged PR"
+              echo "- push the verified values into \`catalog.json\` on the default branch, authenticated by the catalog deploy key (ruleset bypass actor)"
             } >> "${GITHUB_STEP_SUMMARY}"
           fi
 
@@ -626,12 +641,16 @@ jobs:
 
       # Last step on purpose: the catalog must describe the asset that is already
       # published, so it runs only after a successful upload.
-      - name: Sync catalog.json with the published asset
+      #
+      # Variante C: push `catalog.json` straight to `main` with a write-enabled
+      # deploy key, which the ruleset lists as a bypass actor (`always`).  No
+      # `pull-requests: write`, no auto-merge, no ruleset change.
+      - name: Sync catalog.json with the published asset (deploy-key push)
         if: steps.meta.outputs.dry_run != 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SLUG: ${{ steps.meta.outputs.slug }}
           VERSION_BARE: ${{ steps.meta.outputs.version_bare }}
+          CATALOG_DEPLOY_KEY: ${{ secrets.CATALOG_DEPLOY_KEY }}
         run: |
           set -euo pipefail
 
@@ -640,15 +659,46 @@ jobs:
             exit 0
           fi
 
+          if [[ -z "${CATALOG_DEPLOY_KEY:-}" ]]; then
+            echo "::error::secret CATALOG_DEPLOY_KEY is empty - catalog.json cannot be pushed."
+            echo "::error::Add a write-enabled deploy key to ${GITHUB_REPOSITORY} and store the private half as the repository secret CATALOG_DEPLOY_KEY (README -> Catalog sync)."
+            exit 1
+          fi
+
+          # Key material lives in a private throwaway directory: never in the
+          # workspace, never in an artifact, gone when the step ends.
+          ssh_dir="$(mktemp -d)"
+          chmod 700 "${ssh_dir}"
+          trap 'rm -rf -- "${ssh_dir}"' EXIT
+
+          printf '%s\n' "${CATALOG_DEPLOY_KEY}" > "${ssh_dir}/catalog_deploy_key"
+          chmod 600 "${ssh_dir}/catalog_deploy_key"
+
+          # GitHub's published SSH host keys (https://api.github.com/meta -> ssh_keys),
+          # pinned instead of trusting `ssh-keyscan`: a proxy on the runner's egress could
+          # otherwise hand us its own key and collect the deploy key.
+          #   SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU  (ed25519)
+          #   SHA256:p2QAMXNIC1TJYWeIOttrVc98/R1BUFWu3/LiyKgUfQM  (ecdsa-sha2-nistp256)
+          #   SHA256:uNiVztksCsDhcc0u9e8BujQXVUpKZIDTMczCvj3tD2s  (rsa)
+          cat > "${ssh_dir}/known_hosts" <<'KNOWN_HOSTS'
+          github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
+          github.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEmKSENjQEezOmxkZMy7opKgwFB9nkt5YRrYMjNuG5N87uRgg6CLrbo5wAdT/y6v0mKV0U2w0WZ2YB/++Tpockg=
+          github.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+VTTvDP6mHBL9j1aNUkY4Ue1gvwnGLVlOhGeYrnZaMgRK6+PKCUXaDbC7qtbW8gIkhL7aGCsOr/C56SJMy/BCZfxd1nWzAOxSDPgVsmerOBYfNqltV9/hWCqBywINIR+5dIg6JTJ72pcEpEjcYgXkE2YEFXV1JHnsKgbLWNlhScqb2UmyRkQyytRLtL+38TGxkxCflmO+5Z8CSSNY7GidjMIZ7Q4zMjA2n1nGrlTDkzwDCsw+wqFPGQA179cnfGWOWRVruj16z6XyvxvjJwbz0wQZ75XK5tKSb7FNyeIEs4TT4jk+S4dhPeAUC5y+bDYirYgM4GC7uEnztnZyaVWQ7B381AK4Qdrwt51ZqExKbQpTUNn+EjqoTwvqNj4kqx5QUCI0ThS/YkOxJCXmPUWZbhjpCg56i+2aB6CmK2JGhn57K5mj0MNdBXA4/WnwH6XoPWJzK5Nyu2zB3nAZp+S5hpQs+p1vN1/wsjk=
+          KNOWN_HOSTS
+          chmod 600 "${ssh_dir}/known_hosts"
+
+          export GIT_SSH_COMMAND="ssh -i ${ssh_dir}/catalog_deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=${ssh_dir}/known_hosts -o BatchMode=yes"
+          export GIT_TERMINAL_PROMPT=0
+
           status=0
           python3 scripts/sync_catalog.py \
             --repo "${GITHUB_REPOSITORY}" \
             --branch main \
             --slug "${SLUG}" \
             --entry dist/catalog-entry.json \
-            --run-id "${GITHUB_RUN_ID}" || status=$?
+            --method push || status=$?
 
           if [[ "${status}" -ne 0 ]]; then
-            echo "::error::release assets for ${SLUG} ${VERSION_BARE} are published, but catalog.json was not updated - clients verifying against catalog.json will see a sha256 mismatch. See the log above for the catalog PR."
+            echo "::error::release assets for ${SLUG} ${VERSION_BARE} are published, but catalog.json was not updated - clients verifying against catalog.json will see a sha256 mismatch. See the log above for the push failure."
             exit "${status}"
           fi
