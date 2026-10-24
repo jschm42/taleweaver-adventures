@@ -72,6 +72,27 @@ def check_one(slug: str, meta: dict, axis_of: dict[str, str], warnings: set[str]
             f"{slug}: content warnings outside the vocabulary: {', '.join(unknown_warnings)}"
         )
 
+    # Cover: existence, not shape. Every sidecar names its file with a hash suffix
+    # (<slug>-argon-<rand>_cover_<hash8>.jpg), so a pattern check flags all ten correct
+    # names. What an orphan actually is: a cover_asset that no longer resolves.
+    cover_asset = meta.get("cover_asset")
+    if not cover_asset:
+        problems.append(f"{slug}: cover_asset is empty")
+    else:
+        if (REPO_ROOT / slug / cover_asset).is_file():
+            pass
+        else:
+            problems.append(f"{slug}: cover_asset {cover_asset} does not exist in the tree")
+    if not meta.get("cover_aspect"):
+        problems.append(f"{slug}: cover_aspect is empty - the client frames the cover blind")
+
+    if require_copy:
+        if not (meta.get("tags") or []):
+            problems.append(f"{slug}: tags is empty")
+        if "content_warnings" not in meta:
+            problems.append(f"{slug}: content_warnings is missing (an empty list is fine, "
+                            f"a missing field is not an answer)")
+
     manifest = REPO_ROOT / slug / "adventure.adv"
     if manifest.exists():
         declared = json.loads(manifest.read_text(encoding="utf-8"))["adventure"].get("origin_id")
