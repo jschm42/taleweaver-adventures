@@ -217,6 +217,5 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Packaged adventure bundles are build artifacts (see scripts/pack_adventure.py).
-# They are published as GitHub release assets, never committed.
+# Adventures are stored unpacked (scripts/add_adventure.py); bundles are never committed.
 *.adz

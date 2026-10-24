@@ -1,8 +1,12 @@
 # Normalise line endings for text files (adventure blueprints, docs, JSON).
 * text=auto
 
-# Adventure bundles are binary ZIP containers built by scripts/pack_adventure.py.
-# They are release artifacts, not source: never diff, merge or eol-convert them.
+# Always LF, also on Windows checkouts: library.json records the byte size of each
+# adventure as the app downloads it from GitHub, and that must not depend on the OS.
+*.adv text eol=lf
+*.json text eol=lf
+
+# Adventure bundles are binary ZIP containers; never diff, merge or eol-convert them.
 *.adz binary -diff -merge
 
 # Scene/portrait artwork is binary; keep git out of it.
