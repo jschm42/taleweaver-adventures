@@ -1,0 +1,382 @@
+name: Release Adventure
+
+# Builds a `.adz` adventure bundle from its source directory and publishes it as
+# a release asset.
+#
+#   tag push:  adv/<slug>/<version>   e.g. adv/crashed-on-proxima-9/v3.0.0
+#   manual:    workflow_dispatch with `slug` + `version` inputs
+#
+# `<version>` is `v?MAJOR.MINOR.PATCH`; the slug is everything between `adv/`
+# and the last `/`. Source of truth for the bundle is `<slug>/` at the repo
+# root (`adventure.adv` + `assets/`), built with `scripts/pack_adventure.py`.
+# The packer is byte-reproducible, so this workflow builds every bundle twice
+# and refuses to publish if the two digests differ.
+
+on:
+  push:
+    tags:
+      - 'adv/**'
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: 'Adventure slug == source directory name at the repo root'
+        required: true
+        type: string
+      version:
+        description: 'Version to release, e.g. v3.0.0 or 3.0.0'
+        required: true
+        type: string
+
+# Only the token/scope needed to create releases and upload assets.
+permissions:
+  contents: write
+
+# Never cancel a release midway: a half-uploaded release is worse than a queue.
+concurrency:
+  group: release-adventure-${{ github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  release:
+    name: Build and publish .adz
+    runs-on: ubuntu-24.04
+    # Packing is seconds of work; anything approaching this bound is wedged.
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out the tagged commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Show toolchain
+        run: |
+          set -euo pipefail
+          echo "runner : $(uname -srm)"
+          echo "python3: $(python3 --version 2>&1)"
+          echo "gh     : $(gh --version | sed -n '1p')"
+          echo "sha256 : $(sha256sum --version | sed -n '1p')"
+
+      - name: Resolve release metadata
+        id: meta
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          INPUT_SLUG: ${{ inputs.slug }}
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+
+          slug_re='^[a-z0-9]+(-[a-z0-9]+)*$'
+          version_re='^v?[0-9]+\.[0-9]+\.[0-9]+$'
+
+          if [[ "${EVENT_NAME}" == "workflow_dispatch" ]]; then
+            slug="${INPUT_SLUG}"
+            version="${INPUT_VERSION}"
+            tag="adv/${slug}/${version}"
+          else
+            tag="${REF_NAME}"
+            if [[ "${tag}" != adv/*/* ]]; then
+              echo "::error::tag '${tag}' does not match the required scheme adv/<slug>/<version>"
+              exit 1
+            fi
+            # slug = everything between 'adv/' and the last '/'
+            rest="${tag#adv/}"
+            slug="${rest%/*}"
+            version="${tag##*/}"
+            if [[ "${slug}" == */* ]]; then
+              echo "::error::tag '${tag}' has extra path segments; expected exactly adv/<slug>/<version>"
+              exit 1
+            fi
+          fi
+
+          if [[ ! "${slug}" =~ ${slug_re} ]]; then
+            echo "::error::invalid slug '${slug}' (expected lowercase kebab-case, e.g. crashed-on-proxima-9)"
+            exit 1
+          fi
+          if [[ ! "${version}" =~ ${version_re} ]]; then
+            echo "::error::invalid version '${version}' (expected v?MAJOR.MINOR.PATCH, e.g. v3.0.0 or 3.0.0)"
+            exit 1
+          fi
+
+          # `v3.0.0` and `3.0.0` are the same release; the file name never carries
+          # the leading `v` (matches every release published so far), the tag and
+          # the release title keep the version exactly as it was given.
+          version_bare="${version#v}"
+          asset="${slug}-${version_bare}.adz"
+
+          {
+            echo "slug=${slug}"
+            echo "version=${version}"
+            echo "version_bare=${version_bare}"
+            echo "tag=${tag}"
+            echo "asset=${asset}"
+          } >> "${GITHUB_OUTPUT}"
+
+          echo "tag=${tag}"
+          echo "slug=${slug}"
+          echo "version=${version} (asset name uses ${version_bare})"
+          echo "asset=${asset}"
+
+      - name: Validate adventure source
+        env:
+          SLUG: ${{ steps.meta.outputs.slug }}
+          TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          set -euo pipefail
+
+          if [[ ! -f scripts/pack_adventure.py ]]; then
+            echo "::error::scripts/pack_adventure.py is missing on this commit - cannot pack '${SLUG}'"
+            exit 1
+          fi
+          if [[ ! -f "${SLUG}/adventure.adv" ]]; then
+            echo "::error::missing ${SLUG}/adventure.adv - no source directory for slug '${SLUG}'"
+            exit 1
+          fi
+
+          echo "source directory '${SLUG}':"
+          find "${SLUG}" -type f | sort | sed -n '1,50p'
+          echo "files: $(find "${SLUG}" -type f | wc -l), blueprint: $(wc -c < "${SLUG}/adventure.adv") bytes"
+
+      - name: Build bundle twice and compare digests
+        id: build
+        env:
+          SLUG: ${{ steps.meta.outputs.slug }}
+          ASSET: ${{ steps.meta.outputs.asset }}
+        run: |
+          set -euo pipefail
+
+          rm -rf dist dist-verify
+          mkdir -p dist dist-verify
+
+          python3 scripts/pack_adventure.py pack "${SLUG}" -o "dist/${ASSET}"
+          python3 scripts/pack_adventure.py pack "${SLUG}" -o "dist-verify/${ASSET}"
+
+          first="$(sha256sum "dist/${ASSET}" | cut -d' ' -f1)"
+          second="$(sha256sum "dist-verify/${ASSET}" | cut -d' ' -f1)"
+          rm -rf dist-verify
+
+          if [[ "${first}" != "${second}" ]]; then
+            echo "::error::non-deterministic build: first=${first} second=${second}"
+            exit 1
+          fi
+
+          size="$(wc -c < "dist/${ASSET}")"
+          echo "reproducibility ok: two independent builds share sha256 ${first}"
+          {
+            echo "sha256=${first}"
+            echo "size=${size}"
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Collect optional cover image
+        env:
+          SLUG: ${{ steps.meta.outputs.slug }}
+        run: |
+          set -euo pipefail
+
+          for candidate in \
+            "${SLUG}/cover.png" \
+            "${SLUG}/assets/cover.png" \
+            "${SLUG}/cover.jpg" \
+            "${SLUG}/assets/cover.jpg"
+          do
+            if [[ -f "${candidate}" ]]; then
+              cp "${candidate}" "dist/$(basename "${candidate}")"
+              echo "::notice::using cover image from ${candidate}"
+              exit 0
+            fi
+          done
+          echo "no cover image found in ${SLUG}/ - no cover asset will be published"
+
+      - name: Generate release notes
+        env:
+          SLUG: ${{ steps.meta.outputs.slug }}
+          VERSION: ${{ steps.meta.outputs.version }}
+          VERSION_BARE: ${{ steps.meta.outputs.version_bare }}
+          TAG: ${{ steps.meta.outputs.tag }}
+          ASSET: ${{ steps.meta.outputs.asset }}
+          SHA256: ${{ steps.build.outputs.sha256 }}
+          SIZE: ${{ steps.build.outputs.size }}
+        run: |
+          set -euo pipefail
+
+          cover="no"
+          for candidate in dist/cover.png dist/cover.jpg; do
+            if [[ -f "${candidate}" ]]; then
+              cover="yes ($(basename "${candidate}"))"
+              break
+            fi
+          done
+
+          {
+            echo "Adventure **${SLUG}** ${VERSION}"
+            echo ""
+            echo "- tag: \`${TAG}\`"
+            echo "- version: \`${VERSION_BARE}\`"
+            echo "- asset: \`${ASSET}\`"
+            echo "- sha256: \`${SHA256}\`"
+            echo "- size: ${SIZE} bytes"
+            echo "- cover: ${cover}"
+            echo "- built by: GitHub Actions run ${GITHUB_RUN_ID} on commit ${GITHUB_SHA:0:8} with $(python3 --version 2>&1)"
+            echo ""
+            echo "The bundle is byte-reproducible. Rebuild and verify it with:"
+            echo ""
+            echo '```'
+            echo "python3 scripts/pack_adventure.py pack ${SLUG} -o ${ASSET}"
+            echo "sha256sum ${ASSET}   # must print ${SHA256}"
+            echo '```'
+          } > dist/release-notes.md
+
+          cat dist/release-notes.md
+
+      - name: Prepare catalog entry asset
+        env:
+          SLUG: ${{ steps.meta.outputs.slug }}
+          VERSION_BARE: ${{ steps.meta.outputs.version_bare }}
+          TAG: ${{ steps.meta.outputs.tag }}
+          ASSET: ${{ steps.meta.outputs.asset }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import datetime
+          import hashlib
+          import json
+          import os
+          import pathlib
+          import sys
+
+          slug = os.environ["SLUG"]
+          version = os.environ["VERSION_BARE"]
+          tag = os.environ["TAG"]
+          asset_name = os.environ["ASSET"]
+          repo = os.environ.get("GITHUB_REPOSITORY", "")
+
+          dist = pathlib.Path("dist")
+          asset_path = dist / asset_name
+          catalog_path = pathlib.Path("catalog.json")
+
+          entry = None
+          if catalog_path.is_file():
+              data = json.loads(catalog_path.read_text(encoding="utf-8"))
+              for item in data.get("adventures", []):
+                  if item.get("slug") == slug:
+                      entry = dict(item)
+                      break
+
+          if entry is None:
+              print(f"::notice::no catalog.json entry for slug '{slug}' - publishing without catalog-entry.json")
+              sys.exit(0)
+
+          base_url = f"https://github.com/{repo}/releases/download/{tag}"
+          entry["version"] = version
+          entry["sha256"] = hashlib.sha256(asset_path.read_bytes()).hexdigest()
+          entry["size_bytes"] = asset_path.stat().st_size
+          entry["download_url"] = f"{base_url}/{asset_name}"
+          entry["released_at"] = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+          cover = None
+          for name in ("cover.png", "cover.jpg"):
+              candidate = dist / name
+              if candidate.is_file():
+                  cover = candidate
+                  break
+
+          if cover is not None:
+              entry["cover_url"] = f"{base_url}/{cover.name}"
+              entry["cover_sha256"] = hashlib.sha256(cover.read_bytes()).hexdigest()
+          else:
+              entry.pop("cover_url", None)
+              entry.pop("cover_sha256", None)
+
+          out = dist / "catalog-entry.json"
+          out.write_text(json.dumps(entry, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+          print(f"wrote {out}: version={version} sha256={entry['sha256']} cover={'yes' if cover else 'no'}")
+          PY
+
+      - name: Write job summary
+        env:
+          SLUG: ${{ steps.meta.outputs.slug }}
+          VERSION: ${{ steps.meta.outputs.version }}
+          TAG: ${{ steps.meta.outputs.tag }}
+          ASSET: ${{ steps.meta.outputs.asset }}
+          SHA256: ${{ steps.build.outputs.sha256 }}
+          SIZE: ${{ steps.build.outputs.size }}
+        run: |
+          set -euo pipefail
+
+          {
+            echo "## Release \`${TAG}\`"
+            echo ""
+            echo "| field | value |"
+            echo "| --- | --- |"
+            echo "| adventure | \`${SLUG}\` |"
+            echo "| version | \`${VERSION}\` |"
+            echo "| bundle | \`${ASSET}\` |"
+            echo "| size | ${SIZE} bytes |"
+            echo "| sha256 | \`${SHA256}\` |"
+            echo "| reproducible | yes (two independent builds, identical digest) |"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+          # Bare file name + fenced block: copy/paste straight into a verification run.
+          digest_line="$(sha256sum "dist/${ASSET}" | cut -d' ' -f1)  ${ASSET}"
+          echo "bundle digest: ${digest_line}"
+          {
+            echo ""
+            echo '```'
+            echo "${digest_line}"
+            echo '```'
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Ensure GitHub release exists
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+          SLUG: ${{ steps.meta.outputs.slug }}
+          VERSION: ${{ steps.meta.outputs.version }}
+          TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          set -euo pipefail
+
+          if gh release view "${TAG}" >/dev/null 2>&1; then
+            echo "release ${TAG} already exists - assets will be replaced with --clobber"
+            exit 0
+          fi
+
+          # A manual run may target a version whose tag does not exist yet; anchor
+          # it to the commit this run was started from instead of the default branch.
+          target_args=()
+          if [[ "${EVENT_NAME}" == "workflow_dispatch" ]]; then
+            target_args=(--target "${GITHUB_SHA}")
+          fi
+
+          gh release create "${TAG}" \
+            --title "${SLUG} ${VERSION}" \
+            --notes-file dist/release-notes.md \
+            ${target_args[@]+"${target_args[@]}"}
+
+          echo "created release ${TAG}"
+
+      - name: Upload release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.meta.outputs.tag }}
+          ASSET: ${{ steps.meta.outputs.asset }}
+        run: |
+          set -euo pipefail
+
+          assets=("dist/${ASSET}")
+          for extra in dist/catalog-entry.json dist/cover.png dist/cover.jpg; do
+            if [[ -f "${extra}" ]]; then
+              assets+=("${extra}")
+            fi
+          done
+
+          printf 'uploading: %s\n' "${assets[@]}"
+          gh release upload "${TAG}" "${assets[@]}" --clobber
+
+          echo "assets now on release ${TAG}:"
+          gh release view "${TAG}" --json assets --jq '.assets[] | "\(.name)\t\(.size) bytes"'
