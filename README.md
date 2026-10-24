@@ -27,6 +27,53 @@ The adventures in this repository come in two primary formats:
 *   **`.adv` (JSON):** The core blueprint of an adventure. It contains the world manifesto, scene definitions, NPC data, and RPG mechanics.
 *   **`.adz` (ZIP):** An "Adventure Zip" package. This contains the same `.adv` blueprint but also bundles high-quality assets like scene images and character portraits.
 
+## 📦 Packing an Adventure (`.adz`)
+
+`.adz` bundles are **built, not committed**. `scripts/pack_adventure.py` packs a source
+directory into a byte-reproducible ZIP archive, so the same sources always yield the same
+SHA-256 — across machines, working directories and fresh clones.
+
+A source directory contains the blueprint at its root plus an optional `assets/` tree:
+
+```
+my-adventure/
+  adventure.adv          # required
+  assets/                # optional: scene images, portraits, ...
+    cover.png
+```
+
+Build and inspect a bundle (Python 3.10+, standard library only — no system `zip` needed):
+
+```bash
+# pack: source directory -> archive
+python3 scripts/pack_adventure.py pack my-adventure -o dist/my-adventure-3.0.0.adz
+
+# unpack: archive -> source directory (useful to bootstrap sources from an existing bundle)
+python3 scripts/pack_adventure.py unpack dist/my-adventure-3.0.0.adz -o my-adventure
+
+# reproducibility check: build twice and compare
+python3 scripts/pack_adventure.py pack my-adventure -o /tmp/a.adz
+python3 scripts/pack_adventure.py pack my-adventure -o /tmp/b.adz
+sha256sum /tmp/a.adz /tmp/b.adz   # both lines must match
+```
+
+Guarantees of the packer, which is what makes the digest stable:
+
+* entries are sorted lexicographically, `adventure.adv` always first;
+* a fixed DOS timestamp `1980-01-01 00:00:00` for every entry — file mtimes and git
+  metadata never leak into the archive;
+* fixed `external_attr` (`0o644`) and `create_system = 0` for every entry, so the
+  permissions of the source tree do not matter;
+* `ZIP_DEFLATED` with a fixed compression level, no directory entries, no comments and
+  no extra fields.
+
+`pack` exits with code `1` and a clear message if `adventure.adv` is missing; `unpack`
+refuses archives whose paths would escape the target directory.
+
+> Note: the compressed bytes depend on the zlib implementation linked into your CPython
+> build. Reproducibility holds for a pinned interpreter (e.g. CI); switching the zlib
+> build is a deliberate version bump, not a bug.
+
 ## 🚀 How to Use
 
 You can import any adventure from this repository into your local TaleWeaver instance:
