@@ -27,14 +27,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Published releases still match the catalogue
+      # Comparison 1: the file the client downloads, against the release metadata.
+      # This one must be green today and has no baseline - it is the only automated
+      # statement of "the download works", and it starts failing the moment a release
+      # is replaced without the catalogue following.
+      - name: Committed catalog.json matches the published releases
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          # --check is deliberately NOT run here. While the published assets predate the
-          # deterministic packer, the committed catalogue describes them, not this tree,
-          # so --check is red by design until the re-cut. A check that cannot be green is
-          # a check nobody reads.
+          python3 scripts/build_catalog.py --committed-check
+
+      # Comparison 2: what this tree would publish, against the releases. Red by design
+      # until the re-cut - hence the baseline, which knows exactly which findings are
+      # expected and turns red on any new *or* vanished one.
+      - name: Source tree vs releases (known drift only)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
           python3 scripts/build_catalog.py --release-check \
             --baseline catalog-drift-baseline.json
+
+      # Comparison 3 (--check) is deliberately absent: while the published assets
+      # predate the deterministic packer it is red for a reason nobody can fix today.
+      # It becomes free the day comparison 1 and 2 agree again.

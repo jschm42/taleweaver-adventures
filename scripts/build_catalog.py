@@ -155,6 +155,21 @@ def compare_baseline(baseline, released, problems):
     return notes
 
 
+def check_committed_catalogue() -> list[str]:
+    """Compare the catalogue the client downloads against the published releases.
+
+    This is the only check that measures the file the app actually reads. The generated
+    catalogue is what the tree *would* publish; the committed one is what it *does* point
+    at, and after a re-cut the two can part ways silently - no baseline finding would
+    ever mention it, because the baseline describes generated-vs-releases.
+    """
+    document = _load_json(CATALOG_PATH, "catalogue")
+    problems = []
+    for entry in document.get("adventures", []):
+        problems.extend(check_release(entry))
+    return problems
+
+
 def dumps(document: dict) -> str:
     """The one serialisation of `catalog.json`, so `--check` can compare bytes.
 
@@ -686,6 +701,12 @@ def main(argv: list[str] | None = None) -> int:
         help="also fail when curated copy is missing (description length, tags)",
     )
     parser.add_argument(
+        "--committed-check",
+        action="store_true",
+        help="compare the committed catalog.json with the published releases (read-only, "
+             "no baseline: this is the file the client downloads)",
+    )
+    parser.add_argument(
         "--baseline",
         metavar="PATH",
         help="fail only when the release findings differ from this baseline",
@@ -767,6 +788,23 @@ def main(argv: list[str] | None = None) -> int:
             file=sys.stderr,
         )
         return 2
+
+    if args.committed_check:
+        problems = check_committed_catalogue()
+        if problems:
+            print(
+                f"the committed {CATALOG_PATH.name} does not match the published releases "
+                f"({len(problems)} problem(s)) - this is the file the client reads:",
+                file=sys.stderr,
+            )
+            for problem in problems:
+                print(f"  {problem}", file=sys.stderr)
+            return 2
+        print(
+            f"committed {CATALOG_PATH.name} matches the published releases: every asset "
+            f"name, size, digest and cover URL resolves"
+        )
+        return 0
 
     if args.release_check:
         released = [a for a in generated["adventures"] if a["status"] == "released"]
