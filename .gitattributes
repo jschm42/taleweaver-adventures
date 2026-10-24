@@ -1,0 +1,12 @@
+# Normalise line endings for text files (adventure blueprints, docs, JSON).
+* text=auto
+
+# Adventure bundles are binary ZIP containers built by scripts/pack_adventure.py.
+# They are release artefacts, never source: no diff, no merge, no eol conversion.
+*.adz binary -diff -merge
+
+# Artwork is binary as well.
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.webp binary

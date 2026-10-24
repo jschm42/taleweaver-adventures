@@ -21,7 +21,8 @@
       "license": "CC BY-NC 4.0",
       "language": "English",
       "cover_url": "https://github.com/jschm42/taleweaver-adventures/releases/download/adv/crashed-on-proxima-9/v3.0.0/cover.png",
-      "cover_sha256": "dbe086702cb26705d9af1d1487623af689ad814515fd869fbf3f6debe6011fa3"
+      "cover_sha256": "dbe086702cb26705d9af1d1487623af689ad814515fd869fbf3f6debe6011fa3",
+      "source_dir": "crashed-on-proxima-9"
     },
     {
       "id": "d7832419-6916-4b75-84e0-7d941e6b2de9",
@@ -41,7 +42,8 @@
       "license": "CC BY-NC 4.0",
       "language": "English",
       "cover_url": "https://github.com/jschm42/taleweaver-adventures/releases/download/adv/crazy-job-interview/v3.0.0/cover.png",
-      "cover_sha256": "e1c4e4af1bc7091af8a6d201499a1964be556b0328542c945d4207e507ad4c06"
+      "cover_sha256": "e1c4e4af1bc7091af8a6d201499a1964be556b0328542c945d4207e507ad4c06",
+      "source_dir": "crazy-job-interview"
     },
     {
       "id": "3e08c00f-55f1-4d3e-880e-e4e3b5083ba9",
@@ -61,7 +63,8 @@
       "license": "CC BY-NC 4.0",
       "language": "English",
       "cover_url": "https://github.com/jschm42/taleweaver-adventures/releases/download/adv/el-profesor-s-purgatory/v3.0.0/cover.png",
-      "cover_sha256": "539fe6c66b3c71e2235849646ab1914502003a5b43f93e42dde5e8498feef3e1"
+      "cover_sha256": "539fe6c66b3c71e2235849646ab1914502003a5b43f93e42dde5e8498feef3e1",
+      "source_dir": "el-profesor-s-purgatory"
     },
     {
       "id": "0265025e-583b-410c-a962-20a9558cd795",
@@ -81,7 +84,8 @@
       "license": "CC BY-NC 4.0",
       "language": "English",
       "cover_url": "https://github.com/jschm42/taleweaver-adventures/releases/download/adv/kitchen-crisis/v3.0.0/cover.png",
-      "cover_sha256": "8ce95ae4a9a96cda56e55cc92edf1c8a2e89d192a9fe8456ff5acf87f2ab6f4e"
+      "cover_sha256": "8ce95ae4a9a96cda56e55cc92edf1c8a2e89d192a9fe8456ff5acf87f2ab6f4e",
+      "source_dir": "kitchen-crisis"
     },
     {
       "id": "9caf75b2-053d-4249-b353-577308cd3abd",
@@ -101,7 +105,8 @@
       "license": "CC BY-NC 4.0",
       "language": "English",
       "cover_url": "https://github.com/jschm42/taleweaver-adventures/releases/download/adv/professor-quark-s-quantum-quest/v3.0.0/cover.png",
-      "cover_sha256": "928cac382e4ceb0023780d838100fb5655049df5a98eeadc731b2c496802b952"
+      "cover_sha256": "928cac382e4ceb0023780d838100fb5655049df5a98eeadc731b2c496802b952",
+      "source_dir": "professor-quark-s-quantum-quest"
     },
     {
       "id": "5e2c880c-1d21-470a-8409-8cd19c423d3f",
@@ -121,7 +126,8 @@
       "license": "CC BY-NC 4.0",
       "language": "English",
       "cover_url": "https://github.com/jschm42/taleweaver-adventures/releases/download/adv/sledge-and-order/v3.0.1/cover.png",
-      "cover_sha256": "79facf57c30bb2f0ff6a6387647b7c5c68514014f0d42f620e296293f7207076"
+      "cover_sha256": "79facf57c30bb2f0ff6a6387647b7c5c68514014f0d42f620e296293f7207076",
+      "source_dir": "sledge-and-order"
     },
     {
       "id": "8441af35-e354-4920-a513-cbe914ea246d",
@@ -141,7 +147,8 @@
       "license": "CC BY-NC 4.0",
       "language": "English",
       "cover_url": "https://github.com/jschm42/taleweaver-adventures/releases/download/adv/the-alchemist-s-folly/v3.0.0/cover.png",
-      "cover_sha256": "2cf382156233ac9f864dda75fea12eb45ed67b1424f88543e6bb4db9e51022db"
+      "cover_sha256": "2cf382156233ac9f864dda75fea12eb45ed67b1424f88543e6bb4db9e51022db",
+      "source_dir": "the-alchemist-s-folly"
     },
     {
       "id": "fc0ec8b1-c29d-4e66-b480-988aeabf3fdd",
@@ -161,7 +168,8 @@
       "license": "CC BY-NC 4.0",
       "language": "English",
       "cover_url": "https://github.com/jschm42/taleweaver-adventures/releases/download/adv/the-echo-archive-riddle-test/v3.0.0/cover.png",
-      "cover_sha256": "583a3fff6461b6f2328f67fea322cbec5c8c0dd758a5ea17a0aa232afd5045d2"
+      "cover_sha256": "583a3fff6461b6f2328f67fea322cbec5c8c0dd758a5ea17a0aa232afd5045d2",
+      "source_dir": "the-echo-archive-riddle-test"
     },
     {
       "id": "e9ab3f9e-237d-4d25-9cf1-4644c9a044f2",
@@ -181,7 +189,8 @@
       "license": "CC BY-NC 4.0",
       "language": "English",
       "cover_url": "https://github.com/jschm42/taleweaver-adventures/releases/download/adv/the-master-s-workshop/v3.0.0/cover.png",
-      "cover_sha256": "dc0c12464df7f1bfe752b4ee8b7767260953d362deb069650d0361e49594efb6"
+      "cover_sha256": "dc0c12464df7f1bfe752b4ee8b7767260953d362deb069650d0361e49594efb6",
+      "source_dir": "the-master-s-workshop"
     },
     {
       "id": "49508727-de94-4619-9c47-bf7810211a19",
@@ -201,7 +210,9 @@
       "license": "CC BY-NC 4.0",
       "language": "English",
       "cover_url": "https://github.com/jschm42/taleweaver-adventures/releases/download/adv/the-observer-s-labyrinth/v3.0.0/cover.png",
-      "cover_sha256": "e2a213fa294165bfd6f18ff426ca5ae334c93256b0a3c6db271f92c7a8e5072c"
+      "cover_sha256": "e2a213fa294165bfd6f18ff426ca5ae334c93256b0a3c6db271f92c7a8e5072c",
+      "source_dir": "the-observer-s-labyrinth"
     }
-  ]
+  ],
+  "repo_layout": "one source directory per adventure at the repository root"
 }

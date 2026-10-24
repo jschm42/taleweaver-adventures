@@ -11,14 +11,28 @@ TaleWeaver is a generative AI roleplaying engine that uses Large Language Models
 
 ## 📂 Repository Structure
 
-This repository is organized as follows:
+*   **`<slug>/`**: One directory per adventure — the single source of truth.
+    ```text
+    kitchen-crisis/
+      adventure.adv     # required: the blueprint (JSON)
+      assets/           # optional: scene images, portraits, cover
+      README.md         # short summary of the adventure
+    ```
+    The directory name is the adventure's **slug** and must match its release tag
+    (`adv/<slug>/v<version>`). Slugs are immutable: player saves are keyed on them.
+*   **`Concepts/`**: Markdown notes and pre-blueprint world-building ideas.
+*   **`scripts/pack_adventure.py`**: The deterministic packer (see below).
+*   **`catalog.json`**: Machine-readable index of the published releases.
+*   **`MIGRATION.md`**: Audit trail of the move from committed `.adz` blobs to this layout.
 
-*   **`ADV/`**: Stores plain adventure blueprints in `.adv` (JSON) format.
-*   **`ADZ/`**: Stores packaged adventures in `.adz` (ZIP) format (including images and other assets).
-*   **`Concepts/`**: Stores markdown (`.md`) files containing high-level adventure ideas and world-building concepts that haven't been turned into full blueprints yet.
+`.adz` bundles are **not** committed any more. They are build artefacts and live as assets
+on the [releases page](https://github.com/jschm42/taleweaver-adventures/releases); `*.adz`
+is in `.gitignore`.
 
 ### 📝 Documentation Convention
-To make the library easy to browse, **every** file in the `ADV/` and `ADZ/` directories should have a matching `.md` file with the exact same name (e.g., `haunted_manor.adz` and `haunted_manor.md`). This markdown file should provide a short summary and description of the adventure.
+
+Every adventure directory carries a `README.md` describing the adventure. There is no
+longer a separate `ADZ/` folder duplicating the directory names.
 
 ## 🛠️ Adventure Formats
 
@@ -36,10 +50,11 @@ SHA-256 — across machines, working directories and fresh clones.
 A source directory contains the blueprint at its root plus an optional `assets/` tree:
 
 ```
-my-adventure/
+kitchen-crisis/
   adventure.adv          # required
   assets/                # optional: scene images, portraits, ...
-    cover.png
+    61762864-..._protagonist_ee1cbfe4.jpg
+  README.md              # never packed
 ```
 
 Build and inspect a bundle (Python 3.10+, standard library only — no system `zip` needed):
@@ -76,7 +91,23 @@ refuses archives whose paths would escape the target directory.
 
 ## 🚀 How to Use
 
-You can import any adventure from this repository into your local TaleWeaver instance:
+### Where do I get the `.adz` bundles?
+
+From the [releases page](https://github.com/jschm42/taleweaver-adventures/releases) — one
+release per adventure and version, tagged `adv/<slug>/v<version>`, with these assets:
+
+| asset | purpose |
+| --- | --- |
+| `<slug>-<version>.adz` | the playable bundle |
+| `catalog-entry.json` | catalogue metadata incl. `sha256` for verification |
+| `cover.png` | cover artwork |
+
+Releases are built by `.github/workflows/release-adventure.yml` on every
+`adv/<slug>/<version>` tag; the workflow packs twice and refuses to publish if the two
+digests differ. Every bundle can be rebuilt locally and compared against the release's
+`sha256` — see the release notes of any adventure for the exact command.
+
+You can import any adventure into your local TaleWeaver instance:
 
 ### Option 1: Manual Import (Drop-in)
 1.  Download the `.adv` or `.adz` file of your choice.

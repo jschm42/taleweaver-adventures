@@ -178,6 +178,9 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Packaged adventures store the cover inside assets/ under its asset id
+          # (`assets/<slug>-<voice>_cover_<hash>.jpg`). An explicit `cover.*` at the
+          # top level wins, then the first `*_cover_*` asset is published as cover.png.
           for candidate in \
             "${SLUG}/cover.png" \
             "${SLUG}/assets/cover.png" \
@@ -190,6 +193,20 @@ jobs:
               exit 0
             fi
           done
+
+          shopt -s nullglob
+          covers=("${SLUG}"/assets/*_cover_*.jpg "${SLUG}"/assets/*_cover_*.png)
+          shopt -u nullglob
+          if (( ${#covers[@]} > 0 )); then
+            if (( ${#covers[@]} > 1 )); then
+              echo "::warning::${#covers[@]} cover candidates in ${SLUG}/assets/ - using ${covers[0]}"
+            fi
+            name="$(basename "${covers[0]}")"
+            # Keep the real container format: never rename a JPEG to .png.
+            cp "${covers[0]}" "dist/cover.${name##*.}"
+            echo "::notice::using cover image from ${covers[0]} -> dist/cover.${name##*.}"
+            exit 0
+          fi
           echo "no cover image found in ${SLUG}/ - no cover asset will be published"
 
       - name: Generate release notes
