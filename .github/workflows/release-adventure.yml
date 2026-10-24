@@ -172,41 +172,101 @@ jobs:
             echo "size=${size}"
           } >> "${GITHUB_OUTPUT}"
 
-      - name: Collect optional cover image
+      - name: Resolve cover image
+        id: cover
         env:
           SLUG: ${{ steps.meta.outputs.slug }}
         run: |
-          set -euo pipefail
+          mkdir -p dist
 
-          for candidate in \
-            "${SLUG}/cover.png" \
-            "${SLUG}/assets/cover.png" \
-            "${SLUG}/cover.jpg" \
-            "${SLUG}/assets/cover.jpg"
-          do
-            if [[ -f "${candidate}" ]]; then
-              cp "${candidate}" "dist/$(basename "${candidate}")"
-              echo "::notice::using cover image from ${candidate}"
-              exit 0
+          cover=""
+
+          # 1. Authoritative source: the blueprint declares its own cover. `adventure.image_url`
+          #    points at the exact asset file inside assets/, so there is nothing to guess.
+          # Single line on purpose: continuation lines at column 0 would terminate the
+          # YAML block scalar. Invalid JSON is not fatal here - the packer rejects it later.
+          image_url="$(python3 -c 'import json,sys;d=json.load(open(sys.argv[1],encoding="utf-8"));print((d.get("adventure") or {}).get("image_url") or "")' "${SLUG}/adventure.adv" 2>/dev/null || true)"
+          if [[ -n "${image_url}" ]]; then
+            if [[ "${image_url}" == /* || "${image_url}" == *..* ]]; then
+              echo "::error::adventure.image_url must be a relative path inside ${SLUG}/ (got '${image_url}')"
+              exit 1
             fi
-          done
-          # Packaged adventures keep the cover inside assets/ under its asset id
-          # (`assets/<slug>-<voice>_cover_<hash>.jpg`). An explicit `cover.*` at the top
-          # level wins; otherwise the first `*_cover_*` asset is published as cover.jpg.
-          shopt -s nullglob
-          covers=("${SLUG}"/assets/*_cover_*.jpg "${SLUG}"/assets/*_cover_*.png)
-          shopt -u nullglob
-          if (( ${#covers[@]} > 0 )); then
-            if (( ${#covers[@]} > 1 )); then
-              echo "::warning::${#covers[@]} cover candidates in ${SLUG}/assets/ - using ${covers[0]}"
+            if [[ -f "${SLUG}/${image_url}" ]]; then
+              cover="${SLUG}/${image_url}"
+              echo "::notice::cover from adventure.image_url: ${cover}"
+            else
+              echo "::warning::adventure.image_url names '${image_url}', which is not present in ${SLUG}/ - falling back"
             fi
-            name="$(basename "${covers[0]}")"
-            # Keep the real container format: never rename a JPEG to .png.
-            cp "${covers[0]}" "dist/cover.${name##*.}"
-            echo "::notice::using cover image from ${covers[0]} -> dist/cover.${name##*.}"
+          fi
+
+          # 2. An explicit top-level cover file still wins over a stale image_url.
+          if [[ -z "${cover}" ]]; then
+            for candidate in \
+              "${SLUG}/cover.png" \
+              "${SLUG}/assets/cover.png" \
+              "${SLUG}/cover.jpg" \
+              "${SLUG}/assets/cover.jpg"
+            do
+              if [[ -f "${candidate}" ]]; then
+                cover="${candidate}"
+                echo "::notice::cover from explicit file: ${cover}"
+                break
+              fi
+            done
+          fi
+
+          # 3. Last resort: the glob, but only when it is unambiguous. Guessing between two
+          #    hash-named covers ships the wrong artwork silently, so that is a hard error.
+          if [[ -z "${cover}" ]]; then
+            shopt -s nullglob
+            covers=("${SLUG}"/assets/*_cover_*.jpg "${SLUG}"/assets/*_cover_*.png)
+            shopt -u nullglob
+            case "${#covers[@]}" in
+              0) echo "::notice::no cover image in ${SLUG}/ - no cover asset will be published" ;;
+              1) cover="${covers[0]}"; echo "::notice::cover from single glob match: ${cover}" ;;
+              *)
+                echo "::error::${#covers[@]} cover candidates in ${SLUG}/assets/ and adventure.image_url names none of them:"
+                printf '  %s\n' "${covers[@]}"
+                echo "::error::point adventure.image_url at the intended cover; refusing to guess"
+                exit 1
+                ;;
+            esac
+          fi
+
+          cover_name=""
+          if [[ -n "${cover}" ]]; then
+            # Keep the real container format: a JPEG is never renamed to .png.
+            ext="${cover##*.}"
+            ext="${ext,,}"
+            cover_name="cover.${ext}"
+            cp "${cover}" "dist/${cover_name}"
+            echo "::notice::publishing ${cover} as ${cover_name} ($(wc -c < "dist/${cover_name}") bytes)"
+          fi
+          echo "cover_name=${cover_name}" >> "$GITHUB_OUTPUT"
+
+      - name: Prune stale cover assets from an existing release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.meta.outputs.tag }}
+          COVER_NAME: ${{ steps.cover.outputs.cover_name }}
+        run: |
+          set -euo pipefail
+          # `gh release upload --clobber` only replaces assets with the *same* name. When the
+          # cover format changes (cover.png -> cover.jpg) the old file survives and the release
+          # ends up with two covers, one of which no longer matches catalog-entry.json.
+          if ! gh release view "${TAG}" >/dev/null 2>&1; then
+            echo "release ${TAG} does not exist yet - nothing to prune"
             exit 0
           fi
-          echo "no cover image found in ${SLUG}/ - no cover asset will be published"
+          stale="$(gh release view "${TAG}" --json assets --jq '.assets[].name' \
+            | grep -E '^cover\.(png|jpg|jpeg|webp)$' || true)"
+          for name in ${stale}; do
+            if [[ -n "${COVER_NAME}" && "${name}" == "${COVER_NAME}" ]]; then
+              continue
+            fi
+            echo "::notice::deleting stale release asset ${name} (${TAG})"
+            gh release delete-asset "${TAG}" "${name}" --yes
+          done
 
       - name: Generate release notes
         env:
@@ -221,7 +281,8 @@ jobs:
           set -euo pipefail
 
           cover="no"
-          for candidate in dist/cover.png dist/cover.jpg; do
+          shopt -s nullglob
+          for candidate in dist/cover.*; do
             if [[ -f "${candidate}" ]]; then
               cover="yes ($(basename "${candidate}"))"
               break
@@ -294,12 +355,12 @@ jobs:
           entry["download_url"] = f"{base_url}/{asset_name}"
           entry["released_at"] = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
-          cover = None
-          for name in ("cover.png", "cover.jpg"):
-              candidate = dist / name
-              if candidate.is_file():
-                  cover = candidate
-                  break
+          # Exactly one cover.* must exist (the resolve step guarantees it). Fail loudly
+          # instead of picking one: a wrong cover_url with a matching sha256 is invisible.
+          covers = sorted(dist.glob("cover.*"))
+          if len(covers) > 1:
+              raise SystemExit(f"ambiguous cover assets in dist/: {[c.name for c in covers]}")
+          cover = covers[0] if covers else None
 
           if cover is not None:
               entry["cover_url"] = f"{base_url}/{cover.name}"
@@ -385,7 +446,8 @@ jobs:
           set -euo pipefail
 
           assets=("dist/${ASSET}")
-          for extra in dist/catalog-entry.json dist/cover.png dist/cover.jpg; do
+          shopt -s nullglob
+          for extra in dist/catalog-entry.json dist/cover.*; do
             if [[ -f "${extra}" ]]; then
               assets+=("${extra}")
             fi
