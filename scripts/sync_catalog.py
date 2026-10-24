@@ -70,6 +70,14 @@ SYNCED_KEYS = (
     "cover_sha256",
 )
 
+#: Fields that only exist when the adventure actually ships cover artwork.
+#: The release job drops both of them for cover-less adventures, so the merge
+#: must accept an entry without them (and remove stale values from the catalog).
+OPTIONAL_SYNCED_KEYS = ("cover_url", "cover_sha256")
+
+#: Fields every catalog entry has to carry for a client to verify a download.
+REQUIRED_SYNCED_KEYS = tuple(key for key in SYNCED_KEYS if key not in OPTIONAL_SYNCED_KEYS)
+
 #: Entry-level fields that change on every run and must not count as a diff.
 VOLATILE_ENTRY_KEYS = ("released_at",)
 
@@ -126,7 +134,7 @@ def merge_entry(
     target = find_entry(merged, slug)
     assert target is not None  # guaranteed by the lookup above
 
-    missing = [key for key in SYNCED_KEYS if key not in entry and key != "cover_sha256"]
+    missing = [key for key in REQUIRED_SYNCED_KEYS if key not in entry]
     if missing:
         raise SyncError(f"catalog entry is missing required field(s): {', '.join(missing)}")
 

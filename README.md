@@ -90,6 +90,12 @@ change lands as a one-commit, auto-merged PR (`chore(catalog): <slug> <version>`
 than a direct push. If the merge is blocked, the job fails instead of leaving
 `catalog.json` silently stale — the release assets are already published at that point.
 
+The sync only *merges* the fields the release proves (`version`, `sha256`, `size_bytes`,
+`download_url`, `released_at`, `cover_url`, `cover_sha256`); editorial fields (`id`,
+`title`, `teaser`, `tags`, …) stay untouched. `cover_url`/`cover_sha256` are dropped when
+the adventure ships no cover artwork. A slug that has no editorial entry in `catalog.json`
+yet fails the catalog step on purpose: add the entry first, then release.
+
 ## 🛠️ Adventure Formats
 
 The adventures in this repository come in two primary formats:
