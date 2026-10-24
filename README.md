@@ -9,16 +9,63 @@ Welcome to the official repository for **TaleWeaver** adventures! This collectio
 
 TaleWeaver is a generative AI roleplaying engine that uses Large Language Models and cinematic Text-to-Speech to create immersive, dynamic narratives. This repository serves as a library for sharing and preserving these created worlds.
 
-## 📂 Repository Structure
+## 📂 Repository Layout
 
-This repository is organized as follows:
+This repository stores **sources, not binaries**. Every adventure lives in its own
+directory at the repository root, named after its canonical slug:
 
-*   **`ADV/`**: Stores plain adventure blueprints in `.adv` (JSON) format.
-*   **`ADZ/`**: Stores packaged adventures in `.adz` (ZIP) format (including images and other assets).
-*   **`Concepts/`**: Stores markdown (`.md`) files containing high-level adventure ideas and world-building concepts that haven't been turned into full blueprints yet.
+```
+<slug>/                     one directory per adventure
+  adventure.adv             blueprint (JSON) — required
+  assets/*.jpg              scene images, portraits, cover art
+  README.md                 short summary / teaser
+scripts/pack_adventure.py   deterministic packer + unpacker
+catalog.json                machine-readable index (download URLs point at release assets)
+Concepts/                   ideas and world-building notes that are not yet full blueprints
+```
+
+Example: `the-echo-archive-riddle-test/adventure.adv` plus its artwork in
+`the-echo-archive-riddle-test/assets/`.
+
+The directory name is the adventure's **slug**, which is also the release tag prefix
+(`adv/<slug>/v<version>`). Legacy asset filenames inside a source directory may differ
+from the slug — the authoritative identity is `adventure.origin_id` inside
+`adventure.adv`, mirrored as `id` in `catalog.json`.
+
+### 🚫 Why there are no `.adz` files in git
+
+`.adz` bundles are **build artifacts**, not sources. They are produced by
+`scripts/pack_adventure.py` and published as **GitHub release assets** only — they are
+never committed (see `.gitignore` / `.gitattributes`). This keeps the repository
+reviewable: a change to an adventure shows up as a readable diff in `adventure.adv`,
+not as an opaque binary blob.
 
 ### 📝 Documentation Convention
-To make the library easy to browse, **every** file in the `ADV/` and `ADZ/` directories should have a matching `.md` file with the exact same name (e.g., `haunted_manor.adz` and `haunted_manor.md`). This markdown file should provide a short summary and description of the adventure.
+Every adventure directory carries a `README.md` with a short summary and description of
+the adventure.
+
+## 📦 Where do I download the bundles?
+
+Ready-to-import `.adz` bundles — including all artwork — are attached to the
+[**Releases**](https://github.com/jschm42/taleweaver-adventures/releases) page. Each
+release is tagged `adv/<slug>/v<version>` and ships three assets:
+
+| Asset | Purpose |
+| --- | --- |
+| `<slug>-<version>.adz` | the full bundle, ready to import into TaleWeaver |
+| `catalog-entry.json` | the single catalog entry for that release |
+| `cover.png` | cover image |
+
+Direct download URL pattern:
+
+```
+https://github.com/jschm42/taleweaver-adventures/releases/download/adv/<slug>/v<version>/<slug>-<version>.adz
+```
+
+`catalog.json` in this repository already contains the resolved download URL and
+SHA-256 for every adventure, so tooling can fetch bundles straight from the index.
+
+Prefer building from source? See [Packing an Adventure](#-packing-an-adventure-adz) below.
 
 ## 🛠️ Adventure Formats
 
