@@ -127,7 +127,7 @@ def install(adventure: dict, files: dict[str, bytes], slug: str | None) -> Path:
     if readme.is_file():
         shutil.copyfile(_fs(readme), _fs(staging / "README.md"))
     else:
-        (staging / "README.md").write_text(_readme(adventure), encoding="utf-8")
+        (staging / "README.md").write_text(_readme(adventure), encoding="utf-8", newline="\n")
 
     shutil.rmtree(_fs(target), ignore_errors=True)
     os.replace(_fs(staging), _fs(target))
@@ -175,7 +175,8 @@ def build_index() -> dict:
 
 def write_index() -> int:
     index = build_index()
-    INDEX_PATH.write_text(json.dumps(index, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    text = json.dumps(index, indent=2, ensure_ascii=False) + "\n"
+    INDEX_PATH.write_text(text, encoding="utf-8", newline="\n")
     return len(index["adventures"])
 
 
