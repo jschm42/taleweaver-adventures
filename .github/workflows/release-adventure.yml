@@ -1,16 +1,40 @@
 name: Release Adventure
 
-# Builds a `.adz` adventure bundle from its source directory and publishes it as
-# a release asset.
+# Builds a `.adz` adventure bundle from its source directory, publishes it as a
+# release asset, and keeps `catalog.json` on the default branch in sync with the
+# asset that was actually published.
 #
 #   tag push:  adv/<slug>/<version>   e.g. adv/crashed-on-proxima-9/v3.0.0
-#   manual:    workflow_dispatch with `slug` + `version` inputs
+#   manual:    workflow_dispatch with `slug` + `version` (+ `dry_run`)
 #
 # `<version>` is `v?MAJOR.MINOR.PATCH`; the slug is everything between `adv/`
 # and the last `/`. Source of truth for the bundle is `<slug>/` at the repo
 # root (`adventure.adv` + `assets/`), built with `scripts/pack_adventure.py`.
 # The packer is byte-reproducible, so this workflow builds every bundle twice
 # and refuses to publish if the two digests differ.
+#
+# Modes
+# -----
+# * `dry_run: false` (default, and the only mode a tag push can run): publish.
+# * `dry_run: true` (workflow_dispatch only): build, verify, resolve the cover,
+#   generate `catalog-entry.json`, compare against the release as it exists right
+#   now, and print the full plan into the job summary.  Nothing is created,
+#   uploaded, deleted, committed or merged - so this is safe to point at an
+#   already published tag.
+#
+# Why the catalog is synced through a pull request
+# ------------------------------------------------
+# `catalog.json` is what clients verify downloads against, so it must carry the
+# sha256/size of the asset as published - not of a legacy build.  The workflow
+# therefore writes the verified values back after the upload.
+#
+# `main` is protected by the "TaleWeaver-Adventures Ruleset", which requires a
+# pull request for every change.  A direct `git push`/contents-API write with the
+# workflow token would be rejected, and bypassing the ruleset for the bot is the
+# wrong trade.  `scripts/sync_catalog.py` therefore opens a one-commit PR from a
+# short-lived `catalog/*` branch and merges it (0 approvals required, so this is
+# fully automatic but still auditable).  If the merge is blocked, the job fails
+# loudly instead of leaving the catalog silently stale.
 
 on:
   push:
@@ -26,14 +50,23 @@ on:
         description: 'Version to release, e.g. v3.0.0 or 3.0.0'
         required: true
         type: string
+      dry_run:
+        description: 'Build and report only - never create, upload, delete or commit'
+        required: false
+        default: false
+        type: boolean
 
-# Only the token/scope needed to create releases and upload assets.
+# Only the scopes needed: releases + assets (contents) and the catalog PR.
 permissions:
   contents: write
+  pull-requests: write
 
-# Never cancel a release midway: a half-uploaded release is worse than a queue.
+# One release at a time, repo-wide.  A per-ref group would let two tag pushes run
+# in parallel and race each other on the catalog branch/PR, so the lock is
+# intentionally global.  Never cancel a release midway: a half-uploaded release
+# is worse than a queue.
 concurrency:
-  group: release-adventure-${{ github.ref }}
+  group: release-adventure
   cancel-in-progress: false
 
 defaults:
@@ -68,11 +101,19 @@ jobs:
           REF_NAME: ${{ github.ref_name }}
           INPUT_SLUG: ${{ inputs.slug }}
           INPUT_VERSION: ${{ inputs.version }}
+          INPUT_DRY_RUN: ${{ inputs.dry_run }}
         run: |
           set -euo pipefail
 
           slug_re='^[a-z0-9]+(-[a-z0-9]+)*$'
           version_re='^v?[0-9]+\.[0-9]+\.[0-9]+$'
+
+          # A tag push can never be a dry run: `inputs.*` is empty outside
+          # workflow_dispatch, and the tag push exists precisely to publish.
+          dry_run=false
+          if [[ "${EVENT_NAME}" == "workflow_dispatch" && "${INPUT_DRY_RUN}" == "true" ]]; then
+            dry_run=true
+          fi
 
           if [[ "${EVENT_NAME}" == "workflow_dispatch" ]]; then
             slug="${INPUT_SLUG}"
@@ -115,17 +156,20 @@ jobs:
             echo "version_bare=${version_bare}"
             echo "tag=${tag}"
             echo "asset=${asset}"
+            echo "dry_run=${dry_run}"
           } >> "${GITHUB_OUTPUT}"
 
           echo "tag=${tag}"
           echo "slug=${slug}"
           echo "version=${version} (asset name uses ${version_bare})"
           echo "asset=${asset}"
+          if [[ "${dry_run}" == "true" ]]; then
+            echo "::notice::dry_run=true - no release, asset or catalog write will happen"
+          fi
 
       - name: Validate adventure source
         env:
           SLUG: ${{ steps.meta.outputs.slug }}
-          TAG: ${{ steps.meta.outputs.tag }}
         run: |
           set -euo pipefail
 
@@ -244,29 +288,57 @@ jobs:
           fi
           echo "cover_name=${cover_name}" >> "$GITHUB_OUTPUT"
 
-      - name: Prune stale cover assets from an existing release
+      # Read-only. Runs in both modes: a dry run exists precisely to show what the
+      # release would look like next to what is already published.
+      - name: Inspect the published release (read-only)
+        id: existing
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ steps.meta.outputs.tag }}
+          ASSET: ${{ steps.meta.outputs.asset }}
           COVER_NAME: ${{ steps.cover.outputs.cover_name }}
         run: |
           set -euo pipefail
-          # `gh release upload --clobber` only replaces assets with the *same* name. When the
-          # cover format changes (cover.png -> cover.jpg) the old file survives and the release
-          # ends up with two covers, one of which no longer matches catalog-entry.json.
-          if ! gh release view "${TAG}" >/dev/null 2>&1; then
-            echo "release ${TAG} does not exist yet - nothing to prune"
-            exit 0
-          fi
-          stale="$(gh release view "${TAG}" --json assets --jq '.assets[].name' \
-            | grep -E '^cover\.(png|jpg|jpeg|webp)$' || true)"
-          for name in ${stale}; do
-            if [[ -n "${COVER_NAME}" && "${name}" == "${COVER_NAME}" ]]; then
-              continue
+
+          exists=false
+          asset_sha256=""
+          asset_size=""
+          asset_names=""
+          stale_covers=""
+
+          if gh release view "${TAG}" >/dev/null 2>&1; then
+            exists=true
+
+            asset_names="$(gh release view "${TAG}" --json assets --jq '.assets[] | .name' | paste -sd' ' -)"
+
+            # `digest` is GitHub's own sha256 of the stored asset - reading it back
+            # lets a dry run prove drift without downloading 8 MB.
+            match="$(gh release view "${TAG}" --json assets \
+              --jq '.assets[] | select(.name == "'"${ASSET}"'") | ((.digest // "") | sub("^sha256:"; "")) + " " + ((.size // 0) | tostring)')"
+            if [[ -n "${match}" ]]; then
+              asset_sha256="${match%% *}"
+              asset_size="${match##* }"
             fi
-            echo "::notice::deleting stale release asset ${name} (${TAG})"
-            gh release delete-asset "${TAG}" "${name}" --yes
-          done
+
+            stale_covers="$(gh release view "${TAG}" --json assets \
+              --jq '.assets[] | select(.name | test("^cover\\.(png|jpg|jpeg|webp)$")) | select(.name != "'"${COVER_NAME}"'") | .name' \
+              | paste -sd' ' -)"
+          else
+            echo "release ${TAG} does not exist yet"
+          fi
+
+          echo "exists=${exists}"
+          echo "asset_sha256=${asset_sha256}"
+          echo "asset_size=${asset_size}"
+          echo "asset_names=${asset_names}"
+          echo "stale_covers=${stale_covers}"
+          {
+            echo "exists=${exists}"
+            echo "asset_sha256=${asset_sha256}"
+            echo "asset_size=${asset_size}"
+            echo "asset_names=${asset_names}"
+            echo "stale_covers=${stale_covers}"
+          } >> "${GITHUB_OUTPUT}"
 
       - name: Generate release notes
         env:
@@ -311,6 +383,7 @@ jobs:
           cat dist/release-notes.md
 
       - name: Prepare catalog entry asset
+        id: catalog
         env:
           SLUG: ${{ steps.meta.outputs.slug }}
           VERSION_BARE: ${{ steps.meta.outputs.version_bare }}
@@ -374,33 +447,74 @@ jobs:
           print(f"wrote {out}: version={version} sha256={entry['sha256']} cover={'yes' if cover else 'no'}")
           PY
 
+      # Always runs, in both modes. In a dry run this *is* the deliverable.
       - name: Write job summary
         env:
           SLUG: ${{ steps.meta.outputs.slug }}
           VERSION: ${{ steps.meta.outputs.version }}
+          VERSION_BARE: ${{ steps.meta.outputs.version_bare }}
           TAG: ${{ steps.meta.outputs.tag }}
           ASSET: ${{ steps.meta.outputs.asset }}
           SHA256: ${{ steps.build.outputs.sha256 }}
           SIZE: ${{ steps.build.outputs.size }}
+          DRY_RUN: ${{ steps.meta.outputs.dry_run }}
+          EXISTS: ${{ steps.existing.outputs.exists }}
+          EXISTING_SHA: ${{ steps.existing.outputs.asset_sha256 }}
+          EXISTING_SIZE: ${{ steps.existing.outputs.asset_size }}
+          EXISTING_ASSETS: ${{ steps.existing.outputs.asset_names }}
+          STALE_COVERS: ${{ steps.existing.outputs.stale_covers }}
+          COVER_NAME: ${{ steps.cover.outputs.cover_name }}
         run: |
           set -euo pipefail
 
+          if [[ "${DRY_RUN}" == "true" ]]; then
+            {
+              echo "# Dry run - release plan only"
+              echo ""
+              echo "_No release was created, no asset was uploaded or deleted, and \`catalog.json\` was not touched._"
+            } >> "${GITHUB_STEP_SUMMARY}"
+          else
+            echo "## Release \`${TAG}\`" >> "${GITHUB_STEP_SUMMARY}"
+          fi
+
           {
-            echo "## Release \`${TAG}\`"
             echo ""
             echo "| field | value |"
             echo "| --- | --- |"
+            echo "| mode | $([[ "${DRY_RUN}" == "true" ]] && echo 'dry run (nothing written)' || echo 'publish') |"
             echo "| adventure | \`${SLUG}\` |"
             echo "| version | \`${VERSION}\` |"
+            echo "| planned tag | \`${TAG}\` |"
             echo "| bundle | \`${ASSET}\` |"
             echo "| size | ${SIZE} bytes |"
             echo "| sha256 | \`${SHA256}\` |"
             echo "| reproducible | yes (two independent builds, identical digest) |"
+            echo "| release exists | ${EXISTS} |"
           } >> "${GITHUB_STEP_SUMMARY}"
+
+          if [[ "${EXISTS}" == "true" ]]; then
+            {
+              echo "| published assets | ${EXISTING_ASSETS:-none} |"
+              echo "| published bundle sha256 | \`${EXISTING_SHA:-unknown}\` |"
+              echo "| published bundle size | ${EXISTING_SIZE:-unknown} bytes |"
+            } >> "${GITHUB_STEP_SUMMARY}"
+
+            if [[ -n "${EXISTING_SHA}" && "${EXISTING_SHA}" != "${SHA256}" ]]; then
+              {
+                echo ""
+                echo "> **Drift:** the published bundle and this build differ. Publishing would"
+                echo "> replace \`${ASSET}\` (\`${EXISTING_SIZE:-?}\` bytes) with this build"
+                echo "> (\`${SIZE}\` bytes). \`catalog.json\` is a separate file that is only"
+                echo "> updated by the publish path."
+              } >> "${GITHUB_STEP_SUMMARY}"
+            elif [[ -n "${EXISTING_SHA}" ]]; then
+              echo "" >> "${GITHUB_STEP_SUMMARY}"
+              echo "> Published bundle already matches this build (identical sha256)." >> "${GITHUB_STEP_SUMMARY}"
+            fi
+          fi
 
           # Bare file name + fenced block: copy/paste straight into a verification run.
           digest_line="$(sha256sum "dist/${ASSET}" | cut -d' ' -f1)  ${ASSET}"
-          echo "bundle digest: ${digest_line}"
           {
             echo ""
             echo '```'
@@ -408,7 +522,56 @@ jobs:
             echo '```'
           } >> "${GITHUB_STEP_SUMMARY}"
 
+          if [[ "${DRY_RUN}" == "true" ]]; then
+            {
+              echo ""
+              echo "## What a real run would do"
+              echo ""
+              echo "- create release \`${TAG}\` if it does not exist (exists: ${EXISTS})"
+              echo "- upload \`${ASSET}\` (sha256 \`${SHA256}\`, ${SIZE} bytes) with \`--clobber\`"
+              if [[ -n "${COVER_NAME}" ]]; then
+                echo "- upload \`${COVER_NAME}\`"
+              else
+                echo "- upload no cover (adventure has none)"
+              fi
+              echo "- delete stale cover assets: ${STALE_COVERS:-none}"
+              echo "- merge the verified values into \`catalog.json\` on the default branch via an auto-merged PR"
+            } >> "${GITHUB_STEP_SUMMARY}"
+          fi
+
+          if [[ -f dist/catalog-entry.json ]]; then
+            {
+              echo ""
+              echo "## catalog-entry.json"
+              echo ""
+              echo '```json'
+              cat dist/catalog-entry.json
+              echo '```'
+            } >> "${GITHUB_STEP_SUMMARY}"
+          fi
+
+      - name: Prune stale cover assets from an existing release
+        if: steps.meta.outputs.dry_run != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.meta.outputs.tag }}
+          STALE_COVERS: ${{ steps.existing.outputs.stale_covers }}
+        run: |
+          set -euo pipefail
+          # `gh release upload --clobber` only replaces assets with the *same* name. When the
+          # cover format changes (cover.png -> cover.jpg) the old file survives and the release
+          # ends up with two covers, one of which no longer matches catalog-entry.json.
+          if [[ -z "${STALE_COVERS}" ]]; then
+            echo "no stale cover assets on ${TAG}"
+            exit 0
+          fi
+          for name in ${STALE_COVERS}; do
+            echo "::notice::deleting stale release asset ${name} (${TAG})"
+            gh release delete-asset "${TAG}" "${name}" --yes
+          done
+
       - name: Ensure GitHub release exists
+        if: steps.meta.outputs.dry_run != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           EVENT_NAME: ${{ github.event_name }}
@@ -438,6 +601,7 @@ jobs:
           echo "created release ${TAG}"
 
       - name: Upload release assets
+        if: steps.meta.outputs.dry_run != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ steps.meta.outputs.tag }}
@@ -452,9 +616,39 @@ jobs:
               assets+=("${extra}")
             fi
           done
+          shopt -u nullglob
 
           printf 'uploading: %s\n' "${assets[@]}"
           gh release upload "${TAG}" "${assets[@]}" --clobber
 
           echo "assets now on release ${TAG}:"
           gh release view "${TAG}" --json assets --jq '.assets[] | "\(.name)\t\(.size) bytes"'
+
+      # Last step on purpose: the catalog must describe the asset that is already
+      # published, so it runs only after a successful upload.
+      - name: Sync catalog.json with the published asset
+        if: steps.meta.outputs.dry_run != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLUG: ${{ steps.meta.outputs.slug }}
+          VERSION_BARE: ${{ steps.meta.outputs.version_bare }}
+        run: |
+          set -euo pipefail
+
+          if [[ ! -f dist/catalog-entry.json ]]; then
+            echo "::notice::no catalog entry was generated - skipping catalog sync"
+            exit 0
+          fi
+
+          status=0
+          python3 scripts/sync_catalog.py \
+            --repo "${GITHUB_REPOSITORY}" \
+            --branch main \
+            --slug "${SLUG}" \
+            --entry dist/catalog-entry.json \
+            --run-id "${GITHUB_RUN_ID}" || status=$?
+
+          if [[ "${status}" -ne 0 ]]; then
+            echo "::error::release assets for ${SLUG} ${VERSION_BARE} are published, but catalog.json was not updated - clients verifying against catalog.json will see a sha256 mismatch. See the log above for the catalog PR."
+            exit "${status}"
+          fi

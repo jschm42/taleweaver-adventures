@@ -67,6 +67,35 @@ SHA-256 for every adventure, so tooling can fetch bundles straight from the inde
 
 Prefer building from source? See [Packing an Adventure](#-packing-an-adventure-adz) below.
 
+## 🚦 Releasing an Adventure
+
+Releases are produced by `.github/workflows/release-adventure.yml`. Two ways in:
+
+| Trigger | What happens |
+| --- | --- |
+| push a tag `adv/<slug>/v<version>` | full publish: build, verify, release, upload, catalog sync |
+| `workflow_dispatch` with `slug` + `version` | same, but `dry_run` is available |
+
+**Dry run.** Set `dry_run: true` and the job builds the bundle twice, resolves the
+cover, generates `catalog-entry.json`, compares all of that against the release as it
+currently exists, and writes the plan into the job summary (planned tag, asset names,
+sha256, size, the catalog entry, and the drift against the published asset). It never
+creates, uploads or deletes an asset, and never touches `catalog.json`. Pointing a dry
+run at an already released tag is safe.
+
+**Catalog sync.** After a successful upload the workflow merges the verified
+`sha256`/`size_bytes`/`download_url` into `catalog.json` on `main`, so the index cannot
+drift away from the published bytes. The default branch requires a pull request, so the
+change lands as a one-commit, auto-merged PR (`chore(catalog): <slug> <version>`) rather
+than a direct push. If the merge is blocked, the job fails instead of leaving
+`catalog.json` silently stale — the release assets are already published at that point.
+
+The sync only *merges* the fields the release proves (`version`, `sha256`, `size_bytes`,
+`download_url`, `released_at`, `cover_url`, `cover_sha256`); editorial fields (`id`,
+`title`, `teaser`, `tags`, …) stay untouched. `cover_url`/`cover_sha256` are dropped when
+the adventure ships no cover artwork. A slug that has no editorial entry in `catalog.json`
+yet fails the catalog step on purpose: add the entry first, then release.
+
 ## 🛠️ Adventure Formats
 
 The adventures in this repository come in two primary formats:
