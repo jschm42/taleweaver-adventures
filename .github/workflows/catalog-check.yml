@@ -1,0 +1,54 @@
+name: catalog check
+
+# The release workflow publishes assets. This one watches the catalogue that points at
+# them - without it, a release that skips its catalog sync is green while the catalogue
+# drifts, which is the "green and broken" state this repository is migrating out of.
+#
+# Read-only on purpose: this check may not repair what it measures. It reads release
+# metadata through the default GITHUB_TOKEN (contents: read is enough for public repos),
+# so it needs no secret and cannot be switched off because a secret is missing.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - "catalog.json"
+      - "catalog-drift-baseline.json"
+      - "scripts/build_catalog.py"
+      - ".github/workflows/catalog-check.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release-drift:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      # Comparison 1: the file the client downloads, against the release metadata.
+      # This one must be green today and has no baseline - it is the only automated
+      # statement of "the download works", and it starts failing the moment a release
+      # is replaced without the catalogue following.
+      - name: Committed catalog.json matches the published releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          python3 scripts/build_catalog.py --committed-check
+
+      # Comparison 2: what this tree would publish, against the releases. Red by design
+      # until the re-cut - hence the baseline, which knows exactly which findings are
+      # expected and turns red on any new *or* vanished one.
+      - name: Source tree vs releases (known drift only)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          python3 scripts/build_catalog.py --release-check \
+            --baseline catalog-drift-baseline.json
+
+      # Comparison 3 (--check) is deliberately absent: while the published assets
+      # predate the deterministic packer it is red for a reason nobody can fix today.
+      # It becomes free the day comparison 1 and 2 agree again.

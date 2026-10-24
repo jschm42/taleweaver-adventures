@@ -12,10 +12,14 @@ branch.
 
 Design notes
 ------------
-* **Merge, never regenerate.** Only the fields the release actually proves are
-  overwritten (version, sha256, size_bytes, download_url, released_at, cover_url,
-  cover_sha256).  Editorial fields (id, title, teaser, tags, license, ...) are
-  owned by humans and are copied through untouched.
+* **The transport, not the producer.** ``scripts/build_catalog.py`` generates
+  ``catalog.json`` from the source tree; this script only records the fields the
+  release actually proves (version, sha256, size_bytes, download_url,
+  released_at, cover_url, cover_sha256).  Editorial fields (id, title, teaser,
+  tags, license, ...) come from the sidecars and are copied through untouched.
+* **New slugs land.** ``build_catalog.py --emit-entry`` derives a complete entry
+  from the tagged tree, so the first release of a slug has no entry to copy and
+  is appended in slug order instead of being blocked after the upload.
 * **Idempotent.** When the only difference would be the timestamp, nothing is
   written and the script exits 0.  Re-running a release never produces an empty
   ``chore(catalog)`` commit.
@@ -120,33 +124,55 @@ def find_entry(doc: dict[str, Any], slug: str) -> dict[str, Any] | None:
 
 
 def merge_entry(
-    doc: dict[str, Any], entry: dict[str, Any], *, now: str | None = None
+    doc: dict[str, Any], entry: dict[str, Any]
 ) -> tuple[dict[str, Any], bool]:
     """Merge ``entry`` into ``doc``.
 
     Returns ``(merged_document, changed)``.  ``changed`` is ``False`` when the
     merge would only rewrite volatile timestamps; in that case ``doc`` itself is
     returned untouched so the caller writes nothing.
+
+    An unknown slug is *appended*, not rejected. Since ``build_catalog.py`` owns
+    the document and ``--emit-entry`` derives a complete entry from the tagged
+    source tree, "no entry yet" is the normal first-release case and refusing it
+    only strands a release whose assets are already public.
     """
     slug = entry.get("slug")
     if not isinstance(slug, str) or not slug:
         raise SyncError("catalog entry has no slug")
 
-    existing = find_entry(doc, slug)
-    if existing is None:
-        raise SyncError(
-            f"catalog.json has no entry for slug {slug!r}; "
-            "add the editorial entry (id/title/teaser/...) before releasing"
-        )
-
-    merged = json.loads(json.dumps(doc))
-    target = find_entry(merged, slug)
-    assert target is not None  # guaranteed by the lookup above
-
     missing = [key for key in REQUIRED_SYNCED_KEYS if key not in entry]
     if missing:
         raise SyncError(f"catalog entry is missing required field(s): {', '.join(missing)}")
 
+    merged = json.loads(json.dumps(doc))
+    existing = find_entry(merged, slug)
+
+    if existing is None:
+        # First release of a new slug. The entry is complete - it is generated from
+        # the tagged source tree by `build_catalog.py --emit-entry`, which only
+        # succeeds when `<slug>/adventure.adv` and its sidecar exist - so there is
+        # nothing to "add before releasing" and no reason to strand the release
+        # after its assets are already public. Insert in slug order: `catalog.json`
+        # is sorted by the generator, and appending at the end would make the very
+        # next `--check` rewrite the whole file.
+        for key in ("id", "title", "teaser"):
+            if not entry.get(key):
+                raise SyncError(
+                    f"catalog entry for new slug {slug!r} has no {key!r}; it must be "
+                    "generated from the source tree (build_catalog.py --emit-entry), "
+                    "not hand-assembled"
+                )
+        merged["adventures"] = sorted(
+            [*merged.get("adventures", []), json.loads(json.dumps(entry))],
+            key=lambda item: item.get("slug", ""),
+        )
+        if _comparable(merged) == _comparable(doc):
+            return doc, False
+        merged.pop("generated_at", None)
+        return merged, True
+
+    target = existing
     for key in SYNCED_KEYS:
         if key in entry:
             target[key] = entry[key]
@@ -157,7 +183,10 @@ def merge_entry(
     if _comparable(merged) == _comparable(doc):
         return doc, False
 
-    merged["generated_at"] = now or entry.get("released_at") or doc.get("generated_at")
+    # `build_catalog.py` stopped writing this field: it only ever recorded the last
+    # commit and made the document non-canonical. A transport that re-added it would
+    # put the file back in drift on the next `--check`.
+    merged.pop("generated_at", None)
     return merged, True
 
 
