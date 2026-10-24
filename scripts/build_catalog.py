@@ -54,7 +54,10 @@ DERIVED_KEYS = frozenset(
 )
 
 REQUIRED_META_KEYS = ("id", "description", "tags")
-MIN_DESCRIPTION_CHARS = 80
+# CONTENT.md: "wo du bist -> was schiefgeht -> was es kostet", 240-700 characters.
+# A description shorter than the lower bound is a teaser with a newline.
+MIN_DESCRIPTION_CHARS = 240
+MAX_DESCRIPTION_CHARS = 700
 MIN_TEASER_CHARS = 74
 
 STATUS_VALUES = frozenset({"released", "unreleased-complete", "unreleased-qa", "abandoned"})
@@ -153,9 +156,93 @@ def _copy_problems(slug: str, meta: dict) -> list[str]:
             f"{slug}: description has {len(description)} characters, "
             f"at least {MIN_DESCRIPTION_CHARS} expected"
         )
+    elif len(description) > MAX_DESCRIPTION_CHARS:
+        problems.append(
+            f"{slug}: description has {len(description)} characters, "
+            f"at most {MAX_DESCRIPTION_CHARS} expected"
+        )
     if not meta.get("tags"):
         problems.append(f"{slug}: no tags")
     return problems
+
+
+def _image_size(path: Path) -> tuple[int, int] | None:
+    """Pixel dimensions from the file header, without a decoder.
+
+    Covers are shipped as-is, so the declared aspect ratio is the only thing that
+    tells the client how to frame them. A declaration that nobody checks is a
+    declaration that drifts: this reads PNG IHDR and the JPEG SOF marker, which is
+    enough to catch a wrong number without pulling in Pillow.
+    """
+    with path.open("rb") as handle:
+        head = handle.read(26)
+        if head[:8] == b"\x89PNG\r\n\x1a\n":
+            return int.from_bytes(head[16:20], "big"), int.from_bytes(head[20:24], "big")
+        if head[:2] != b"\xff\xd8":
+            return None
+        handle.seek(2)
+        while True:
+            marker = handle.read(2)
+            if len(marker) < 2 or marker[0] != 0xFF:
+                return None
+            while marker[1] == 0xFF:
+                following = handle.read(1)
+                if not following:
+                    return None
+                marker = bytes((0xFF, following[0]))
+            code = marker[1]
+            if code in (0xD8, 0xD9) or 0xD0 <= code <= 0xD7:
+                continue
+            raw_length = handle.read(2)
+            if len(raw_length) < 2:
+                return None
+            length = int.from_bytes(raw_length, "big")
+            if code in (0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7, 0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF):
+                frame = handle.read(5)
+                if len(frame) < 5:
+                    return None
+                return int.from_bytes(frame[3:5], "big"), int.from_bytes(frame[1:3], "big")
+            handle.seek(length - 2, 1)
+
+
+def _parse_aspect(value: object) -> float | None:
+    """`cover_aspect` is curated, so accept the two forms a human writes: "3:2" or 1.5."""
+    if isinstance(value, (int, float)) and value > 0:
+        return float(value)
+    if isinstance(value, str) and ":" in value:
+        left, _, right = value.partition(":")
+        try:
+            numerator, denominator = float(left), float(right)
+        except ValueError:
+            return None
+        if numerator > 0 and denominator > 0:
+            return numerator / denominator
+    return None
+
+
+def _check_cover_aspect(slug: str, path: Path, meta: dict) -> str | None:
+    """Validate `cover_aspect` against the real pixels. Absent field, no check."""
+    if meta.get("cover_aspect") is None:
+        return None
+    declared = _parse_aspect(meta["cover_aspect"])
+    _require(
+        declared is not None,
+        f"{slug}/adventure.meta.json: cover_aspect must be 'W:H' or a positive number, "
+        f"got {meta['cover_aspect']!r}",
+    )
+    size = _image_size(path)
+    _require(
+        size is not None,
+        f"{slug}: cannot read the pixel size of {path.name} - cover_aspect cannot be verified",
+    )
+    width, height = size
+    actual = width / height
+    _require(
+        abs(actual - declared) <= 0.01,
+        f"{slug}: cover_aspect says {meta['cover_aspect']!r} ({declared:.3f}) but "
+        f"{path.name} is {width}x{height} ({actual:.3f}) - the client would frame it wrong",
+    )
+    return f"{width}x{height}"
 
 
 def _resolve_cover(source_dir: Path, meta: dict) -> tuple[Path | None, list[str]]:
@@ -183,6 +270,9 @@ def _resolve_cover(source_dir: Path, meta: dict) -> tuple[Path | None, list[str]
         path = candidates[0]
     else:
         path = None
+
+    if path is not None:
+        _check_cover_aspect(slug, path, meta)
 
     unreferenced = []
     if path is not None:
