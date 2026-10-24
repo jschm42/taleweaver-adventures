@@ -49,6 +49,15 @@ jobs:
           python3 scripts/build_catalog.py --release-check \
             --baseline catalog-drift-baseline.json
 
+      # Copy gate: whichever descriptions are present must be valid. Empty copy passes
+      # today - ten empty fields are the shipped state, and a gate that is red by design
+      # is a gate nobody reads before the release that matters. On the re-cut the same
+      # script runs with --require-copy, which makes "the copy is in" an exit code.
+      - name: Copy in the sidecars is valid
+        run: |
+          set -euo pipefail
+          python3 scripts/check_copy.py
+
       # Comparison 3 (--check) is deliberately absent: while the published assets
       # predate the deterministic packer it is red for a reason nobody can fix today.
       # It becomes free the day comparison 1 and 2 agree again.
