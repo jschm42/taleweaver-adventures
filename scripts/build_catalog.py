@@ -85,6 +85,15 @@ def _load_json(path: Path, what: str) -> dict:
         raise CatalogError(f"{path.relative_to(REPO_ROOT)}: invalid JSON ({exc})") from exc
 
 
+def dumps(document: dict) -> str:
+    """The one serialisation of `catalog.json`, so `--check` can compare bytes.
+
+    Field-level diffs are what a human reads, but a file that differs only in
+    formatting or key order is still a file the next generator run will rewrite.
+    """
+    return json.dumps(document, indent=2, ensure_ascii=False) + "\n"
+
+
 def _require(condition: bool, message: str) -> None:
     if not condition:
         raise CatalogError(message)
@@ -658,9 +667,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if not args.check:
-        CATALOG_PATH.write_text(
-            json.dumps(generated, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
-        )
+        CATALOG_PATH.write_text(dumps(generated), encoding="utf-8")
         print(
             f"wrote {CATALOG_PATH.name}: {len(generated['adventures'])} adventures, "
             f"generated_at={generated['generated_at']}"
@@ -669,6 +676,11 @@ def main(argv: list[str] | None = None) -> int:
 
     committed = _load_json(CATALOG_PATH, "catalogue")
     problems = diff_catalog(committed, generated)
+    if not problems and CATALOG_PATH.read_text(encoding="utf-8") != dumps(committed):
+        problems.append(
+            "catalog.json differs from the canonical serialisation (formatting or key order); "
+            "run the generator and commit the result"
+        )
     copy_errors = copy_problems if args.strict_copy else []
 
     if args.json:
