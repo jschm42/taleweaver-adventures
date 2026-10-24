@@ -109,6 +109,52 @@ def _guard_against_publishing_drift(generated: dict) -> list[str]:
     return problems
 
 
+BASELINE_PATH = REPO_ROOT / "catalog-drift-baseline.json"
+
+
+def baseline_document(released, problems):
+    """Record the drift that is known and expected, with the versions it belongs to.
+
+    A check that is red by design for days is a check nobody reads. Recording the known
+    findings makes "the same 30 findings as yesterday" green and anything else red - in
+    both directions, because a finding that disappears means the re-cut happened and the
+    baseline has become an excuse.
+    """
+    return {
+        "note": (
+            "Known catalog drift while the published assets still predate the "
+            "deterministic packer. Regenerate with --write-baseline after the re-cut, "
+            "which must leave an empty findings list."
+        ),
+        "versions": {adventure["slug"]: adventure["version"] for adventure in released},
+        "findings": sorted(problems),
+    }
+
+
+def compare_baseline(baseline, released, problems):
+    """Return why the baseline no longer describes reality - empty list means it does."""
+    recorded = baseline.get("versions") or {}
+    version_notes = []
+    for adventure in released:
+        slug, version = adventure["slug"], adventure["version"]
+        if recorded.get(slug) and recorded[slug] != version:
+            version_notes.append(
+                f"{slug}: baseline was recorded at v{recorded[slug]} but the tree is at "
+                f"v{version} - the baseline expired with that release"
+            )
+    if version_notes:
+        return version_notes
+
+    known = set(baseline.get("findings") or [])
+    found = set(problems)
+    notes = [f"new drift:  {problem}" for problem in sorted(found - known)]
+    notes += [
+        f"drift gone: {problem} (if this was the re-cut, regenerate the baseline)"
+        for problem in sorted(known - found)
+    ]
+    return notes
+
+
 def dumps(document: dict) -> str:
     """The one serialisation of `catalog.json`, so `--check` can compare bytes.
 
@@ -640,6 +686,16 @@ def main(argv: list[str] | None = None) -> int:
         help="also fail when curated copy is missing (description length, tags)",
     )
     parser.add_argument(
+        "--baseline",
+        metavar="PATH",
+        help="fail only when the release findings differ from this baseline",
+    )
+    parser.add_argument(
+        "--write-baseline",
+        action="store_true",
+        help="record the current release findings as known drift",
+    )
+    parser.add_argument(
         "--force",
         action="store_true",
         help="write catalog.json even when the releases do not carry the tree's bytes",
@@ -704,11 +760,55 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 0
 
+    if (args.baseline or args.write_baseline) and not args.release_check:
+        print(
+            "--baseline and --write-baseline only apply to --release-check; the committed "
+            "catalogue is always compared strictly against the source tree",
+            file=sys.stderr,
+        )
+        return 2
+
     if args.release_check:
         released = [a for a in generated["adventures"] if a["status"] == "released"]
         release_problems = []
         for adventure in released:
             release_problems.extend(check_release(adventure))
+
+        if args.write_baseline:
+            BASELINE_PATH.write_text(
+                dumps(baseline_document(released, release_problems)), encoding="utf-8"
+            )
+            print(
+                f"wrote {BASELINE_PATH.name}: {len(release_problems)} known finding(s) "
+                f"across {len(released)} released adventures"
+            )
+            return 0
+
+        if args.baseline:
+            path = Path(args.baseline)
+            if not path.exists():
+                print(
+                    f"baseline {path} does not exist - run --release-check "
+                    f"--write-baseline first",
+                    file=sys.stderr,
+                )
+                return 2
+            notes = compare_baseline(_load_json(path, "baseline"), released, release_problems)
+            if notes:
+                print(
+                    f"{path.name} no longer describes the releases "
+                    f"({len(notes)} difference(s)):",
+                    file=sys.stderr,
+                )
+                for note in notes:
+                    print(f"  {note}", file=sys.stderr)
+                return 2
+            print(
+                f"release check matches the baseline: {len(release_problems)} known "
+                f"finding(s), no new drift, no drift resolved"
+            )
+            return 0
+
         if release_problems:
             print(
                 f"published releases do not match the catalogue ({len(release_problems)} problem(s)):",

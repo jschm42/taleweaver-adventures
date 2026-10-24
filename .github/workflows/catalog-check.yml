@@ -1,0 +1,40 @@
+name: catalog check
+
+# The release workflow publishes assets. This one watches the catalogue that points at
+# them - without it, a release that skips its catalog sync is green while the catalogue
+# drifts, which is the "green and broken" state this repository is migrating out of.
+#
+# Read-only on purpose: this check may not repair what it measures. It reads release
+# metadata through the default GITHUB_TOKEN (contents: read is enough for public repos),
+# so it needs no secret and cannot be switched off because a secret is missing.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - "catalog.json"
+      - "catalog-drift-baseline.json"
+      - "scripts/build_catalog.py"
+      - ".github/workflows/catalog-check.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release-drift:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Published releases still match the catalogue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          # --check is deliberately NOT run here. While the published assets predate the
+          # deterministic packer, the committed catalogue describes them, not this tree,
+          # so --check is red by design until the re-cut. A check that cannot be green is
+          # a check nobody reads.
+          python3 scripts/build_catalog.py --release-check \
+            --baseline catalog-drift-baseline.json
