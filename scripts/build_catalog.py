@@ -20,6 +20,9 @@ cut instead of a silent lie after it.
 Usage:
     python3 scripts/build_catalog.py            # write catalog.json
     python3 scripts/build_catalog.py --check    # verify, exit 1 on drift
+    python3 scripts/build_catalog.py --entry dist/catalog-entry.json
+                                                # pre-upload gate: a built release
+                                                # entry against the source tree
     python3 scripts/build_catalog.py --json     # machine-readable report
 """
 
@@ -46,7 +49,8 @@ RELEASE_BASE = f"https://github.com/{REPOSITORY}/releases/download"
 # Keys that are results, never input. Seeing one in a sidecar means someone is
 # hand-maintaining a hash, which is exactly the drift this script removes.
 DERIVED_KEYS = frozenset(
-    {"sha256", "size_bytes", "cover_sha256", "cover_url", "download_url", "released_at"}
+    {"sha256", "size_bytes", "cover_sha256", "cover_source_sha256", "cover_url",
+     "download_url", "released_at"}
 )
 
 REQUIRED_META_KEYS = ("id", "description", "tags")
@@ -288,6 +292,14 @@ def build_entry(slug: str, staging: Path) -> tuple[dict, list[str], list[str]]:
     if meta.get("save_compat"):
         entry["save_compat"] = meta["save_compat"]
     if cover is not None:
+        # Two hashes with two jobs. `cover_source_sha256` hashes the bundled
+        # original and proves the delivered artwork was derived from this asset.
+        # `cover_sha256` hashes exactly the bytes `cover_url` resolves to, which
+        # is what a client verifies after downloading. While the release ships the
+        # bundled file unchanged both are equal; the moment a derivative
+        # (cover.webp) is published, only `cover_sha256` follows it and the
+        # provenance claim stays checkable.
+        entry["cover_source_sha256"] = _sha256(cover)
         entry["cover_url"] = f"{RELEASE_BASE}/{tag}/cover{cover.suffix.lower()}"
         entry["cover_sha256"] = _sha256(cover)
     if blueprint["image_url"] and blueprint["image_url"] != (
@@ -361,6 +373,51 @@ def diff_catalog(committed: dict, generated: dict) -> list[str]:
     return problems
 
 
+# Fields a published release entry must agree with the source tree on. Everything
+# else in `catalog-entry.json` is derived from the same sources, so comparing it
+# is only meaningful for these: they are what a verifying client keys on.
+ENTRY_FIELDS = ("id", "slug", "version", "sha256", "size_bytes", "cover_sha256",
+                "cover_source_sha256", "download_url", "cover_url")
+
+
+def verify_entry(entry_path: Path, generated: dict) -> list[str]:
+    """Compare a built `catalog-entry.json` against the source tree.
+
+    Run before anything is uploaded: every mismatch here is a defect that no
+    post-upload read-back can repair, because the wrong bytes are already public
+    by then. `id` is the save key, `sha256` is the download truth.
+    """
+    entry = _load_json(entry_path, "release entry")
+    slug = entry.get("slug") or ""
+    if not slug:
+        return [f"{entry_path}: release entry carries no slug, cannot match it to a source directory"]
+    generated_entry = next(
+        (a for a in generated["adventures"] if a["slug"] == slug), None
+    )
+    if generated_entry is None:
+        return [f"{entry_path}: slug '{slug}' has no source directory in this tree"]
+
+    problems = [
+        f"{slug}.{field}: release entry says {entry.get(field)!r} but the source tree "
+        f"produces {generated_entry.get(field)!r}"
+        for field in ENTRY_FIELDS
+        if entry.get(field) != generated_entry.get(field)
+    ]
+
+    # The identity chain the client actually relies on: the UUID a save is keyed
+    # on must survive bundle -> release entry unchanged.
+    origin_id = (REPO_ROOT / slug / "adventure.adv")
+    if origin_id.is_file():
+        manifest = json.loads(origin_id.read_text(encoding="utf-8")).get("adventure", {})
+        if manifest.get("origin_id") != entry.get("id"):
+            problems.append(
+                f"{slug}: id chain broken: adventure.origin_id="
+                f"{manifest.get('origin_id')!r} vs release entry id={entry.get('id')!r} "
+                f"(saves key on this UUID)"
+            )
+    return problems
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--check", action="store_true", help="verify catalog.json instead of writing it")
@@ -369,6 +426,11 @@ def main(argv: list[str] | None = None) -> int:
         "--strict-copy",
         action="store_true",
         help="also fail when curated copy is missing (description length, tags)",
+    )
+    parser.add_argument(
+        "--entry",
+        metavar="PATH",
+        help="verify a built catalog-entry.json against the source tree (pre-upload gate)",
     )
     args = parser.parse_args(argv)
 
@@ -380,6 +442,20 @@ def main(argv: list[str] | None = None) -> int:
 
     for warning in warnings:
         print(f"warning: {warning}", file=sys.stderr)
+
+    if args.entry:
+        entry_problems = verify_entry(Path(args.entry), generated)
+        if entry_problems:
+            print(
+                f"release entry does not match the source tree ({len(entry_problems)} problem(s)):",
+                file=sys.stderr,
+            )
+            for problem in entry_problems:
+                print(f"  {problem}", file=sys.stderr)
+            print("refusing to continue: these bytes must not be published", file=sys.stderr)
+            return 2
+        print(f"{args.entry} matches the source tree ({len(ENTRY_FIELDS)} fields + id chain)")
+        return 0
 
     if not args.check:
         CATALOG_PATH.write_text(
