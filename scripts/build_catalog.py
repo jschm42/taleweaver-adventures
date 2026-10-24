@@ -23,7 +23,16 @@ Usage:
     python3 scripts/build_catalog.py --entry dist/catalog-entry.json
                                                 # pre-upload gate: a built release
                                                 # entry against the source tree
+    python3 scripts/build_catalog.py --emit-entry dist/catalog-entry.json --slug kitchen-crisis
+                                                # produce the release entry from the
+                                                # tree, for a slug that has no
+                                                # catalog.json entry yet
     python3 scripts/build_catalog.py --json     # machine-readable report
+
+`catalog.json` carries no `generated_at`: a field that records "when this was
+generated" only ever records the last commit that touched the file, so it either
+lies or forces a rewrite on every run. Without it the document is a pure function
+of the source tree, which is what makes `--check` a byte-for-byte comparison.
 """
 
 from __future__ import annotations
@@ -448,7 +457,6 @@ def build_catalog() -> tuple[dict, list[str], list[str]]:
     released = [entry for entry in entries if entry["status"] == "released"]
     catalog = {
         "schema": CATALOG_SCHEMA,
-        "generated_at": _build_timestamp(),
         "generator": GENERATOR,
         "repo_layout": "one source directory per adventure at the repository root",
         "adventures": entries,
@@ -460,22 +468,20 @@ def build_catalog() -> tuple[dict, list[str], list[str]]:
     return catalog, warnings, copy_problems
 
 
-def _build_timestamp() -> str:
-    """Deterministic timestamp. A field that records "when this was generated" but
-    lives in the repository only ever records the last human commit, so derive it:
-    SOURCE_DATE_EPOCH when the caller pins it, otherwise the commit date."""
+def _release_timestamp() -> str:
+    """`released_at` for an emitted release entry.
+
+    Only `--emit-entry` uses this, and only for a file under `dist/` that is never
+    committed: the release is being published now, so "now" is the honest value.
+    SOURCE_DATE_EPOCH wins when a caller pins it (reproducible reruns of a release
+    job), which keeps the emitted entry stable in tests.
+    """
     epoch = os.environ.get("SOURCE_DATE_EPOCH")
     if epoch and epoch.isdigit():
         moment = datetime.datetime.fromtimestamp(int(epoch), datetime.timezone.utc)
-        return moment.strftime("%Y-%m-%dT%H:%M:%SZ")
-    result = subprocess.run(
-        ["git", "-C", str(REPO_ROOT), "log", "-1", "--format=%cI"],
-        capture_output=True, text=True,
-    )
-    if result.returncode == 0 and result.stdout.strip():
-        moment = datetime.datetime.fromisoformat(result.stdout.strip())
-        return moment.astimezone(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    return "1970-01-01T00:00:00Z"
+    else:
+        moment = datetime.datetime.now(datetime.timezone.utc)
+    return moment.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def check_release(slug_entry: dict) -> list[str]:
@@ -553,8 +559,11 @@ def diff_catalog(committed: dict, generated: dict) -> list[str]:
     order = ("title", "teaser", "description", "tags", "content_warnings", "status")
     problems: list[str] = []
 
-    if committed.get("schema") != generated.get("schema"):
-        problems.append(f"schema: {committed.get('schema')} -> {generated.get('schema')}")
+    for key in sorted(set(committed) | set(generated), key=str):
+        if key == "adventures":
+            continue
+        if committed.get(key) != generated.get(key):
+            problems.append(f"catalog.{key}: {committed.get(key)!r} -> {generated.get(key)!r}")
 
     old = {entry["slug"]: entry for entry in committed.get("adventures", [])}
     new = {entry["slug"]: entry for entry in generated.get("adventures", [])}
@@ -645,7 +654,23 @@ def main(argv: list[str] | None = None) -> int:
         metavar="PATH",
         help="verify a built catalog-entry.json against the source tree (pre-upload gate)",
     )
+    parser.add_argument(
+        "--emit-entry",
+        metavar="PATH",
+        help="write the release entry for --slug from the source tree (no catalog.json lookup)",
+    )
+    parser.add_argument(
+        "--slug",
+        help="the adventure a release entry is emitted for (only with --emit-entry)",
+    )
     args = parser.parse_args(argv)
+
+    if args.emit_entry and not args.slug:
+        print("error: --emit-entry needs --slug", file=sys.stderr)
+        return 2
+    if args.slug and not args.emit_entry:
+        print("error: --slug is only meaningful with --emit-entry", file=sys.stderr)
+        return 2
 
     try:
         generated, warnings, copy_problems = build_catalog()
@@ -655,6 +680,29 @@ def main(argv: list[str] | None = None) -> int:
 
     for warning in warnings:
         print(f"warning: {warning}", file=sys.stderr)
+
+    if args.emit_entry:
+        # The release job needs one entry for one slug. Deriving it from the source
+        # tree instead of copying the existing catalog.json entry is what closes the
+        # new-slug hole: the first release of a slug has no entry to copy, and a
+        # transport that silently skipped it left the catalogue permanently short.
+        target = next((a for a in generated["adventures"] if a["slug"] == args.slug), None)
+        if target is None:
+            print(
+                f"error: no source directory for slug '{args.slug}' "
+                f"(expected {args.slug}/adventure.adv + adventure.meta.json)",
+                file=sys.stderr,
+            )
+            return 2
+        entry = dict(target, released_at=_release_timestamp())
+        out = Path(args.emit_entry)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(dumps(entry), encoding="utf-8")
+        print(
+            f"wrote {out}: slug={entry['slug']} version={entry['version']} "
+            f"sha256={entry['sha256']} cover={'yes' if entry.get('cover_url') else 'no'}"
+        )
+        return 0
 
     if args.release_check:
         released = [a for a in generated["adventures"] if a["status"] == "released"]
@@ -704,18 +752,18 @@ def main(argv: list[str] | None = None) -> int:
             )
             return 2
         CATALOG_PATH.write_text(dumps(generated), encoding="utf-8")
-        print(
-            f"wrote {CATALOG_PATH.name}: {len(generated['adventures'])} adventures, "
-            f"generated_at={generated['generated_at']}"
-        )
+        print(f"wrote {CATALOG_PATH.name}: {len(generated['adventures'])} adventures")
         return 0
 
     committed = _load_json(CATALOG_PATH, "catalogue")
     problems = diff_catalog(committed, generated)
-    if not problems and CATALOG_PATH.read_text(encoding="utf-8") != dumps(committed):
+    # Field-level findings explain what drifted; this catches the rest - formatting,
+    # key order, a stale field nobody compares. Both documents are pure functions of
+    # the source tree, so the comparison is bytes, not a diff of selected keys.
+    if not problems and CATALOG_PATH.read_text(encoding="utf-8") != dumps(generated):
         problems.append(
-            "catalog.json differs from the canonical serialisation (formatting or key order); "
-            "run the generator and commit the result"
+            "catalog.json differs from the canonical serialisation generated from the "
+            "source tree; run `python3 scripts/build_catalog.py` and commit the result"
         )
     copy_errors = copy_problems if args.strict_copy else []
 
