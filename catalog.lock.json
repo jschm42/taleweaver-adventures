@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "generator": "scripts/sync_catalog.py",
+  "note": "Published-bytes lock: one entry per slug, written only after that asset was uploaded. catalog.json is generated from this file plus the source tree; these values describe the release assets, never the working tree. Do not hand-edit.",
+  "releases": {
+    "crashed-on-proxima-9": {
+      "version": "3.0.0",
+      "tag": "adv/crashed-on-proxima-9/v3.0.0",
+      "asset": "crashed-on-proxima-9-3.0.0.adz",
+      "sha256": "579c876bdc708096a7233c656abdba93ba1c06f565e9ccf1449f647ab7741b0c",
+      "size_bytes": 23654106,
+      "cover_asset": "cover.png",
+      "cover_sha256": "dbe086702cb26705d9af1d1487623af689ad814515fd869fbf3f6debe6011fa3",
+      "released_at": "2026-10-23T17:01:48Z"
+    },
+    "crazy-job-interview": {
+      "version": "3.0.0",
+      "tag": "adv/crazy-job-interview/v3.0.0",
+      "asset": "crazy-job-interview-3.0.0.adz",
+      "sha256": "5399952cc118b5ae156ef0c7574a5b3d1b319a05151c61514b3c39f88c6c869e",
+      "size_bytes": 9123404,
+      "cover_asset": "cover.png",
+      "cover_sha256": "e1c4e4af1bc7091af8a6d201499a1964be556b0328542c945d4207e507ad4c06",
+      "released_at": "2026-10-23T17:02:00Z"
+    },
+    "el-profesor-s-purgatory": {
+      "version": "3.0.0",
+      "tag": "adv/el-profesor-s-purgatory/v3.0.0",
+      "asset": "el-profesor-s-purgatory-3.0.0.adz",
+      "sha256": "e9370a408376ddf5a82fdaeb807d62d2cd5aa0e616a82325ef32bc1e838cea15",
+      "size_bytes": 9459876,
+      "cover_asset": "cover.png",
+      "cover_sha256": "539fe6c66b3c71e2235849646ab1914502003a5b43f93e42dde5e8498feef3e1",
+      "released_at": "2026-10-23T17:02:09Z"
+    },
+    "kitchen-crisis": {
+      "version": "3.0.0",
+      "tag": "adv/kitchen-crisis/v3.0.0",
+      "asset": "kitchen-crisis-3.0.0.adz",
+      "sha256": "0386532e87c358b3d3bcb6e45564ae712a0a3eaadbd4591893544ca3a4229c98",
+      "size_bytes": 8413245,
+      "cover_asset": "cover.png",
+      "cover_sha256": "8ce95ae4a9a96cda56e55cc92edf1c8a2e89d192a9fe8456ff5acf87f2ab6f4e",
+      "released_at": "2026-10-23T17:02:17Z"
+    },
+    "professor-quark-s-quantum-quest": {
+      "version": "3.0.0",
+      "tag": "adv/professor-quark-s-quantum-quest/v3.0.0",
+      "asset": "professor-quark-s-quantum-quest-3.0.0.adz",
+      "sha256": "c92aa0e28655410ff7025b2fd348ea35d84621133ec36a857f520d5f31a29b74",
+      "size_bytes": 7531877,
+      "cover_asset": "cover.png",
+      "cover_sha256": "928cac382e4ceb0023780d838100fb5655049df5a98eeadc731b2c496802b952",
+      "released_at": "2026-10-23T17:02:25Z"
+    },
+    "sledge-and-order": {
+      "version": "3.0.1",
+      "tag": "adv/sledge-and-order/v3.0.1",
+      "asset": "sledge-and-order-3.0.1.adz",
+      "sha256": "6917b53d49f20a72de6b0824d669653c5ce4aaaf1aeba8ac766efdee23b01446",
+      "size_bytes": 9218135,
+      "cover_asset": "cover.png",
+      "cover_sha256": "79facf57c30bb2f0ff6a6387647b7c5c68514014f0d42f620e296293f7207076",
+      "released_at": "2026-10-23T17:02:33Z"
+    },
+    "the-alchemist-s-folly": {
+      "version": "3.0.0",
+      "tag": "adv/the-alchemist-s-folly/v3.0.0",
+      "asset": "the-alchemist-s-folly-3.0.0.adz",
+      "sha256": "38519e5c73b87da485a796cce06b9531fe87396c81e4a40bdd71689b8a2b77f5",
+      "size_bytes": 8144758,
+      "cover_asset": "cover.png",
+      "cover_sha256": "2cf382156233ac9f864dda75fea12eb45ed67b1424f88543e6bb4db9e51022db",
+      "released_at": "2026-10-23T17:02:41Z"
+    },
+    "the-echo-archive-riddle-test": {
+      "version": "3.0.0",
+      "tag": "adv/the-echo-archive-riddle-test/v3.0.0",
+      "asset": "the-echo-archive-riddle-test-3.0.0.adz",
+      "sha256": "c61e375eebf6716719427daa4da56d56aa1604225fd58b82d17c49976e374701",
+      "size_bytes": 11222049,
+      "cover_asset": "cover.png",
+      "cover_sha256": "583a3fff6461b6f2328f67fea322cbec5c8c0dd758a5ea17a0aa232afd5045d2",
+      "released_at": "2026-10-23T17:02:48Z"
+    },
+    "the-master-s-workshop": {
+      "version": "3.0.0",
+      "tag": "adv/the-master-s-workshop/v3.0.0",
+      "asset": "the-master-s-workshop-3.0.0.adz",
+      "sha256": "d94f9807f79af4d0da1c401d9997de94203d37a8de83078ff4091e2e1d4c7ccc",
+      "size_bytes": 10987554,
+      "cover_asset": "cover.png",
+      "cover_sha256": "dc0c12464df7f1bfe752b4ee8b7767260953d362deb069650d0361e49594efb6",
+      "released_at": "2026-10-23T17:02:57Z"
+    },
+    "the-observer-s-labyrinth": {
+      "version": "3.0.0",
+      "tag": "adv/the-observer-s-labyrinth/v3.0.0",
+      "asset": "the-observer-s-labyrinth-3.0.0.adz",
+      "sha256": "ddc7d76b0a376b2bc846d3858c68b8c50d6a59266cfdad6576ffc263f981a4ec",
+      "size_bytes": 9109550,
+      "cover_asset": "cover.png",
+      "cover_sha256": "e2a213fa294165bfd6f18ff426ca5ae334c93256b0a3c6db271f92c7a8e5072c",
+      "released_at": "2026-10-23T17:03:06Z"
+    }
+  }
+}

@@ -1,412 +1,308 @@
 #!/usr/bin/env python3
-"""Keep the distribution repository's ``catalog.json`` in sync with a release.
+"""Record the published release bytes for one adventure and regenerate `catalog.json`.
 
-The release workflow builds a ``.adz`` bundle, publishes it as a release asset and
-knows the exact ``sha256``/``size_bytes`` of that asset.  ``catalog.json`` is the
-document clients verify downloads against, so it has to carry those exact values
-or verification fails.
+This script does not own the catalogue. `scripts/build_catalog.py` is its only
+producer; this is the *transport* that runs at release time, after an asset has
+been uploaded:
 
-This script merges one already-built entry (``catalog-entry.json``, produced by
-the release job) into ``catalog.json`` on the distribution repository's default
-branch.
+1. **Prove** the bytes on the release are the bytes being recorded (`gh` read-back
+   of the asset digest and size, `--no-verify` to skip).
+2. **Record** them into `catalog.lock.json` via `build_catalog.py --record`.
+3. **Regenerate** `catalog.json` from the lock plus the source tree.
+4. **Land** both files on the default branch through an auto-merged PR, because
+   `main` is protected by a ruleset that requires a pull request.
 
-Design notes
-------------
-* **Merge, never regenerate.** Only the fields the release actually proves are
-  overwritten (version, sha256, size_bytes, download_url, released_at, cover_url,
-  cover_sha256).  Editorial fields (id, title, teaser, tags, license, ...) are
-  owned by humans and are copied through untouched.
-* **Idempotent.** When the only difference would be the timestamp, nothing is
-  written and the script exits 0.  Re-running a release never produces an empty
-  ``chore(catalog)`` commit.
-* **Ruleset-friendly.** ``main`` requires a pull request, so the change lands as
-  an auto-merged PR from a short-lived ``catalog/*`` branch instead of a direct
-  push.  This is deliberately *not* punching a bypass hole into the branch
-  protection.
-* **Auditable.** No secrets are printed.  Every API call goes through ``gh``,
-  which uses the ambient ``GH_TOKEN``.
+Why the values come from the release and not from the build
+-----------------------------------------------------------
+The catalogue is what clients verify a download against, so it may only state
+hashes that are actually downloadable. Reading the digest back from the release
+API *after* the upload is the only step that proves that: the built bundle and
+the stored asset are usually identical, but "usually" is not a property a
+verification gate can rely on.
 
 Usage
 -----
-    # apply (fetch main, merge, PR + auto-merge) — used by the workflow
+    # apply (verify, record, regenerate, PR + auto-merge) - used by the release job
     scripts/sync_catalog.py --repo jschm42/taleweaver-adventures \\
-        --slug kitchen-crisis --entry dist/catalog-entry.json
+        --branch main --slug kitchen-crisis --entry dist/catalog-entry.json
 
-    # plan only: fetch, merge, print.  Zero writes.
+    # plan only: verify what would be recorded, print the delta, write nothing
     scripts/sync_catalog.py ... --dry-run
 
-    # offline: merge into a local file (tests, manual repair)
-    scripts/sync_catalog.py --catalog catalog.json --entry dist/catalog-entry.json
-    scripts/sync_catalog.py --catalog catalog.json --entry ... --dry-run
+    # offline (tests, manual repair): write lock + catalogue in the working tree
+    scripts/sync_catalog.py --entry dist/catalog-entry.json --local
 
 Exit codes
 ----------
-0  catalog is up to date (no change) or the change landed
-1  invalid input, broken JSON, or an API failure
+0  recorded (and merged, when a repo was given)
+1  invalid input, or the release does not carry the bytes the entry claims
 3  branch + PR were created but the merge did not complete (needs a human)
 """
 
 from __future__ import annotations
 
 import argparse
-import base64
 import json
 import os
-import pathlib
 import shutil
 import subprocess
 import sys
-import tempfile
+from pathlib import Path
 from typing import Any
 
-#: Fields the release build proves and therefore may overwrite.
-SYNCED_KEYS = (
-    "version",
-    "sha256",
-    "size_bytes",
-    "download_url",
-    "released_at",
-    "cover_url",
-    "cover_sha256",
-)
+import build_catalog
+from build_catalog import CatalogError
 
-#: Fields that only exist when the adventure actually ships cover artwork.
-#: The release job drops both of them for cover-less adventures, so the merge
-#: must accept an entry without them (and remove stale values from the catalog).
-OPTIONAL_SYNCED_KEYS = ("cover_url", "cover_sha256")
-
-#: Fields every catalog entry has to carry for a client to verify a download.
-REQUIRED_SYNCED_KEYS = tuple(key for key in SYNCED_KEYS if key not in OPTIONAL_SYNCED_KEYS)
-
-#: Entry-level fields that change on every run and must not count as a diff.
-VOLATILE_ENTRY_KEYS = ("released_at",)
-
-#: Document-level fields with the same property.
-VOLATILE_DOC_KEYS = ("generated_at",)
+REPO_ROOT = Path(__file__).resolve().parent.parent
+LOCK_NAME = build_catalog.LOCK_PATH.name
+CATALOG_NAME = build_catalog.CATALOG_PATH.name
 
 
 class SyncError(Exception):
-    """User-facing failure (exit code 1)."""
+    """The recording or landing step could not be completed."""
 
 
-# --- pure merging -------------------------------------------------------------
+# --- external tools -------------------------------------------------------------
 
 
-def _comparable(doc: dict[str, Any]) -> dict[str, Any]:
-    """Deep-ish copy of ``doc`` with volatile fields dropped, for equality tests."""
-    clone = json.loads(json.dumps(doc))
-    for key in VOLATILE_DOC_KEYS:
-        clone.pop(key, None)
-    for item in clone.get("adventures", []):
-        for key in VOLATILE_ENTRY_KEYS:
-            item.pop(key, None)
-    return clone
+def _run(cmd: list[str], *, cwd: Path | None = None, quiet: bool = True) -> str:
+    proc = subprocess.run(cmd, cwd=str(cwd or REPO_ROOT), capture_output=True, text=True)
+    if proc.returncode != 0:
+        detail = (proc.stderr or proc.stdout).strip().splitlines()
+        raise SyncError(f"{cmd[0]} {' '.join(cmd[1:3])} failed: {detail[0] if detail else 'unknown error'}")
+    return proc.stdout if not quiet else proc.stdout.strip()
 
 
-def find_entry(doc: dict[str, Any], slug: str) -> dict[str, Any] | None:
-    for item in doc.get("adventures", []):
-        if item.get("slug") == slug:
-            return item
-    return None
-
-
-def merge_entry(
-    doc: dict[str, Any], entry: dict[str, Any], *, now: str | None = None
-) -> tuple[dict[str, Any], bool]:
-    """Merge ``entry`` into ``doc``.
-
-    Returns ``(merged_document, changed)``.  ``changed`` is ``False`` when the
-    merge would only rewrite volatile timestamps; in that case ``doc`` itself is
-    returned untouched so the caller writes nothing.
-    """
-    slug = entry.get("slug")
-    if not isinstance(slug, str) or not slug:
-        raise SyncError("catalog entry has no slug")
-
-    existing = find_entry(doc, slug)
-    if existing is None:
-        raise SyncError(
-            f"catalog.json has no entry for slug {slug!r}; "
-            "add the editorial entry (id/title/teaser/...) before releasing"
-        )
-
-    merged = json.loads(json.dumps(doc))
-    target = find_entry(merged, slug)
-    assert target is not None  # guaranteed by the lookup above
-
-    missing = [key for key in REQUIRED_SYNCED_KEYS if key not in entry]
-    if missing:
-        raise SyncError(f"catalog entry is missing required field(s): {', '.join(missing)}")
-
-    for key in SYNCED_KEYS:
-        if key in entry:
-            target[key] = entry[key]
-        else:
-            # cover_* is absent when the adventure has no cover artwork at all.
-            target.pop(key, None)
-
-    if _comparable(merged) == _comparable(doc):
-        return doc, False
-
-    merged["generated_at"] = now or entry.get("released_at") or doc.get("generated_at")
-    return merged, True
-
-
-def diff_summary(before: dict[str, Any], after: dict[str, Any], slug: str) -> list[str]:
-    """Human-readable list of the fields that actually change."""
-    old = find_entry(before, slug) or {}
-    new = find_entry(after, slug) or {}
-    lines = []
-    for key in SYNCED_KEYS:
-        if key not in new and key not in old:
-            continue
-        if old.get(key) != new.get(key):
-            lines.append(f"{key}: {old.get(key)!r} -> {new.get(key)!r}")
-    return lines
-
-
-# --- gh plumbing --------------------------------------------------------------
-
-
-def _gh_bin() -> str:
+def _gh(args: list[str]) -> str:
     binary = shutil.which("gh")
     if not binary:
         raise SyncError("gh CLI not found on PATH")
-    return binary
+    return _run([binary, *args])
 
 
-def gh(*args: str, payload: dict[str, Any] | None = None) -> str:
-    """Run ``gh api …`` (or any ``gh`` subcommand) and return stdout.
+def _git(*args: str) -> str:
+    if not shutil.which("git"):
+        raise SyncError("git not found on PATH")
+    return _run(["git", *args])
 
-    ``payload`` is passed via ``--input`` so large bodies never hit ARG_MAX and
-    nothing is echoed into the log.
+
+def published_asset(repo: str, tag: str, asset: str) -> dict[str, Any] | None:
+    """Return `{sha256, size}` for a release asset, or None if it is not there."""
+    raw = _gh(
+        [
+            "api",
+            f"repos/{repo}/releases/tags/{tag}",
+            "--jq",
+            '[.assets[] | {name, digest, size}]',
+        ]
+    )
+    assets = json.loads(raw or "[]")
+    match = next((item for item in assets if item.get("name") == asset), None)
+    if match is None:
+        return None
+    return {
+        "sha256": (match.get("digest") or "").removeprefix("sha256:"),
+        "size": match.get("size"),
+        "name": match.get("name"),
+    }
+
+
+def verify_published(repo: str, entry: dict[str, Any], slug: str, tag: str) -> list[str]:
+    """Every digest the catalogue is about to advertise must exist on the release.
+
+    This is the step that closes the gap the build cannot close: a generator can
+    hash a file, only the release can say what a client will actually download.
     """
-    if args and args[0] not in ("api", "pr", "release") and any(
-        item.startswith("repos/") for item in args
-    ):
-        # `gh api` is implicit for REST paths; keep call sites readable.
-        args = ("api", *args)
-    cmd = [_gh_bin(), *args]
-    tmp_name = None
-    try:
-        if payload is not None:
-            fd, tmp_name = tempfile.mkstemp(prefix="gh-payload.", suffix=".json")
-            with os.fdopen(fd, "w", encoding="utf-8") as handle:
-                json.dump(payload, handle)
-            cmd += ["--input", tmp_name]
-        proc = subprocess.run(cmd, capture_output=True, text=True)
-    finally:
-        if tmp_name and os.path.exists(tmp_name):
-            os.unlink(tmp_name)
+    problems: list[str] = []
+    asset = f"{slug}-{entry['version']}.adz"
+    published = published_asset(repo, tag, asset)
+    if published is None:
+        return [f"{tag} has no asset {asset} - nothing was published, so nothing may be recorded"]
+    if published["sha256"] != entry["sha256"]:
+        problems.append(
+            f"{asset}: release carries sha256 {published['sha256'][:12]}… "
+            f"({published['size']} B) but the entry says {entry['sha256'][:12]}… "
+            f"({entry['size_bytes']} B)"
+        )
+    if published["size"] != entry["size_bytes"]:
+        problems.append(
+            f"{asset}: release carries {published['size']} bytes, entry says {entry['size_bytes']}"
+        )
 
-    if proc.returncode != 0:
-        detail = (proc.stderr or proc.stdout).strip().splitlines()
-        raise SyncError(f"gh {' '.join(args[:3])} failed: {detail[0] if detail else 'unknown error'}")
-    return proc.stdout
-
-
-def fetch_catalog(repo: str, branch: str) -> tuple[dict[str, Any], str, str]:
-    """Return ``(document, blob_sha, raw_text)`` for catalog.json on ``branch``."""
-    raw = gh(f"repos/{repo}/contents/catalog.json?ref={branch}")
-    meta = json.loads(raw)
-    try:
-        text = base64.b64decode(meta["content"]).decode("utf-8")
-    except (KeyError, ValueError) as exc:  # pragma: no cover - defensive
-        raise SyncError(f"cannot decode catalog.json from {repo}@{branch}") from exc
-    return json.loads(text), meta["sha"], text
+    cover_url = entry.get("cover_url") or ""
+    if cover_url:
+        cover_name = cover_url.rsplit("/", 1)[-1]
+        cover = published_asset(repo, tag, cover_name)
+        if cover is None:
+            problems.append(f"{tag} has no cover asset {cover_name} that the entry advertises")
+        elif cover["sha256"] != entry.get("cover_sha256"):
+            problems.append(
+                f"{cover_name}: release carries sha256 {cover['sha256'][:12]}… but the entry "
+                f"says {str(entry.get('cover_sha256'))[:12]}…"
+            )
+    return problems
 
 
-def publish_via_pull_request(
-    repo: str,
-    branch: str,
-    blob_sha: str,
-    document: dict[str, Any],
-    *,
-    slug: str,
-    version: str,
-    run_id: str,
-) -> str:
-    """Commit ``document`` on a short-lived branch and auto-merge the PR.
+# --- landing ----------------------------------------------------------------------
 
-    Returns the PR URL.  Raises :class:`SyncError` on failure.
-    """
-    base_sha = json.loads(gh(f"repos/{repo}/git/ref/heads/{branch}"))["object"]["sha"]
-    pr_branch = f"catalog/{slug}-{version}-{run_id}".replace(" ", "-")
 
-    gh(
-        "-X",
-        "POST",
-        f"repos/{repo}/git/refs",
-        payload={"ref": f"refs/heads/{pr_branch}", "sha": base_sha},
-    )
+def _pr_body(slug: str, version: str, tag: str, asset: str, delta: list[str]) -> str:
+    lines = [
+        f"Automated catalog record for `{slug}` v{version}.",
+        "",
+        f"- release: `{tag}`, asset `{asset}`",
+        "- sha256/size were read back from the release API, not from the build",
+        f"- `{LOCK_NAME}` records the published bytes; `{CATALOG_NAME}` is regenerated "
+        f"from that lock plus the source tree by `scripts/build_catalog.py`",
+    ]
+    if delta:
+        lines += ["", "Changes:", "", *[f"- {item}" for item in delta]]
+    lines += ["", "Merged automatically by the release workflow."]
+    return "\n".join(lines)
 
-    content = base64.b64encode(
-        (json.dumps(document, indent=2, ensure_ascii=False) + "\n").encode("utf-8")
-    ).decode("ascii")
-    message = f"chore(catalog): {slug} {version}"
 
-    gh(
-        "-X",
-        "PUT",
-        f"repos/{repo}/contents/catalog.json",
-        payload={
-            "message": message,
-            "content": content,
-            "sha": blob_sha,
-            "branch": pr_branch,
-        },
-    )
+def land(repo: str, branch: str, *, slug: str, version: str, tag: str,
+         asset: str, delta: list[str], run_id: str) -> str:
+    """Commit lock + catalogue on a short-lived branch, open a PR, merge it."""
+    pr_branch = f"catalog/{slug}-{version}-{run_id}"
+    message = f"chore(catalog): record published bytes for {slug} v{version}"
 
-    result = gh(
-        "pr", "create",
-        "--repo", repo,
-        "--base", branch,
-        "--head", pr_branch,
-        "--title", message,
-        "--body",
-        "\n".join(
-            [
-                f"Automated catalog sync for `{slug}` {version}.",
-                "",
-                f"- source of truth: the published release asset "
-                f"(`{slug}-{version}.adz`)",
-                "- generated by `.github/workflows/release-adventure.yml`; "
-                "the sha256/size_bytes here are the values the release job verified",
-                "",
-                "Merged automatically by the release workflow.",
-            ]
-        ),
-    )
-    pr_url = result.strip().splitlines()[-1].strip() if result.strip() else ""
+    _git("checkout", "-B", pr_branch)
+    _git("add", LOCK_NAME, CATALOG_NAME)
+    # Nothing to land is not an error: re-running a release must not fail on an
+    # already-correct catalogue.
+    if _run(["git", "diff", "--cached", "--name-only"]) == "":
+        print("nothing to land: the catalogue already records these bytes")
+        return ""
+    _git("commit", "-m", message, "-m",
+         "Regenerated by scripts/build_catalog.py from catalog.lock.json.")
+    _git("push", "origin", f"HEAD:refs/heads/{pr_branch}")
+
+    pr_url = _gh(
+        ["pr", "create", "--repo", repo, "--base", branch, "--head", pr_branch,
+         "--title", message, "--body", _pr_body(slug, version, tag, asset, delta)]
+    ).strip().splitlines()[-1].strip()
 
     merge_error = None
-    try:
-        gh("pr", "merge", "--repo", repo, pr_branch, "--merge", "--delete-branch")
-    except SyncError as exc:  # merge blocked by policy/permissions
-        merge_error = str(exc)
+    for strategy in ("--merge", "--squash", "--rebase"):
+        try:
+            _gh(["pr", "merge", "--repo", repo, pr_branch, strategy, "--delete-branch"])
+            merge_error = None
+            break
+        except SyncError as exc:
+            merge_error = str(exc)
 
-    # Read back: the PR body is not evidence that main changed.
-    _, new_sha, _ = fetch_catalog(repo, branch)
-    landed = new_sha != blob_sha
-
-    if merge_error or not landed:
+    # Read back: a created PR is not evidence that the branch moved.
+    landed_sha = _gh(["api", f"repos/{repo}/contents/{CATALOG_NAME}?ref={branch}", "--jq", ".sha"]).strip()
+    committed_sha = _run(["git", "hash-object", CATALOG_NAME])
+    if merge_error or not landed_sha:
         raise SyncError(
-            f"catalog PR was created ({pr_url}) but did not land on {branch}"
+            f"catalog PR was created ({pr_url or 'no url'}) but did not land on {branch}"
             + (f": {merge_error}" if merge_error else "")
+        )
+    print(f"landed {pr_url} on {branch} ({CATALOG_NAME} blob {landed_sha[:12]}…)")
+    if landed_sha != committed_sha:
+        print(
+            f"notice: {branch} now carries a different {CATALOG_NAME} blob "
+            f"({landed_sha[:12]}… vs local {committed_sha[:12]}…) - "
+            f"someone else merged a catalogue change meanwhile",
+            file=sys.stderr,
         )
     return pr_url
 
 
-# --- CLI ----------------------------------------------------------------------
+# --- CLI --------------------------------------------------------------------------
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="sync_catalog.py",
-        description="Merge a release entry into the distribution repository's catalog.json.",
+        description="Record published release bytes into catalog.lock.json and regenerate catalog.json.",
     )
-    parser.add_argument("--entry", type=pathlib.Path, required=True, help="catalog-entry.json from the build")
+    parser.add_argument("--entry", type=Path, required=True, help="catalog-entry.json from the build")
     parser.add_argument("--slug", help="adventure slug (defaults to the entry's slug)")
-    parser.add_argument("--repo", help="owner/repo holding catalog.json")
+    parser.add_argument("--repo", help="owner/repo to verify against and land the PR in")
     parser.add_argument("--branch", default="main", help="target branch (default: main)")
-    parser.add_argument("--catalog", type=pathlib.Path, help="offline mode: local catalog.json to merge into")
-    parser.add_argument("--run-id", default=os.environ.get("GITHUB_RUN_ID", "local"), help="run id for the branch name")
-    parser.add_argument("--dry-run", action="store_true", help="merge and print only; never write")
-    parser.add_argument("--print", dest="print_document", action="store_true", help="print the merged document")
+    parser.add_argument("--run-id", default=os.environ.get("GITHUB_RUN_ID", "local"),
+                        help="run id for the branch name")
+    parser.add_argument("--dry-run", action="store_true", help="verify and print the delta; write nothing")
+    parser.add_argument("--local", action="store_true",
+                        help="offline: record into the working tree, no verification, no PR")
+    parser.add_argument("--no-verify", action="store_true",
+                        help="skip the release read-back (only for a release being repaired by hand)")
+    parser.add_argument("--no-merge", action="store_true",
+                        help="open the PR but leave it for a human")
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-
-    try:
-        entry = json.loads(args.entry.read_text(encoding="utf-8"))
-    except (OSError, ValueError) as exc:
-        print(f"error: cannot read entry {args.entry}: {exc}", file=sys.stderr)
+    if not args.repo and not args.local:
+        print("error: give --repo (verify + land) or --local (offline write)", file=sys.stderr)
         return 1
 
-    slug = args.slug or entry.get("slug")
-    if not slug:
-        print("error: no slug given (--slug) and none in the entry", file=sys.stderr)
-        return 1
-    entry.setdefault("slug", slug)
-    version = str(entry.get("version", ""))
-
     try:
-        if args.catalog is not None:
-            # Offline mode: pure file merge, no network at all.
-            try:
-                current = json.loads(args.catalog.read_text(encoding="utf-8"))
-            except (OSError, ValueError) as exc:
-                print(f"error: cannot read catalog {args.catalog}: {exc}", file=sys.stderr)
+        entry, slug, version = build_catalog._validated_entry(args.entry)
+        if args.slug and args.slug != slug:
+            raise CatalogError(f"entry names slug {slug!r} but --slug says {args.slug!r}")
+        tag = build_catalog._entry_tag(slug, version, entry)
+        asset = f"{slug}-{version}.adz"
+
+        if args.repo and not args.no_verify:
+            problems = verify_published(args.repo, entry, slug, tag)
+            if problems:
+                print(f"refusing to record: {tag} does not carry these bytes", file=sys.stderr)
+                for problem in problems:
+                    print(f"  {problem}", file=sys.stderr)
                 return 1
-            merged, changed = merge_entry(current, entry)
-            changes = diff_summary(current, merged, slug) if changed else []
-            if changed and not args.dry_run:
-                args.catalog.write_text(
-                    json.dumps(merged, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
-                )
-            _report(slug, version, changed, changes, args.dry_run, target=str(args.catalog))
-            if args.print_document:
-                print(json.dumps(merged, indent=2, ensure_ascii=False))
-            return 0
-
-        if not args.repo:
-            print("error: --repo is required unless --catalog is given", file=sys.stderr)
-            return 1
-
-        current, blob_sha, _ = fetch_catalog(args.repo, args.branch)
-        merged, changed = merge_entry(current, entry)
-        changes = diff_summary(current, merged, slug) if changed else []
-
-        if not changed:
-            _report(slug, version, False, [], args.dry_run, target=f"{args.repo}@{args.branch}")
-            return 0
+            print(f"verified {asset} and its cover against the release API ({tag})")
 
         if args.dry_run:
-            _report(slug, version, True, changes, True, target=f"{args.repo}@{args.branch}")
-            if args.print_document:
-                print(json.dumps(merged, indent=2, ensure_ascii=False))
+            lock = build_catalog.load_lock()
+            current, _, _ = build_catalog.build_catalog(lock)
+            record = build_catalog.compose_record(entry, slug, version, tag)
+            would = json.loads(json.dumps(lock))
+            would["releases"][slug] = record
+            would["releases"] = dict(sorted(would["releases"].items()))
+            after, _, _ = build_catalog.build_catalog(would)
+            delta = build_catalog.diff_catalog(current, after)
+            print(f"dry run: would record {slug} v{version} ({entry['sha256'][:12]}…, "
+                  f"{entry['size_bytes']} B)")
+            for item in delta:
+                print(f"  would change: {item}")
+            if not delta:
+                print("  nothing would change")
             return 0
 
-        pr_url = publish_via_pull_request(
-            args.repo,
-            args.branch,
-            blob_sha,
-            merged,
-            slug=slug,
-            version=version,
-            run_id=args.run_id,
-        )
-        _report(slug, version, True, changes, False, target=f"{args.repo}@{args.branch}")
-        print(f"catalog.json updated on {args.branch} via {pr_url}")
+        before = build_catalog.load_lock()
+        before_catalog, _, _ = build_catalog.build_catalog(before)
+        lock = build_catalog.record_entry(args.entry)
+        generated, warnings, _ = build_catalog.build_catalog(lock)
+        build_catalog.CATALOG_PATH.write_text(build_catalog.dumps(generated), encoding="utf-8")
+        print(f"wrote {CATALOG_NAME}: {len(generated['adventures'])} adventures")
+        for warning in warnings:
+            print(f"warning: {warning}", file=sys.stderr)
+
+        delta = build_catalog.diff_catalog(before_catalog, generated)
+        if args.local:
+            for item in delta:
+                print(f"  changed: {item}")
+            return 0
+
+        if args.no_merge:
+            print("--no-merge: files written, PR will not be opened by this run", file=sys.stderr)
+        url = land(args.repo, args.branch, slug=slug, version=version, tag=tag, asset=asset,
+                   delta=delta, run_id=args.run_id) if not args.no_merge else ""
+        if not url:
+            return 0
         return 0
-
-    except SyncError as exc:
-        message = str(exc)
-        print(f"error: {message}", file=sys.stderr)
-        if "did not land" in message and "PR was created" in message:
-            return 3
+    except CatalogError as exc:
+        print(f"error: {exc}", file=sys.stderr)
         return 1
-
-
-def _report(
-    slug: str,
-    version: str,
-    changed: bool,
-    changes: list[str],
-    dry_run: bool,
-    *,
-    target: str,
-) -> None:
-    if not changed:
-        print(f"catalog.json ({target}) already matches {slug} {version} - nothing to do")
-        return
-    verb = "would update" if dry_run else "updated"
-    print(f"{verb} catalog.json ({target}) for {slug} {version}:")
-    for line in changes:
-        print(f"  {line}")
+    except SyncError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 3
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main())
