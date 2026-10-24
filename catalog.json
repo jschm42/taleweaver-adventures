@@ -2,10 +2,12 @@
   "schema": 1,
   "generated_at": "2026-10-23T17:03:14Z",
   "generator": "publish_adventures.py 1.1.0",
+  "repo_layout": "one source directory per adventure at the repository root",
   "adventures": [
     {
       "id": "336119af-f2b9-46ae-9035-8c0300bc4492",
       "slug": "crashed-on-proxima-9",
+      "source_dir": "crashed-on-proxima-9",
       "title": "Crashed on Proxima-9",
       "teaser": "Infected by a ravenous alien parasite on a living world, every step toward the cure costs blood.",
       "description": "",
@@ -26,6 +28,7 @@
     {
       "id": "d7832419-6916-4b75-84e0-7d941e6b2de9",
       "slug": "crazy-job-interview",
+      "source_dir": "crazy-job-interview",
       "title": "Crazy Job Interview",
       "teaser": "A bland job interview becomes a foamy fight to flush a homicidal bidet AI.",
       "description": "",
@@ -46,6 +49,7 @@
     {
       "id": "3e08c00f-55f1-4d3e-880e-e4e3b5083ba9",
       "slug": "el-profesor-s-purgatory",
+      "source_dir": "el-profesor-s-purgatory",
       "title": "El Profesor's Purgatory",
       "teaser": "Three portals. One disappointed teacher. Your escape depends on verbs you slept through.",
       "description": "",
@@ -66,6 +70,7 @@
     {
       "id": "0265025e-583b-410c-a962-20a9558cd795",
       "slug": "kitchen-crisis",
+      "source_dir": "kitchen-crisis",
       "title": "Kitchen Crisis",
       "teaser": "One hour until Grandma Edith arrives. The casserole is frozen, the microwave is on fire. Good luck.",
       "description": "",
@@ -86,6 +91,7 @@
     {
       "id": "9caf75b2-053d-4249-b353-577308cd3abd",
       "slug": "professor-quark-s-quantum-quest",
+      "source_dir": "professor-quark-s-quantum-quest",
       "title": "Professor Quark's Quantum Quest",
       "teaser": "Survive broken physics, solve cosmic riddles, and reassemble your professor before reality implodes!",
       "description": "",
@@ -106,6 +112,7 @@
     {
       "id": "5e2c880c-1d21-470a-8409-8cd19c423d3f",
       "slug": "sledge-and-order",
+      "source_dir": "sledge-and-order",
       "title": "Sledge and Order",
       "teaser": "A missing informant, a mob-run diner, and a walk-in freezer running colder than the truth.",
       "description": "",
@@ -126,6 +133,7 @@
     {
       "id": "8441af35-e354-4920-a513-cbe914ea246d",
       "slug": "the-alchemist-s-folly",
+      "source_dir": "the-alchemist-s-folly",
       "title": "The Alchemist's Folly",
       "teaser": "Trapped in a dead alchemist's dungeon, outwit vermin and goblins to claim the Crimson Tear.",
       "description": "",
@@ -146,6 +154,7 @@
     {
       "id": "fc0ec8b1-c29d-4e66-b480-988aeabf3fdd",
       "slug": "the-echo-archive-riddle-test",
+      "source_dir": "the-echo-archive-riddle-test",
       "title": "The Echo Archive (Riddle-Test)",
       "teaser": "In a self-sealing tomb of echoes, breath and timing matter more than steel.",
       "description": "",
@@ -166,6 +175,7 @@
     {
       "id": "e9ab3f9e-237d-4d25-9cf1-4644c9a044f2",
       "slug": "the-master-s-workshop",
+      "source_dir": "the-master-s-workshop",
       "title": "The Master's Workshop",
       "teaser": "A vanished inventor, a silent machine, and a workshop full of dangerous clockwork answers.",
       "description": "",
@@ -186,6 +196,7 @@
     {
       "id": "49508727-de94-4619-9c47-bf7810211a19",
       "slug": "the-observer-s-labyrinth",
+      "source_dir": "the-observer-s-labyrinth",
       "title": "The Observer's Labyrinth",
       "teaser": "Wake nameless in a lethal research labyrinth. Outwit a rogue AI before its final purge begins.",
       "description": "",
