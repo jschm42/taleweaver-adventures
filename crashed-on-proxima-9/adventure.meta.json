@@ -6,5 +6,6 @@
   "content_warnings": [],
   "min_app_version": "0.7.0",
   "cover_asset": "assets/crashed-on-proxima-9-argo-9e896erg_cover_36e3528c.jpg",
-  "save_compat": null
+  "save_compat": null,
+  "cover_aspect": "3:2"
 }

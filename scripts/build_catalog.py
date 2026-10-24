@@ -31,6 +31,7 @@ from __future__ import annotations
 import argparse
 import datetime
 import hashlib
+import os
 import json
 import subprocess
 import sys
@@ -423,7 +424,7 @@ def build_catalog() -> tuple[dict, list[str], list[str]]:
     released = [entry for entry in entries if entry["status"] == "released"]
     catalog = {
         "schema": CATALOG_SCHEMA,
-        "generated_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "generated_at": _build_timestamp(),
         "generator": GENERATOR,
         "repo_layout": "one source directory per adventure at the repository root",
         "adventures": entries,
@@ -433,6 +434,94 @@ def build_catalog() -> tuple[dict, list[str], list[str]]:
         f"({', '.join(sorted({e['status'] for e in entries if e['status'] != 'released'})) or 'none'})"
     )
     return catalog, warnings, copy_problems
+
+
+def _build_timestamp() -> str:
+    """Deterministic timestamp. A field that records "when this was generated" but
+    lives in the repository only ever records the last human commit, so derive it:
+    SOURCE_DATE_EPOCH when the caller pins it, otherwise the commit date."""
+    epoch = os.environ.get("SOURCE_DATE_EPOCH")
+    if epoch and epoch.isdigit():
+        moment = datetime.datetime.fromtimestamp(int(epoch), datetime.timezone.utc)
+        return moment.strftime("%Y-%m-%dT%H:%M:%SZ")
+    result = subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "log", "-1", "--format=%cI"],
+        capture_output=True, text=True,
+    )
+    if result.returncode == 0 and result.stdout.strip():
+        moment = datetime.datetime.fromisoformat(result.stdout.strip())
+        return moment.astimezone(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return "1970-01-01T00:00:00Z"
+
+
+def check_release(slug_entry: dict) -> list[str]:
+    """Read back the published release and compare it with what the catalogue claims.
+
+    `--check` only guards the source tree, so it stays green while `cover_url` points
+    at a name the release does not carry - a 404 that no local check can see. This is
+    the only check that talks to the published artefact, and it is read-only.
+    """
+    slug = slug_entry["slug"]
+    version = slug_entry["version"]
+    tag = f"adv/{slug}/v{version}"
+    result = subprocess.run(
+        ["gh", "api", f"repos/{REPOSITORY}/releases/tags/{tag}"],
+        capture_output=True, text=True,
+    )
+    if result.returncode != 0:
+        detail = (result.stderr or "").strip().splitlines()
+        return [f"{slug}: cannot read release {tag}: {detail[0] if detail else 'gh api failed'}"]
+
+    assets = json.loads(result.stdout).get("assets", [])
+    names = [asset["name"] for asset in assets]
+    problems = []
+
+    bundles = [asset for asset in assets if asset["name"].endswith(".adz")]
+    expected_bundle = f"{slug}-{version}.adz"
+    if len(bundles) != 1:
+        problems.append(
+            f"{slug}: {len(bundles)} .adz assets in {tag} ({', '.join(b['name'] for b in bundles)}) "
+            f"- a client cannot tell which one the catalogue means"
+        )
+    elif bundles[0]["name"] != expected_bundle:
+        problems.append(
+            f"{slug}: release carries {bundles[0]['name']!r} but the catalogue links "
+            f"{expected_bundle!r}"
+        )
+    else:
+        bundle = bundles[0]
+        if bundle["size"] != slug_entry["size_bytes"]:
+            problems.append(
+                f"{slug}: {expected_bundle} is {bundle['size']} B in the release but "
+                f"{slug_entry['size_bytes']} B in the catalogue"
+            )
+        digest = (bundle.get("digest") or "").removeprefix("sha256:")
+        if digest and digest != slug_entry["sha256"]:
+            problems.append(
+                f"{slug}: {expected_bundle} digest {digest[:12]}... is not the catalogue "
+                f"sha256 {slug_entry['sha256'][:12]}..."
+            )
+
+    cover_url = slug_entry.get("cover_url")
+    if cover_url:
+        expected_cover = cover_url.rsplit("/", 1)[-1]
+        covers = [name for name in names if name.startswith("cover")]
+        if expected_cover not in covers:
+            problems.append(
+                f"{slug}: cover_url points at {expected_cover!r} but {tag} carries "
+                f"{covers or 'no cover asset'} - every client following that URL gets a 404"
+            )
+        elif len(covers) > 1:
+            problems.append(f"{slug}: {len(covers)} cover assets in {tag}: {covers}")
+        else:
+            asset = next(a for a in assets if a["name"] == expected_cover)
+            digest = (asset.get("digest") or "").removeprefix("sha256:")
+            if digest and digest != slug_entry.get("cover_sha256"):
+                problems.append(
+                    f"{slug}: {expected_cover} digest {digest[:12]}... is not the catalogue "
+                    f"cover_sha256 {(slug_entry.get('cover_sha256') or '')[:12]}..."
+                )
+    return problems
 
 
 def diff_catalog(committed: dict, generated: dict) -> list[str]:
@@ -518,6 +607,11 @@ def main(argv: list[str] | None = None) -> int:
         help="also fail when curated copy is missing (description length, tags)",
     )
     parser.add_argument(
+        "--release-check",
+        action="store_true",
+        help="read back every released tag and compare it with the generated catalogue",
+    )
+    parser.add_argument(
         "--entry",
         metavar="PATH",
         help="verify a built catalog-entry.json against the source tree (pre-upload gate)",
@@ -532,6 +626,22 @@ def main(argv: list[str] | None = None) -> int:
 
     for warning in warnings:
         print(f"warning: {warning}", file=sys.stderr)
+
+    if args.release_check:
+        released = [a for a in generated["adventures"] if a["status"] == "released"]
+        release_problems = []
+        for adventure in released:
+            release_problems.extend(check_release(adventure))
+        if release_problems:
+            print(
+                f"published releases do not match the catalogue ({len(release_problems)} problem(s)):",
+                file=sys.stderr,
+            )
+            for problem in release_problems:
+                print(f"  {problem}", file=sys.stderr)
+            return 2
+        print(f"all {len(released)} published releases match the catalogue")
+        return 0
 
     if args.entry:
         entry_problems = verify_entry(Path(args.entry), generated)

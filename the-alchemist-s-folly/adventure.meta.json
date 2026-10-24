@@ -6,5 +6,6 @@
   "content_warnings": [],
   "min_app_version": "0.7.0",
   "cover_asset": "assets/the-alchemists-folly-argo-gzjnuzzg_cover_0f29eff2.jpg",
-  "save_compat": null
+  "save_compat": null,
+  "cover_aspect": "3:2"
 }

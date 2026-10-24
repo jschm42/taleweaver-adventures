@@ -6,5 +6,6 @@
   "content_warnings": [],
   "min_app_version": "0.7.0",
   "cover_asset": "assets/crazy-job-interview-argon-7fviat1z_cover_c727df14.jpg",
-  "save_compat": null
+  "save_compat": null,
+  "cover_aspect": "3:2"
 }

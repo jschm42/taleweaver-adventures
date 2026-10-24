@@ -6,5 +6,6 @@
   "content_warnings": [],
   "min_app_version": "0.7.0",
   "cover_asset": "assets/the-observers-labyrinth-a-izrtswxr_cover_8a788a99.jpg",
-  "save_compat": null
+  "save_compat": null,
+  "cover_aspect": "1:1"
 }

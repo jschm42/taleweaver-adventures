@@ -6,5 +6,6 @@
   "content_warnings": [],
   "min_app_version": "0.7.0",
   "cover_asset": "assets/sledge-and-order-argon-co-tmbfozio_cover_7f6c5fee.jpg",
-  "save_compat": null
+  "save_compat": null,
+  "cover_aspect": "3:2"
 }
