@@ -85,6 +85,21 @@ def _load_json(path: Path, what: str) -> dict:
         raise CatalogError(f"{path.relative_to(REPO_ROOT)}: invalid JSON ({exc})") from exc
 
 
+def _guard_against_publishing_drift(generated: dict) -> list[str]:
+    """Writing catalog.json is only safe when the releases already carry the tree's bytes.
+
+    While the ten published bundles predate the deterministic packer, regenerating the
+    catalogue rewrites ten working hashes with ten that resolve to nothing - the one
+    failure that breaks downloads for every adventure at once. The freeze is therefore
+    enforced here instead of agreed in chat: the write path asks the releases first.
+    """
+    problems = []
+    for adventure in generated["adventures"]:
+        if adventure["status"] == "released":
+            problems.extend(check_release(adventure))
+    return problems
+
+
 def dumps(document: dict) -> str:
     """The one serialisation of `catalog.json`, so `--check` can compare bytes.
 
@@ -616,6 +631,11 @@ def main(argv: list[str] | None = None) -> int:
         help="also fail when curated copy is missing (description length, tags)",
     )
     parser.add_argument(
+        "--force",
+        action="store_true",
+        help="write catalog.json even when the releases do not carry the tree's bytes",
+    )
+    parser.add_argument(
         "--release-check",
         action="store_true",
         help="read back every released tag and compare it with the generated catalogue",
@@ -667,6 +687,22 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if not args.check:
+        drift = [] if args.force else _guard_against_publishing_drift(generated)
+        if drift:
+            print(
+                f"refusing to write {CATALOG_PATH.name}: the published releases do not carry "
+                f"the bytes this tree produces ({len(drift)} problem(s)).",
+                file=sys.stderr,
+            )
+            for problem in drift[:4]:
+                print(f"  {problem}", file=sys.stderr)
+            print(
+                "  This is the freeze, not a bug: regenerating now would point every download "
+                "at an asset that does not exist. Re-cut the releases first, or pass --force "
+                "if you know exactly why the catalogue must move ahead of them.",
+                file=sys.stderr,
+            )
+            return 2
         CATALOG_PATH.write_text(dumps(generated), encoding="utf-8")
         print(
             f"wrote {CATALOG_PATH.name}: {len(generated['adventures'])} adventures, "
