@@ -659,10 +659,23 @@ jobs:
             exit 0
           fi
 
+          # Without the deploy key the assets are already published at this point, so a
+          # hard failure here would only paint a successful release red and leave the
+          # repository in the state it is in anyway.  Skip loudly instead: the run keeps
+          # its real verdict and the summary says exactly which asset the catalog has
+          # not seen yet.  Deliberate, not a silent no-op - the warning names the fix.
           if [[ -z "${CATALOG_DEPLOY_KEY:-}" ]]; then
-            echo "::error::secret CATALOG_DEPLOY_KEY is empty - catalog.json cannot be pushed."
-            echo "::error::Add a write-enabled deploy key to ${GITHUB_REPOSITORY} and store the private half as the repository secret CATALOG_DEPLOY_KEY (README -> Catalog sync)."
-            exit 1
+            echo "::warning::secret CATALOG_DEPLOY_KEY is empty - release assets are published, catalog.json was NOT updated."
+            echo "::warning::Add a write-enabled deploy key to ${GITHUB_REPOSITORY} and store the private half as the repository secret CATALOG_DEPLOY_KEY (README -> Catalog sync), then re-run the 'Sync catalog.json' step."
+            {
+              echo "### Catalog sync skipped"
+              echo ""
+              echo "Release assets for \`${SLUG}\` \`${VERSION_BARE}\` are published."
+              echo ""
+              echo "\`catalog.json\` still describes the previous published asset because \`CATALOG_DEPLOY_KEY\` is not set."
+              echo "Clients keep working; they just will not see this release until a sync runs."
+            } >> "${GITHUB_STEP_SUMMARY:-/dev/null}"
+            exit 0
           fi
 
           # Key material lives in a private throwaway directory: never in the
