@@ -27,6 +27,9 @@
       "instruction": "The tone is heroic and epic. Focus on grand scale, legendary atmosphere, and inspiring narratives.",
       "image_url": "/assets/catalog/tones/heroic-epic_9206142b.jpg"
     },
+    "ui_theme": {
+      "skin": "chronicle"
+    },
     "selected_image_styles": [
       {
         "id": "dark-fantasy-painting",

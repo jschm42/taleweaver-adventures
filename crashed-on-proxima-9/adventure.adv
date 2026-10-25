@@ -27,6 +27,9 @@
       "instruction": "Use futuristic world logic, technical flavor, and discovery-driven narrative beats.",
       "image_url": "/assets/catalog/tones/sci-fi_0b2e548f.jpg"
     },
+    "ui_theme": {
+      "skin": "terminal"
+    },
     "selected_image_styles": [
       {
         "id": "science-fiction",
