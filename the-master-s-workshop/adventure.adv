@@ -27,6 +27,9 @@
       "instruction": "Keep a classic heroic arc, meaningful choices, and clear quest momentum.",
       "image_url": "/assets/catalog/tones/classic-rpg_551efe58.jpg"
     },
+    "ui_theme": {
+      "skin": "grimoire"
+    },
     "selected_image_styles": [
       {
         "id": "grimdark-ink-sketch",

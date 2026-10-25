@@ -27,6 +27,9 @@
       "instruction": "The tone is absurd slapstick. Use deadpan humor, emphasize ridiculous physical comedy, nonsensical dialogue, and over-the-top reactions. Serious situations should be undermined by absurdity and bizarre coincidences.",
       "image_url": "/assets/catalog/tones/absurd-slapstick_42e21daa.jpg"
     },
+    "ui_theme": {
+      "skin": "noir"
+    },
     "selected_image_styles": [
       {
         "id": "cinematic-realism",

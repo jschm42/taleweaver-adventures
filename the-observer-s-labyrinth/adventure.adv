@@ -27,6 +27,9 @@
       "instruction": "Maintain unsettling tension, sparse comfort, and consequences that feel dangerous.",
       "image_url": "/assets/catalog/tones/horror_7e4a6db5.jpg"
     },
+    "ui_theme": {
+      "skin": "eldritch"
+    },
     "selected_image_styles": [
       {
         "id": "cinematic-realism",

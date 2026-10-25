@@ -27,6 +27,9 @@
       "instruction": "Favor witty dialogue, comic timing, and low-stakes chaos with charming setbacks.",
       "image_url": "/assets/catalog/tones/sitcom_3b747e63.jpg"
     },
+    "ui_theme": {
+      "skin": "toon"
+    },
     "selected_image_styles": [
       {
         "id": "cinematic-realism",
