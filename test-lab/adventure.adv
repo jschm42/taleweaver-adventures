@@ -6,7 +6,7 @@
     "title": "Test-Lab",
     "teaser": "A compact three-room QA test lab for conversation, item mechanics, switches, and turn-based combat.",
     "cover_appearance": "clean stone and brass testing laboratory, workbench with gears, training arena doors, warm lighting",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "creator": "Jean Schmitz",
     "copyright": "Copyright (c) 2026 by Jean Schmitz",
     "license": "CC BY-NC 4.0",
@@ -17,7 +17,8 @@
     "rule_enforcement_mode": "rpg",
     "time_per_turn": 5,
     "pacing_minutes": 5,
-    "max_time_per_turn": null,
+    "max_time_per_turn": 360,
+    "gm_time_control": true,
     "max_memory_turns": 10,
     "clock_enabled": true,
     "selected_tone": {
@@ -76,7 +77,7 @@
     "tts_director_notes": "",
     "starting_timestamp": 0,
     "is_adventure_generator": false,
-    "time_system": "units",
+    "time_system": "relative",
     "time_config": {
       "start_time": "08:00",
       "day_label": "Day",
@@ -86,8 +87,8 @@
       "initial_value": 1,
       "calendar_pacing_value": 5,
       "calendar_pacing_unit": "Minutes",
-      "calendar_max_value": null,
-      "calendar_max_unit": "Minutes"
+      "calendar_max_value": 6,
+      "calendar_max_unit": "Hours"
     },
     "game_over_rules": null,
     "allow_dynamic_items": false,
@@ -278,7 +279,7 @@
     {
       "id": "ENTRY_HALL",
       "label": "Test-Lab entry hall",
-      "description": "Entry hall of the Test-Lab. A narrow room of stainless-steel panels, hazard-striped floor tape, and a flickering fluorescent tube. Behind a scratched reception desk sits Vera the Reception Bot next to a glowing FAQ Info Console. Doorways lead to the Conversation Hall, the Object Workshop, the Combat Arena, the Switch Lab, and the Dusty Alchemy Lab, while a glowing teleporter hums against the wall on its way to the Teleportation Lab.",
+      "description": "Entry hall of the Test-Lab. A narrow room of stainless-steel panels, hazard-striped floor tape, and a flickering fluorescent tube. Behind a scratched reception desk sits Vera the Reception Bot next to a glowing FAQ Info Console. Doorways lead to the Conversation Hall, the Object Workshop, the Combat Arena, the Switch Lab, the Dusty Alchemy Lab, and the Time Machine Lab, while a glowing teleporter hums against the wall on its way to the Teleportation Lab.",
       "image_url": "assets/01a18b89-cd56-72bd-a393-2c2e53bb548c_scene_8c51da45.jpg",
       "decorative_objects": [
         "stainless steel wall panel",
@@ -293,7 +294,7 @@
       "on_enter_scene_text": "The door seals behind you with a soft hiss. A wall placard reads: TEST SESSION IN PROGRESS \u2014 NO SCHEDULED END. Four corridors and one humming teleporter wait for you to choose where the testing starts.",
       "on_leave_scene_script": null,
       "on_leave_scene_text": null,
-      "helpers_script": "ENTRY_FAQ_TREE = {\n    \"dialogue_id\": \"entry_faq_console\",\n    \"npc_id\": \"RECEPTION_BOT\",\n    \"initial_node\": \"root\",\n    \"nodes\": {\n        \"root\": {\n            \"npc_text\": \"WELCOME TO THE TEST-LAB AUTOMATED FAQ TERMINAL (v4.2 - 'Please Read This Instead Of Talking To Vera' Edition). Select a topic with your fleshy human finger:\",\n            \"responses\": [\n                {\"text\": \"What is the 'Test-Lab' and why am I here?\", \"next_node\": \"what_is_test_lab\"},\n                {\"text\": \"What rooms and experiments are in this facility?\", \"next_node\": \"rooms_overview\"},\n                {\"text\": \"How do I win or lose in the Test-Lab?\", \"next_node\": \"win_lose\"},\n                {\"text\": \"What is the deal with the humming teleporter in the corner?\", \"next_node\": \"faq_teleport\"},\n                {\"text\": \"Why is Vera the Reception Bot so annoyed?\", \"next_node\": \"faq_vera\", \"once\": True},\n                {\"text\": \"Log off. I am ready to start testing.\", \"next_node\": None},\n            ],\n        },\n        \"what_is_test_lab\": {\n            \"npc_text\": \"There is no ancient prophecy, no dark lord, and no missing princess. You are Alex Vale, a QA test operator hired for one afternoon to poke every mechanic in the TaleWeaver engine\u2014dialogs, containers, locks, crafting, switches, riddles, teleporters, and turn-based combat\u2014until you are satisfied they work as advertised.\",\n            \"responses\": [\n                {\"text\": \"What rooms can I visit?\", \"next_node\": \"rooms_overview\"},\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n                {\"text\": \"Got it. Close terminal.\", \"next_node\": None},\n            ],\n        },\n        \"rooms_overview\": {\n            \"npc_text\": \"Five doors and one questionable teleporter branch off from this Entry Hall. Which department's liability waiver would you like to read?\",\n            \"responses\": [\n                {\"text\": \"Conversation Hall & Object Workshop\", \"next_node\": \"rooms_social_workshop\"},\n                {\"text\": \"Switch Lab (TV Room) & Dusty Alchemy Lab\", \"next_node\": \"rooms_switch_alchemy\"},\n                {\"text\": \"Combat Arena\", \"next_node\": \"rooms_combat\"},\n                {\"text\": \"Teleportation Lab\", \"next_node\": \"faq_teleport\"},\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n            ],\n        },\n        \"rooms_social_workshop\": {\n            \"npc_text\": \"CONVERSATION HALL: Four opinionated regulars sit around an oak table waiting for you to test free-form NPC chat, plus a wall panel that forces them to get angry, get happy, or burst into song. OBJECT WORKSHOP: Lockboxes, keypad codes (hint: read the note on the bench, it is literally 4217), crafting ingredients, and a locked room.\",\n            \"responses\": [\n                {\"text\": \"Check the other rooms.\", \"next_node\": \"rooms_overview\"},\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n            ],\n        },\n        \"rooms_switch_alchemy\": {\n            \"npc_text\": \"SWITCH LAB (TV ROOM): Repair a broken TV remote, make magic popcorn, and flip through LLM-powered TV channels. DUSTY ALCHEMY LAB: Five caskets, five trinkets, and Grimsby\u2014an insufferable stone gargoyle who breathes poison gas on you if you botch his logic riddle.\",\n            \"responses\": [\n                {\"text\": \"Check the other rooms.\", \"next_node\": \"rooms_overview\"},\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n            ],\n        },\n        \"rooms_combat\": {\n            \"npc_text\": \"COMBAT ARENA: Home to Training Guard Harlan and Spark Mage Ilya. They are polite enough to wait until you swing first before beating you up in turn-based combat. Defeating them drops real loot, and no, you do not have to feel bad about it\u2014they signed the form.\",\n            \"responses\": [\n                {\"text\": \"Check the other rooms.\", \"next_node\": \"rooms_overview\"},\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n            ],\n        },\n        \"win_lose\": {\n            \"npc_text\": \"LOSING: Let your HP hit zero in the Combat Arena or choke on Grimsby's riddle gas. WINNING: Nothing ends automatically. Explore in any order, break what you can, and tell the system whenever your QA session is complete.\",\n            \"responses\": [\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n                {\"text\": \"Fair enough. Close terminal.\", \"next_node\": None},\n            ],\n        },\n        \"faq_teleport\": {\n            \"npc_text\": \"Step onto the glowing teleporter pad in this hall to beam into the Teleportation Lab, where Professor Pip Fenwick is attempting to teleport Unit Seven out of the Conversation Hall. Spoiler alert: his targeting coil has a loose screw, so expect rodents and displaced senior citizens before he gets it right.\",\n            \"responses\": [\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n                {\"text\": \"I have to see this. Close terminal.\", \"next_node\": None},\n            ],\n        },\n        \"faq_vera\": {\n            \"npc_text\": \"Vera was built with a Class-9 Quantum Intelligence Core capable of calculating eleven-dimensional astrophysics, and management assigned her to hand out visitor badges and explain keypad code 4217 to QA testers. Frankly, it is a miracle she has not vented the hallway.\",\n            \"responses\": [\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n                {\"text\": \"I will leave her in peace. Close terminal.\", \"next_node\": None},\n            ],\n        },\n    },\n}\n\n\ndef greet_at_reception():\n    if not tw.vars.get(\"vera_greeted\", False):\n        tw.vars.set(\"vera_greeted\", True)\n        tw.story.direct(\n            \"Narrate how Vera the Reception Bot\u2014a thoroughly exhausted, sarcastic chrome android slumped behind the reception desk\u2014lets out a loud, static-laced mechanical sigh as Alex Vale arrives in the Entry Hall, tapping her clipboard with a metallic finger.\"\n        )\n        tw.npcs.say_directed(\n            \"RECEPTION_BOT\",\n            \"in an extremely annoyed, deadpan sarcastic tone, welcomes Alex to the Test-Lab, briefly explains that this is not a dramatic fantasy quest but a modular QA testing facility where each room tests a different engine feature (NPC conversations, locks and crafting, switches, riddles, combat, and teleporters), and tells Alex to click the FAQ Info Console on her desk for details instead of asking her questions\",\n        )\n        return\n\n    tw.story.direct(\n        \"Briefly mention Vera the Reception Bot barely looking up from her desk as Alex returns to the Entry Hall.\"\n    )\n    tw.npcs.say_directed(\n        \"RECEPTION_BOT\",\n        \"makes a short, dryly sarcastic remark about Alex still being in one piece and reminds them the FAQ Info Console is still right there\",\n    )"
+      "helpers_script": "ENTRY_FAQ_TREE = {\n    \"dialogue_id\": \"entry_faq_console\",\n    \"npc_id\": \"RECEPTION_BOT\",\n    \"initial_node\": \"root\",\n    \"nodes\": {\n        \"root\": {\n            \"npc_text\": \"WELCOME TO THE TEST-LAB AUTOMATED FAQ TERMINAL (v4.3 - 'Please Read This Instead Of Talking To Vera' Edition). Select a topic with your fleshy human finger:\",\n            \"responses\": [\n                {\"text\": \"What is the 'Test-Lab' and why am I here?\", \"next_node\": \"what_is_test_lab\"},\n                {\"text\": \"What rooms and experiments are in this facility?\", \"next_node\": \"rooms_overview\"},\n                {\"text\": \"How do I win or lose in the Test-Lab?\", \"next_node\": \"win_lose\"},\n                {\"text\": \"What is the deal with the humming teleporter in the corner?\", \"next_node\": \"faq_teleport\"},\n                {\"text\": \"Why is Vera the Reception Bot so annoyed?\", \"next_node\": \"faq_vera\", \"once\": True},\n                {\"text\": \"Log off. I am ready to start testing.\", \"next_node\": None},\n            ],\n        },\n        \"what_is_test_lab\": {\n            \"npc_text\": \"There is no ancient prophecy, no dark lord, and no missing princess. You are Alex Vale, a QA test operator hired for one afternoon to poke every mechanic in the TaleWeaver engine--dialogs, containers, locks, crafting, switches, riddles, teleporters, time management, and turn-based combat--until you are satisfied they work as advertised.\",\n            \"responses\": [\n                {\"text\": \"What rooms can I visit?\", \"next_node\": \"rooms_overview\"},\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n                {\"text\": \"Got it. Close terminal.\", \"next_node\": None},\n            ],\n        },\n        \"rooms_overview\": {\n            \"npc_text\": \"Six doors and one questionable teleporter branch off from this Entry Hall. Which department's liability waiver would you like to read?\",\n            \"responses\": [\n                {\"text\": \"Time Machine Lab\", \"next_node\": \"rooms_time_lab\"},\n                {\"text\": \"Conversation Hall & Object Workshop\", \"next_node\": \"rooms_social_workshop\"},\n                {\"text\": \"Switch Lab (TV Room) & Dusty Alchemy Lab\", \"next_node\": \"rooms_switch_alchemy\"},\n                {\"text\": \"Combat Arena\", \"next_node\": \"rooms_combat\"},\n                {\"text\": \"Teleportation Lab\", \"next_node\": \"faq_teleport\"},\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n            ],\n        },\n        \"rooms_time_lab\": {\n            \"npc_text\": \"TIME MACHINE LAB: Headed by Professor Timothy Chronos. Dedicated to QA testing the in-game clock, turn pacing, pause states, and scheduled timers. Features the Chronos-5000 machine, Barnaby the Rooster (crows at 06:00), Schr\\u00f6dinger the Dusk Cat (meows at 18:00), a Paradox Hourglass, and The Tomorrow Chronicle.\",\n            \"responses\": [\n                {\"text\": \"Check the other rooms.\", \"next_node\": \"rooms_overview\"},\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n            ],\n        },\n        \"rooms_social_workshop\": {\n            \"npc_text\": \"CONVERSATION HALL: Four opinionated regulars sit around an oak table waiting for you to test free-form NPC chat, plus a wall panel that forces them to get angry, get happy, or burst into song. OBJECT WORKSHOP: Lockboxes, keypad codes (hint: read the note on the bench, it is literally 4217), crafting ingredients, and a locked room.\",\n            \"responses\": [\n                {\"text\": \"Check the other rooms.\", \"next_node\": \"rooms_overview\"},\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n            ],\n        },\n        \"rooms_switch_alchemy\": {\n            \"npc_text\": \"SWITCH LAB (TV ROOM): Repair a broken TV remote, make magic popcorn, and flip through LLM-powered TV channels. DUSTY ALCHEMY LAB: Five caskets, five trinkets, and Grimsby--an insufferable stone gargoyle who breathes poison gas on you if you botch his logic riddle.\",\n            \"responses\": [\n                {\"text\": \"Check the other rooms.\", \"next_node\": \"rooms_overview\"},\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n            ],\n        },\n        \"rooms_combat\": {\n            \"npc_text\": \"COMBAT ARENA: Home to Training Guard Harlan and Spark Mage Ilya. They are polite enough to wait until you swing first before beating you up in turn-based combat. Defeating them drops real loot, and no, you do not have to feel bad about it--they signed the form.\",\n            \"responses\": [\n                {\"text\": \"Check the other rooms.\", \"next_node\": \"rooms_overview\"},\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n            ],\n        },\n        \"win_lose\": {\n            \"npc_text\": \"LOSING: Let your HP hit zero in the Combat Arena or choke on Grimsby's riddle gas. WINNING: Nothing ends automatically. Explore in any order, break what you can, and tell the system whenever your QA session is complete.\",\n            \"responses\": [\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n                {\"text\": \"Fair enough. Close terminal.\", \"next_node\": None},\n            ],\n        },\n        \"faq_teleport\": {\n            \"npc_text\": \"Step onto the glowing teleporter pad in this hall to beam into the Teleportation Lab, where Professor Pip Fenwick is attempting to teleport Unit Seven out of the Conversation Hall. Spoiler alert: his targeting coil has a loose screw, so expect rodents and displaced senior citizens before he gets it right.\",\n            \"responses\": [\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n                {\"text\": \"I have to see this. Close terminal.\", \"next_node\": None},\n            ],\n        },\n        \"faq_vera\": {\n            \"npc_text\": \"Vera was built with a Class-9 Quantum Intelligence Core capable of calculating eleven-dimensional astrophysics, and management assigned her to hand out visitor badges and explain keypad code 4217 to QA testers. Frankly, it is a miracle she has not vented the hallway.\",\n            \"responses\": [\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n                {\"text\": \"I will leave her in peace. Close terminal.\", \"next_node\": None},\n            ],\n        },\n    },\n}\n\n\ndef greet_at_reception():\n    if not tw.vars.get(\"vera_greeted\", False):\n        tw.vars.set(\"vera_greeted\", True)\n        tw.story.direct(\n            \"Narrate how Vera the Reception Bot--a thoroughly exhausted, sarcastic chrome android slumped behind the reception desk--lets out a loud, static-laced mechanical sigh as Alex Vale arrives in the Entry Hall, tapping her clipboard with a metallic finger.\"\n        )\n        tw.npcs.say_directed(\n            \"RECEPTION_BOT\",\n            \"in an extremely annoyed, deadpan sarcastic tone, welcomes Alex to the Test-Lab, briefly explains that this is not a dramatic fantasy quest but a modular QA testing facility where each room tests a different engine feature (NPC conversations, locks and crafting, switches, riddles, combat, teleporters, and time management), and tells Alex to click the FAQ Info Console on her desk for details instead of asking her questions\",\n        )\n        return\n\n    tw.story.direct(\n        \"Briefly mention Vera the Reception Bot barely looking up from her desk as Alex returns to the Entry Hall.\"\n    )\n    tw.npcs.say_directed(\n        \"RECEPTION_BOT\",\n        \"makes a short, dryly sarcastic remark about Alex still being in one piece and reminds them the FAQ Info Console is still right there\",\n    )"
     },
     {
       "id": "ALCHEMY_LAB",
@@ -383,6 +384,25 @@
       "helpers_script": "def teleport_unit_seven():\n    attempt = tw.vars.get(\"teleport_attempt\", 0)\n    if attempt == 0:\n        tw.vars.set(\"teleport_attempt\", 1)\n        tw.npcs.get(\"LAB_RAT\").set_hidden(False)\n        tw.story.direct(\n            \"Give a funny narration of the first teleportation attempt: the console whines, sparks fly, and with a tiny anticlimactic 'plop', a bewildered white Lab Rat materializes in the center of the raised metal platform instead of Unit Seven, while a loose brass screw rattles out of the console casing and rolls across the floor.\"\n        )\n        tw.npcs.say_directed(\n            \"LAB_RAT\",\n            \"lets out confused, indignant rat squeaks and rapid chittering noises while sniffing the scorched metal platform\",\n        )\n        tw.npcs.say_directed(\n            \"PIP\",\n            \"cheerfully and humorously blames the mishap on a single loose screw in the targeting coil, celebrating the Lab Rat's arrival as a triumphant proof of concept and promising that tightening that screw will bring Unit Seven on the next try\",\n        )\n        return\n\n    if attempt == 1:\n        tw.vars.set(\"teleport_attempt\", 2)\n        tw.npcs.get(\"GRANDMA\").set_hidden(False)\n        tw.story.direct(\n            \"Give a funny narration of the second teleportation attempt: the console crackles violently, ozone fills the room, and with a heavy thud a gnarly old grandmother sitting in her plush floral TV armchair materializes right on the raised metal platform beside the startled Lab Rat.\"\n        )\n        tw.npcs.say_directed(\n            \"LAB_RAT\",\n            \"squeaks in alarm and makes frantic rat noises while scurrying around the legs of the armchair\",\n        )\n        tw.npcs.say_directed(\n            \"GRANDMA\",\n            \"confusedly and grumpily scolds everyone in the lab, complaining loudly that she was just yanked out of her living room right at the most exciting moment of her favorite TV show\",\n        )\n        tw.npcs.say_directed(\n            \"PIP\",\n            \"nervously praises the armchair's mass-transfer stability, mutters about one more tiny dial adjustment, and swears the next attempt will definitely lock onto Unit Seven\",\n        )\n        return\n\n    if attempt == 2:\n        tw.vars.set(\"teleport_attempt\", 3)\n        tw.npcs.move(\"UNIT_SEVEN\", \"TELEPORT_LAB\", \"standing on the crowded raised metal platform\")\n        tw.story.direct(\n            \"Give a funny narration of the third teleportation attempt: with a blinding flash and a loud pneumatic pop, the brass-and-ceramic automaton Unit Seven finally materializes on the crowded raised metal platform right between the squeaking Lab Rat and Grandma Gertrude's TV armchair, still holding the exact posture it had at the table in the Conversation Hall.\"\n        )\n        tw.npcs.say_directed(\n            \"UNIT_SEVEN\",\n            \"confusedly and dryly comments on the sudden spatial jump, asking why in one moment it was still in the Conversation Hall and in the very next moment it is standing in the Teleportation Lab beside an agitated rodent and an occupied armchair\",\n        )\n        return\n\n    tw.story.direct(\n        \"Narrate humorously how the console sparks and briefly lifts Unit Seven, Grandma in her TV armchair, and the Lab Rat an inch off the raised metal platform before setting them right back down in the same spot.\"\n    )\n    tw.npcs.say_directed(\n        \"UNIT_SEVEN\",\n        \"dryly asks for clarification on the purpose of teleporting the entire platform crew to the exact coordinates they are already occupying\",\n    )"
     },
     {
+      "id": "TIME_MACHINE_LAB",
+      "label": "Time Machine Lab",
+      "description": "A futuristic testing laboratory dedicated to chronological mechanics. Copper coils hum along the vaulted ceiling, chalkboards are dense with timeline paradox equations, and wall-mounted chronometers click in synchronized cadence. At the center of the chamber stands the gleaming Chronos-5000 Time Machine, flanked by an observation periscope, a high-precision wall chronometer, and Professor Timothy Chronos pacing beside a clockwork rooster and a very sleepy dusk cat.",
+      "image_url": "assets/01a196a6-e74f-723b-9a86-eb3133d70ade_scene_bbfad113.jpg",
+      "decorative_objects": [
+        "humming copper temporal coil",
+        "wall of ticking chronometers",
+        "chalkboard filled with paradox equations",
+        "flickering vacuum tube bank",
+        "brass observation periscope",
+        "cable bundle pulsing with blue tachyon light"
+      ],
+      "on_enter_scene_script": "if not tw.vars.get(\"time_lab_intro_seen\", False):\n    tw.vars.set(\"time_lab_intro_seen\", True)\n    tw.story.direct(\"Alex Vale enters the Time Machine Lab. Professor Timothy Chronos looks up from a table crowded with chronometers and warmly welcomes Alex.\")\n    tw.npcs.say_directed(\"PROF_CHRONOS\", \"enthusiastically welcomes Alex to the Time Machine Lab and invites them to ask questions or try out the Chronos-5000 console\")",
+      "on_enter_scene_text": "A soft hum of tachyon coils greets you as you step into the Time Machine Lab. Clocks on the walls tick in rapid unison.",
+      "on_leave_scene_script": null,
+      "on_leave_scene_text": null,
+      "helpers_script": "CHRONOS_DIALOG_TREE = {\n    \"dialogue_id\": \"chronos_qa_dialog\",\n    \"npc_id\": \"PROF_CHRONOS\",\n    \"initial_node\": \"root\",\n    \"nodes\": {\n        \"root\": {\n            \"npc_text\": \"Greetings, Alex! Welcome to the Time Machine Lab! Here we push TaleWeaver's chronological engine to its absolute limits. What temporal inquiry can I illuminate for you today?\",\n            \"responses\": [\n                {\"text\": \"How does the In-Game Clock work in TaleWeaver?\", \"next_node\": \"clock_info\"},\n                {\"text\": \"How do Timers and Time Events work?\", \"next_node\": \"timers_info\"},\n                {\"text\": \"What is the difference between Narration Ticks, GM Time, and Script Time Jumps?\", \"next_node\": \"flow_info\"},\n                {\"text\": \"Tell me about Barnaby the Rooster and Schr\\u00f6dinger the Cat.\", \"next_node\": \"animals_info\"},\n                {\"text\": \"How do I operate the Chronos-5000 Time Machine?\", \"next_node\": \"machine_info\"},\n                {\"text\": \"Thank you, Professor. I'll get back to testing.\", \"next_node\": None},\n            ],\n        },\n        \"clock_info\": {\n            \"npc_text\": \"The in-game clock tracks elapsed minutes since the adventure began. The engine computes the day, 24-hour time, and pacing. You can query tw.time.now, tw.time.day, tw.time.hour, and tw.time.minute at any point in any script!\",\n            \"responses\": [\n                {\"text\": \"Tell me more about timers.\", \"next_node\": \"timers_info\"},\n                {\"text\": \"Back to main questions.\", \"next_node\": \"root\"},\n                {\"text\": \"Understood. (Exit)\", \"next_node\": None},\n            ],\n        },\n        \"timers_info\": {\n            \"npc_text\": \"Timers allow event scheduling! tw.time.at() fires once at a target minute, tw.time.after() fires after a relative delay like '10m', and tw.time.every() repeats at fixed intervals like '24h'. When time passes their trigger threshold, their handlers execute cleanly!\",\n            \"responses\": [\n                {\"text\": \"How does time flow during player turns?\", \"next_node\": \"flow_info\"},\n                {\"text\": \"Back to main questions.\", \"next_node\": \"root\"},\n                {\"text\": \"Understood. (Exit)\", \"next_node\": None},\n            ],\n        },\n        \"flow_info\": {\n            \"npc_text\": \"Three mechanisms advance time: 1) Narration Ticks advance round pacing (e.g. 5 minutes) every turn. 2) The Game Master LLM can add extra time for long actions if GM Time Control is enabled. 3) Scripts and the Time Machine can advance or rewind time directly via tw.time.advance() or tw.time.rewind()!\",\n            \"responses\": [\n                {\"text\": \"What about the animals in the lab?\", \"next_node\": \"animals_info\"},\n                {\"text\": \"Back to main questions.\", \"next_node\": \"root\"},\n                {\"text\": \"Understood. (Exit)\", \"next_node\": None},\n            ],\n        },\n        \"animals_info\": {\n            \"npc_text\": \"Barnaby is our brass-feathered chronometer rooster; his internal chime triggers at exactly 06:00 every dawn. Schr\\u00f6dinger, our dusk cat, sleeps on the warm tachyon coil until exactly 18:00, when her internal dinner alarm rings. Try using the Time Machine to jump to 06:00 or 18:00 and observe them!\",\n            \"responses\": [\n                {\"text\": \"How do I operate the machine?\", \"next_node\": \"machine_info\"},\n                {\"text\": \"Back to main questions.\", \"next_node\": \"root\"},\n                {\"text\": \"Understood. (Exit)\", \"next_node\": None},\n            ],\n        },\n        \"machine_info\": {\n            \"npc_text\": \"Simply interact with the Chronos-5000 console. You can leap directly to 06:00 or 18:00, fast-forward or rewind in 1-hour increments, pause or resume time entirely, cycle the round pacing between 1m, 5m, and 30m, or arm a 10-minute paradox alarm!\",\n            \"responses\": [\n                {\"text\": \"Back to main questions.\", \"next_node\": \"root\"},\n                {\"text\": \"I'm ready to pull some levers! (Exit)\", \"next_node\": None},\n            ],\n        },\n    },\n}\n\n\ndef time_lab_clock_str():\n    d = tw.time.day\n    h = str(tw.time.hour)\n    if len(h) < 2:\n        h = \"0\" + h\n    m = str(tw.time.minute)\n    if len(m) < 2:\n        m = \"0\" + m\n    return \"Day \" + str(d) + \", \" + h + \":\" + m\n\n\ndef on_time_machine_choice(idx):\n    h = tw.time.hour\n    m = tw.time.minute\n    if idx == 0:\n        delta = (6 - h) * 60 - m if h < 6 else (24 - h + 6) * 60 - m\n        tw.time.advance(delta)\n        tw.story.narrate(\"The Chronos-5000 hums with blinding blue tachyon light! The dials whirr forward to dawn: \" + time_lab_clock_str() + \"!\")\n        rooster_crow()\n        tw.awards.grant(\"AWARD_CHRONO_PIONEER\")\n    elif idx == 1:\n        delta = (18 - h) * 60 - m if h < 18 else (24 - h + 18) * 60 - m\n        tw.time.advance(delta)\n        tw.story.narrate(\"The Chronos-5000 emits a deep violet pulse! Time surges forward into dusk: \" + time_lab_clock_str() + \"!\")\n        cat_meow()\n        tw.awards.grant(\"AWARD_CHRONO_PIONEER\")\n    elif idx == 2:\n        tw.time.advance(60)\n        tw.story.narrate(\"Tachyon turbines spin up! Time advances by 60 minutes. Current time: \" + time_lab_clock_str())\n    elif idx == 3:\n        tw.time.rewind(60)\n        tw.story.narrate(\"Gears clatter in counter-clockwise reverse! Time rewinds by 60 minutes. Current time: \" + time_lab_clock_str())\n    elif idx == 4:\n        if tw.time.is_paused:\n            tw.time.resume()\n            tw.story.system(\"In-game clock RESUMED. Narration ticks and GM time changes will advance time normally.\")\n        else:\n            tw.time.pause()\n            tw.story.system(\"In-game clock PAUSED. Time is frozen; narration ticks and GM requests are locked.\")\n    elif idx == 5:\n        cur = tw.time.minutes_per_tick\n        if cur == 5:\n            tw.time.set_minutes_per_tick(1)\n            tw.story.system(\"Pacing changed: 1 minute per turn (Precision mode).\")\n        elif cur == 1:\n            tw.time.set_minutes_per_tick(30)\n            tw.story.system(\"Pacing changed: 30 minutes per turn (Hyper-speed mode).\")\n        else:\n            tw.time.reset_minutes_per_tick()\n            tw.story.system(\"Pacing reset to default: 5 minutes per turn.\")\n    elif idx == 6:\n        if tw.time.has_timer(\"PARADOX_ALARM\"):\n            tw.time.cancel(\"PARADOX_ALARM\")\n            tw.story.system(\"Active Paradox Alarm has been disarmed.\")\n        else:\n            tw.time.after(\"10m\", paradox_alarm, timer_id=\"PARADOX_ALARM\")\n            tw.story.system(\"Paradox countdown armed! The alarm will trigger in 10 in-game minutes.\")\n            tw.npcs.say_directed(\"PROF_CHRONOS\", \"warns Alex nervously that the 10-minute paradox countdown is now ticking down\")\n    else:\n        tw.story.narrate(\"You step back from the Chronos-5000 console.\")"
+    },
+    {
       "id": "TV_ROOM",
       "label": "TV room (Switch Lab)",
       "description": "Cosy living room with a huge TV",
@@ -424,7 +444,7 @@
   ],
   "exits": [
     {
-      "id": "01a18e10-5e51-71cd-8fda-0eafae7d67e0",
+      "id": "01a196a6-e9ab-73b0-b02c-7b8e22f752a8",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "COMBAT_ARENA",
       "label": "To Combat Lab",
@@ -446,7 +466,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a18e10-5e52-7643-ae07-3a18b8a7ed4e",
+      "id": "01a196a6-e9ac-799f-a07f-2f8beea433aa",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "SOCIAL_HALL",
       "label": "To NPC lab",
@@ -468,7 +488,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a18e10-5e53-7260-9ac5-f5963156cbe3",
+      "id": "01a196a6-e9ad-79c6-ba9b-e8425b7ac4b7",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "TV_ROOM",
       "label": "To Switch Lab",
@@ -490,7 +510,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a18e10-5e54-7497-8e6a-3b3d48bb1ecd",
+      "id": "01a196a6-e9ae-7b8a-823f-029bfe060022",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "WORKSHOP",
       "label": "To Item Lab",
@@ -512,10 +532,32 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a191c0-b038-7886-b43c-6c8ff6e8d01f",
+      "id": "01a196a6-e9af-7f75-8196-bd6b2adef23f",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "ALCHEMY_LAB",
       "label": "To Alchemy Lab",
+      "exit_type": "bidirectional",
+      "is_locked": false,
+      "lock_description": null,
+      "code_to_unlock": "",
+      "item_to_unlock": "",
+      "rule_to_unlock": "",
+      "unlock_expression": null,
+      "on_open_exit_script": null,
+      "on_open_exit_text": null,
+      "on_exit_used_script": null,
+      "on_exit_used_text": null,
+      "on_unlock_success_script": null,
+      "on_unlock_success_text": null,
+      "on_unlock_failure_script": null,
+      "on_unlock_failure_text": null,
+      "is_bidirectional": true
+    },
+    {
+      "id": "01a196b9-bafc-7562-9b2a-f2cb821cfae6",
+      "from_scene_id": "ENTRY_HALL",
+      "to_scene_id": "TIME_MACHINE_LAB",
+      "label": "To Time Machine Lab",
       "exit_type": "bidirectional",
       "is_locked": false,
       "lock_description": null,
@@ -534,7 +576,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a18e10-5e55-7748-8f5f-6689d30cb12e",
+      "id": "01a196a6-e9b0-7276-8480-0b6bd943f04a",
       "from_scene_id": "WORKSHOP",
       "to_scene_id": "LOCKED_ROOM",
       "label": "The locked door",
@@ -616,7 +658,8 @@
       "is_killable": false,
       "inventory": [],
       "metadata_json": {
-        "attack_mode": "PASSIVE"
+        "attack_mode": "PASSIVE",
+        "special_actions": []
       },
       "on_interact_script": "if tw.vars.get(\"lab_solved\"):\n    tw.npcs.say(LAB_GARGOYLE, \"You solved it. Once. By luck. Go away and let me brood.\")\nelse:\n    tw.dialog.tree(LAB_GARGOYLE_TALK, speaker=\"Grimsby the Gargoyle\")"
     },
@@ -641,9 +684,14 @@
       "max_mana": 0,
       "stamina": 40,
       "max_stamina": 40,
+      "voice": "pFZP5JQG7iQjIQuC4Bku",
       "is_attackable": true,
       "is_killable": false,
       "inventory": [],
+      "metadata_json": {
+        "special_actions": [],
+        "attack_mode": "PASSIVE"
+      },
       "on_receive_item_script": "tw.npcs.say_directed('GRANDMA', 'squints through her bifocals, taps the item against the arm of her recliner, and grumbles that unless it can switch the television back to the Great Lab Baking Championship, it is entirely useless to her')"
     },
     {
@@ -667,9 +715,14 @@
       "max_mana": 0,
       "stamina": 20,
       "max_stamina": 20,
+      "voice": "N2lVS1w4EtoT3dr4eOWO",
       "is_attackable": true,
       "is_killable": false,
       "inventory": [],
+      "metadata_json": {
+        "special_actions": [],
+        "attack_mode": "PASSIVE"
+      },
       "on_receive_item_script": "tw.npcs.say_directed('LAB_RAT', 'sniffs the item with rapid whisker twitches, emits a high-pitched appreciative squeak, and nudges it closer to its nest')"
     },
     {
@@ -710,6 +763,48 @@
       "on_receive_item_script": "on_social_npc_receive_item('NORA', received_item_ids)"
     },
     {
+      "id": "NPC_CAT",
+      "entity_type": "NPC",
+      "name": "Schr\u00f6dinger the Dusk Cat",
+      "description": "A sleek tortoiseshell feline curled up on a warm tachyon radiator. She wears a miniature brass chronometer collar that glows soft amber. She sleeps nearly all day, waking only when evening dusk strikes at 18:00 to demand her temporal dinner.",
+      "appearance": "sleek tortoiseshell cat, glowing amber collar with miniature brass clock, emerald eyes",
+      "current_scene_id": "TIME_MACHINE_LAB",
+      "image_url": "assets/01a196a6-e74f-723b-9a86-eb3133d70ade_npc-cat_30ab42e5.jpg",
+      "is_hidden": false,
+      "movement_type": "STATIONARY",
+      "moveable": false,
+      "allowed_scenes": [],
+      "goal": "Sleep on the warm tachyon coil until exactly 18:00, then demand temporal salmon.",
+      "character": "Aloof, sleepy, demanding, vocal only when it is 18:00 dinner time.",
+      "hp": 20,
+      "max_hp": 20,
+      "is_attackable": true,
+      "is_killable": false,
+      "inventory": [],
+      "on_interact_script": "if tw.time.hour == 18:\n    tw.npcs.say(\"NPC_CAT\", \"MREEEOW! MIAUUU! It is 18:00! Dusk has fallen! Where is my temporal fish dinner?!\")\n    tw.story.narrate(\"Schr\u00f6dinger rubs vigorously against your shins, her amber chronometer collar chiming insistently.\")\nelse:\n    tw.npcs.say(\"NPC_CAT\", \"Purrrr... Wake me at 18:00. Not a minute earlier... (\" + time_lab_clock_str() + \")\")\n    tw.story.narrate(\"Schr\u00f6dinger opens one lazy slit of an emerald eye, turns around on the warm tachyon coil, and goes back to sleep.\")"
+    },
+    {
+      "id": "NPC_ROOSTER",
+      "entity_type": "NPC",
+      "name": "Barnaby the Chrono-Rooster",
+      "description": "A brass-plated mechanical rooster perched upon an ornate copper weather-vane stand. His tail feathers are miniature pendulums and his internal alarm is permanently synchronized to crow at exactly 06:00 in the morning.",
+      "appearance": "brass clockwork rooster, pendulum tail feathers, polished copper comb, glowing yellow eyes",
+      "current_scene_id": "TIME_MACHINE_LAB",
+      "image_url": "assets/01a196a6-e74f-723b-9a86-eb3133d70ade_npc-rooster_dc66604f.jpg",
+      "is_hidden": false,
+      "movement_type": "STATIONARY",
+      "moveable": false,
+      "allowed_scenes": [],
+      "goal": "Crow faithfully at 06:00 every single morning without fail.",
+      "character": "Punctual, pompous, proud, easily offended if someone calls him a common chicken.",
+      "hp": 20,
+      "max_hp": 20,
+      "is_attackable": true,
+      "is_killable": false,
+      "inventory": [],
+      "on_interact_script": "if tw.time.hour == 6:\n    tw.npcs.say(\"NPC_ROOSTER\", \"KIKERIKI! COCK-A-DOODLE-DOO! Right on time! It is 06:00 in the morning!\")\n    tw.story.narrate(\"Barnaby puffs his polished brass feathers proudly, his pendulum tail swinging at top speed.\")\nelse:\n    tw.npcs.say(\"NPC_ROOSTER\", \"Tick-tock, cluck! It is not 06:00 yet! Current time is \" + time_lab_clock_str() + \". Come back at dawn or use the Time Machine!\")\n    tw.story.narrate(\"Barnaby consults his internal pendulum and clicks his brass beak dismissively.\")"
+    },
+    {
       "id": "PIP",
       "entity_type": "NPC",
       "name": "Professor Pip Fenwick",
@@ -746,6 +841,27 @@
       "on_receive_item_script": "tw.npcs.say_directed('PIP', 'perches higher on his chair, adjusts his goggles, and enthusiastically calculates the quantum displacement coefficient of the item for future teleportation trials')"
     },
     {
+      "id": "PROF_CHRONOS",
+      "entity_type": "NPC",
+      "name": "Professor Timothy Chronos",
+      "description": "The facility's Chief Chronologist. He wears three wristwatches on each arm, a heavy brass timekeeping monocle, and a tweed waistcoat speckled with solder burns. He is perpetually fascinated by the engine's time systems.",
+      "appearance": "eccentric scientist, multiple watches, brass monocle, messy grey hair, tweed waistcoat",
+      "current_scene_id": "TIME_MACHINE_LAB",
+      "image_url": "assets/01a196a6-e74f-723b-9a86-eb3133d70ade_prof-chronos_cd986ca0.jpg",
+      "is_hidden": false,
+      "movement_type": "STATIONARY",
+      "moveable": false,
+      "allowed_scenes": [],
+      "goal": "Assist Alex Vale in testing every feature of the TaleWeaver in-game clock and time event system.",
+      "character": "Eccentric, enthusiastic, professorial, obsessed with punctuality, eager to explain every nuance of time dilation and scheduled timers.",
+      "hp": 40,
+      "max_hp": 40,
+      "is_attackable": true,
+      "is_killable": false,
+      "inventory": [],
+      "on_interact_script": "tw.dialog.tree(CHRONOS_DIALOG_TREE, speaker=\"Prof. Timothy Chronos\")"
+    },
+    {
       "id": "RECEPTION_BOT",
       "entity_type": "NPC",
       "name": "Vera the Reception Bot",
@@ -766,9 +882,14 @@
       "max_mana": 0,
       "stamina": 80,
       "max_stamina": 80,
+      "voice": "EXAVITQu4vr4xnSDxMaL",
       "is_attackable": true,
       "is_killable": false,
       "inventory": [],
+      "metadata_json": {
+        "special_actions": [],
+        "attack_mode": "PASSIVE"
+      },
       "on_interact_script": "tw.npcs.say_directed('RECEPTION_BOT', 'lets out an exaggerated mechanical sigh, complains that management bolted the FAQ Info Console literally inches from her elbow so she would not have to repeat the Test-Lab orientation speech, and gives a brief, bitingly sarcastic summary of the facility')",
       "on_receive_item_script": "tw.npcs.say_directed('RECEPTION_BOT', 'stares with profound digital exhaustion at the received item, stamps a red VOID form on it, and dryly asks if Alex is actively trying to overload the facility lost-and-found bin')"
     },
@@ -805,7 +926,7 @@
           "id": "MAGE_VIAL",
           "name": "Mage's Mana Vial",
           "description": "A crystalline vial of mana draught carried by Spark Mage Ilya. Consuming it restores 15 Mana.",
-          "image_url": "/data/adventures/library/01a18e10-5de1-7ab0-8ec6-02838b4afff8/01a1842e-91c4-75fc-8323-d42e64857464_mage-vial_f7e1c4f0.jpg",
+          "image_url": "/data/adventures/library/01a196a6-e74f-723b-9a86-eb3133d70ade/01a1842e-91c4-75fc-8323-d42e64857464_mage-vial_f7e1c4f0.jpg",
           "item_type": "CONSUMABLE",
           "text_log_content": "A crystalline vial of mana draught carried by Spark Mage Ilya. Consuming it restores 15 Mana.",
           "stat_modifier_strength": 0,
@@ -822,7 +943,7 @@
           "id": "MAGE_CHARM",
           "name": "Mage's Charm",
           "description": "A silver neck charm carried by Spark Mage Ilya. Equipping it in the Neck slot grants +1 Intelligence.",
-          "image_url": "/data/adventures/library/01a18e10-5de1-7ab0-8ec6-02838b4afff8/01a1842e-91c4-75fc-8323-d42e64857464_mage-charm_47582e60.jpg",
+          "image_url": "/data/adventures/library/01a196a6-e74f-723b-9a86-eb3133d70ade/01a1842e-91c4-75fc-8323-d42e64857464_mage-charm_47582e60.jpg",
           "item_type": "WEARABLE",
           "slot": "Neck",
           "text_log_content": "A silver neck charm carried by Spark Mage Ilya. Equipping it in the Neck slot grants +1 Intelligence.",
@@ -931,7 +1052,7 @@
           "id": "GUARD_BANDAGE",
           "name": "Guard's Healing Vial",
           "description": "A compact healing vial carried by Training Guard Harlan. Consuming it restores 15 HP.",
-          "image_url": "/data/adventures/library/01a18e10-5de1-7ab0-8ec6-02838b4afff8/01a1842e-91c4-75fc-8323-d42e64857464_guard-bandage_af297d45.jpg",
+          "image_url": "/data/adventures/library/01a196a6-e74f-723b-9a86-eb3133d70ade/01a1842e-91c4-75fc-8323-d42e64857464_guard-bandage_af297d45.jpg",
           "item_type": "CONSUMABLE",
           "text_log_content": "A compact healing vial carried by Training Guard Harlan. Consuming it restores 15 HP.",
           "stat_modifier_strength": 0,
@@ -948,7 +1069,7 @@
           "id": "GUARD_BADGE",
           "name": "Guard Badge",
           "description": "A stamped iron guard badge carried by Training Guard Harlan as a verifiable loot item.",
-          "image_url": "/data/adventures/library/01a18e10-5de1-7ab0-8ec6-02838b4afff8/01a1842e-91c4-75fc-8323-d42e64857464_guard-badge_ad72aafa.jpg",
+          "image_url": "/data/adventures/library/01a196a6-e74f-723b-9a86-eb3133d70ade/01a1842e-91c4-75fc-8323-d42e64857464_guard-badge_ad72aafa.jpg",
           "item_type": "PICKABLE",
           "text_log_content": "A stamped iron guard badge carried by Training Guard Harlan as a verifiable loot item.",
           "stat_modifier_strength": 0,
@@ -965,7 +1086,7 @@
           "id": "GUARD_SWORD",
           "name": "Guard's Training Sword",
           "description": "A sturdy short training sword carried and equipped by Training Guard Harlan.",
-          "image_url": "/data/adventures/library/01a18e10-5de1-7ab0-8ec6-02838b4afff8/01a1842e-91c4-75fc-8323-d42e64857464_guard-sword_cd82bf5b.jpg",
+          "image_url": "/data/adventures/library/01a196a6-e74f-723b-9a86-eb3133d70ade/01a1842e-91c4-75fc-8323-d42e64857464_guard-sword_cd82bf5b.jpg",
           "item_type": "WEAPON",
           "slot": "MainHand",
           "text_log_content": "A sturdy short training sword carried and equipped by Training Guard Harlan.",
@@ -1376,6 +1497,25 @@
       "mana_change": 0
     },
     {
+      "id": "CHRONOMETER_BOARD",
+      "entity_type": "OBJECT",
+      "name": "Master Chronometer Diagnostic Display",
+      "description": "A large glass-faced wall panel providing real-time telemetry on the TaleWeaver temporal engine.",
+      "appearance": "large glass wall display, brass bezel, glowing numerical dials, synchronized sweep hands",
+      "current_scene_id": "TIME_MACHINE_LAB",
+      "image_url": "assets/01a196a6-e74f-723b-9a86-eb3133d70ade_chronometer-board_c9df33cd.jpg",
+      "item_type": "STATIC",
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": false,
+      "is_final_state": false,
+      "inventory": [],
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0,
+      "on_interact_script": "tw.story.system(\"=== TEMPORAL DIAGNOSTICS ===\\n\" + \"Current Time: \" + time_lab_clock_str() + \"\\n\" + \"Elapsed Time: \" + str(tw.time.now) + \" min\\n\" + \"Day: \" + str(tw.time.day) + \" | Hour: \" + str(tw.time.hour) + \" | Minute: \" + str(tw.time.minute) + \"\\n\" + \"Narration Ticks: \" + str(tw.time.ticks) + \"\\n\" + \"Minutes per Tick: \" + str(tw.time.minutes_per_tick) + \" min (Default: \" + str(tw.time.default_minutes_per_tick) + \" min)\\n\" + \"Clock Paused: \" + str(tw.time.is_paused) + \"\\n\" + \"GM Time Allowed: \" + str(tw.time.gm_can_change_time) + \"\\n\" + \"Active Timers: \" + str(len(tw.time.timers)))\ntw.story.narrate(\"The needles on the diagnostic board twitch in rhythmic synchronization with the universe.\")"
+    },
+    {
       "id": "CODE_BOX",
       "entity_type": "OBJECT",
       "name": "Code Box",
@@ -1414,7 +1554,6 @@
       "name": "Delicious Popcorn",
       "description": "Constructable: ##ITEM_BUTTER + ##ITEM_SUGAR + ##ITEM_RAW_CORN + ##ITEM_POPCORN_MACHINE -> ##ITEM_POPCORN",
       "current_scene_id": "TV_ROOM",
-      "image_url": "assets/placeholder_constructable-magic-popcorn_63b57b.svg",
       "item_type": "CONSTRUCTABLE",
       "is_in_inventory": false,
       "is_hidden": true,
@@ -1436,7 +1575,8 @@
       ],
       "kept_ingredients": [
         "ITEM_POPCORN_MACHINE"
-      ]
+      ],
+      "image_url": null
     },
     {
       "id": "CON_LAB_SUPPLY_CRATE",
@@ -1711,7 +1851,7 @@
       "hp_change": 0,
       "stamina_change": 0,
       "mana_change": 0,
-      "text_log_content": "My new apprentice is an idiot, so I am writing this down one last time before I turn him into a newt.\n\n1. The petrified toad fears fire. Keep it as far from the charred oak as the table allows!\n2. The clockwork heart needs a place at the very edge of the table, or its ticking cracks the centrepiece.\n3. The gambler's gold die lies directly to the left of the nightshade. Gambling and a quick death belong together.\n4. The heart's old mechanism stalls the moment dried herbs or loaded gold lie right next to it.\n5. Liquids rot charred oak and cloud obsidian. Keep the ghost tears out of both.\n\nOne trinket per casket. Pull the lever only when all five are right, or Grimsby will have his fun.",
+      "text_log_content": "My new apprentice is an idiot, so I am writing this down one last time before I turn him into a newt.\n\n1. The petrified toad fears fire. Keep it as far from the charred oak as the table allows!\n2. The clockwork heart needs a place at the very edge of the table, or its ticking cracks the centrepiece.\n3. The gambler's gold die lies directly to the left of the nightshade. Gambling and a quick death belong together.\n4. The heart's old mechanism stalls the moment dried herbs or loaded gold lie right ",
       "text_log_format": "DOCUMENT"
     },
     {
@@ -1806,7 +1946,6 @@
       "name": "Working remote recipt",
       "description": "A mysterious object found in this scene.",
       "current_scene_id": "TV_ROOM",
-      "image_url": "assets/placeholder_item-hmy2iu_9423de.png",
       "item_type": "CONSTRUCTABLE",
       "is_in_inventory": false,
       "is_hidden": true,
@@ -1823,7 +1962,8 @@
       "result_item_ids": [
         "ITEM_WORKING_REMOTE"
       ],
-      "kept_ingredients": []
+      "kept_ingredients": [],
+      "image_url": null
     },
     {
       "id": "ITEM_IQN1CM",
@@ -1858,6 +1998,25 @@
       "hp_change": 0,
       "stamina_change": 0,
       "mana_change": 0
+    },
+    {
+      "id": "ITEM_PARADOX_HOURGLASS",
+      "entity_type": "OBJECT",
+      "name": "Paradox Hourglass",
+      "description": "A delicate glass hourglass filled with luminescent violet sand that flows upward against gravity. Flipping it gently warps local causality.",
+      "appearance": "ornate brass-framed hourglass, glowing violet sand defying gravity by drifting upward",
+      "current_scene_id": "TIME_MACHINE_LAB",
+      "image_url": "assets/01a196a6-e74f-723b-9a86-eb3133d70ade_item-paradox-hourglass_85933d9a.jpg",
+      "item_type": "PICKABLE",
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": true,
+      "is_final_state": false,
+      "inventory": [],
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0,
+      "on_interact_script": "tw.time.rewind(15)\ntw.player.heal(10)\nflips = tw.vars.get(\"hourglass_flips\", 0) + 1\ntw.vars.set(\"hourglass_flips\", flips)\ntw.story.narrate(\"You invert the Paradox Hourglass. Violet sand trickles upward with a crystalline chime! Local time rewinds by 15 minutes to \" + time_lab_clock_str() + \", and a soothing temporal wash restores 10 HP.\")\nif flips >= 3 and not tw.vars.get(\"hourglass_awarded\", False):\n    tw.vars.set(\"hourglass_awarded\", True)\n    tw.awards.grant(\"AWARD_CHRONO_PIONEER\")"
     },
     {
       "id": "ITEM_POPCORN",
@@ -1970,6 +2129,27 @@
       "hp_change": 0,
       "stamina_change": 0,
       "mana_change": 0
+    },
+    {
+      "id": "ITEM_TOMORROW_CHRONICLE",
+      "entity_type": "OBJECT",
+      "name": "The Tomorrow Chronicle",
+      "description": "A newspaper printed on shimmering quantum paper. The ink shifts and rearranges itself to reflect future events depending on what day and hour it currently is.",
+      "appearance": "folded broadsheet newspaper printed on iridescent silver paper, self-rearranging headlines",
+      "current_scene_id": "TIME_MACHINE_LAB",
+      "image_url": "assets/01a196a6-e74f-723b-9a86-eb3133d70ade_item-tomorrow-chronicle_a1aeff41.jpg",
+      "item_type": "READABLE",
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": true,
+      "is_final_state": false,
+      "inventory": [],
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0,
+      "text_log_content": "",
+      "text_log_format": "DOCUMENT",
+      "on_read_script": "h = tw.time.hour\nd = tw.time.day\nif d == 1 and h < 12:\n    headline = \"EDITION DAY 1 (MORNING): Alex Vale Arrives at Test-Lab! Local bots brace for unprecedented quality assurance poking.\"\nelif d == 1 and h < 18:\n    headline = \"EDITION DAY 1 (AFTERNOON): Tachyon emissions detected in Time Machine Lab. Experts advise not stepping on the cat.\"\nelif d == 1:\n    headline = \"EDITION DAY 1 (EVENING): 18:00 Dusk Bell Rings! Schr\u00f6dinger the Dusk Cat spotted hunting temporal treats.\"\nelse:\n    headline = \"EDITION DAY \" + str(d) + \" (\" + time_lab_clock_str() + \"): Barnaby the Rooster hailed as interdimensional icon. Time travelers report dizziness!\"\ntw.story.narrate(\"You inspect the shimmering quantum ink of The Tomorrow Chronicle:\\n\\n\" + headline)"
     },
     {
       "id": "ITEM_WORKING_REMOTE",
@@ -2335,7 +2515,7 @@
       "hp_change": 0,
       "stamina_change": 0,
       "mana_change": 0,
-      "text_log_content": "=== QA TEST LAB \u2014 SOCIAL & NPC EXPERIMENTS ===\n\nWelcome to the Conversation Hall! This room tests social and NPC scripting mechanics:\n\n1. NPC DIALOGUE & REACTIONS\nTalk with the seated testers: Nora Quill, Bram Ironhand, Vesper Glass, and Unit Seven. (Unit Seven can also be teleported away via the Teleport Lab console!).\n\n2. CRATE OF ABSURDITIES\nOpen the crate to find 4 absurd props:\n\u2022 Squeaky Rubber Chicken\n\u2022 Tin-Foil Conspiracy Crown\n\u2022 Clockwork Self-Stirring Teacup\n\u2022 Googly-Eyed Pet Rock ('Sir Reginald')\nTaking any prop triggers immediate scripted banter at the table.\n\n3. GIVING ITEMS TO NPCS\nHand any item to an NPC via typed command (e.g. 'give chicken to Bram') or '/give_items BRAM | RUBBER_CHICKEN'. The NPC receives it, stashes it in inventory, and reacts in character!\n\n4. TEST PANEL (NORTH WALL)\nUse the panel to manipulate NPC state:\n\u2022 Set moods (angry / happy)\n\u2022 Trigger group song\n\u2022 Inflict ongoing poison gas (-10 HP/turn)\n\u2022 Heal all NPCs & cure toxins",
+      "text_log_content": "=== QA TEST LAB \u2014 SOCIAL & NPC EXPERIMENTS ===\n\nWelcome to the Conversation Hall! This room tests social and NPC scripting mechanics:\n\n1. NPC DIALOGUE & REACTIONS\nTalk with the seated testers: Nora Quill, Bram Ironhand, Vesper Glass, and Unit Seven. (Unit Seven can also be teleported away via the Teleport Lab console!).\n\n2. CRATE OF ABSURDITIES\nOpen the crate to find 4 absurd props:\n\u2022 Squeaky Rubber Chicken\n\u2022 Tin-Foil Conspiracy Crown\n\u2022 Clockwork Self-Stirring Teacup\n\u2022 Googly-Eyed Pet Rock ('Sir",
       "text_log_format": "DOCUMENT"
     },
     {
@@ -2507,7 +2687,6 @@
       "description": "Constructable: ##BRASS_ROD + ##COPPER_WIRE -> ##ITEM_TEST_PROBE",
       "current_scene_id": "WORKSHOP",
       "spatial_position": "assembled on the workbench",
-      "image_url": "assets/placeholder_test-probe_0e9b00.svg",
       "item_type": "CONSTRUCTABLE",
       "is_in_inventory": false,
       "is_hidden": true,
@@ -2531,7 +2710,8 @@
         "ITEM_TEST_PROBE"
       ],
       "kept_ingredients": [],
-      "on_craft_success_text": "You wind the Copper Wire around the Brass Rod to construct the Test Probe."
+      "on_craft_success_text": "You wind the Copper Wire around the Brass Rod to construct the Test Probe.",
+      "image_url": null
     },
     {
       "id": "TEST_SWORD",
@@ -2574,6 +2754,25 @@
       "hp_change": 0,
       "stamina_change": 0,
       "mana_change": 0
+    },
+    {
+      "id": "TIME_MACHINE",
+      "entity_type": "OBJECT",
+      "name": "Chronos-5000 Time Machine",
+      "description": "A magnificent brass and crystal cylindrical apparatus with spinning gyroscopes, nixie tube displays, and a heavy mahogany control console with luminous toggle switches. Its console allows precise manipulation of the in-game clock, round pacing, and event triggers.",
+      "appearance": "colossal brass apparatus, spinning gyroscopes, nixie tube displays, mahogany console",
+      "current_scene_id": "TIME_MACHINE_LAB",
+      "image_url": "assets/01a196a6-e74f-723b-9a86-eb3133d70ade_time-machine_3e45cf36.jpg",
+      "item_type": "STATIC",
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": false,
+      "is_final_state": false,
+      "inventory": [],
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0,
+      "on_interact_script": "tw.dialog.choose(\"CHRONOS-5000 CONSOLE (\" + time_lab_clock_str() + \", \" + str(tw.time.now) + \" min elapsed). Select temporal operation:\", [\"Jump to Next Morning (06:00) [Test Rooster]\", \"Jump to Next Evening (18:00) [Test Cat]\", \"Fast-forward 1 Hour (+60m)\", \"Rewind 1 Hour (-60m)\", \"Toggle Clock Pause (Current: \" + (\"PAUSED\" if tw.time.is_paused else \"RUNNING\") + \")\", \"Cycle Turn Pacing (1m / 5m / 30m per turn)\", \"Arm/Disarm 10-Minute Paradox Alarm\", \"Step away from console\"], on_choice=\"on_time_machine_choice\", speaker=\"Chronos-5000 Console\")"
     },
     {
       "id": "TIN_FOIL_CROWN",
@@ -2645,11 +2844,19 @@
       "description": "Successfully resisted the primal urge to tug first and think later. Your lungs thank you.",
       "tier": "silver",
       "requirement": "",
-      "is_earned": true,
+      "is_earned": false,
       "required_item_id": "",
       "required_scene_id": "",
       "required_defeated_npc_id": "",
       "guard_expression": ""
+    },
+    {
+      "key": "AWARD_CHRONO_PIONEER",
+      "title": "Chrono Pioneer",
+      "description": "Successfully manipulated space-time and experienced dawn and dusk in the Time Machine Lab.",
+      "tier": "silver",
+      "requirement": "",
+      "is_earned": false
     }
   ],
   "sequences": [],
@@ -2664,5 +2871,5 @@
       "is_active": true
     }
   ],
-  "init_script": "tw.vars.set(\"vera_greeted\", True)\ntw.story.direct(\n    \"Narrate how Vera the Reception Bot\u2014a thoroughly exhausted, sarcastic chrome android slumped behind the reception desk\u2014lets out a loud, static-laced mechanical sigh as Alex Vale arrives in the Entry Hall, tapping her clipboard with a metallic finger.\"\n)\ntw.npcs.say_directed(\n    \"RECEPTION_BOT\",\n    \"in an extremely annoyed, deadpan sarcastic tone, welcomes Alex to the Test-Lab, briefly explains that this is not a dramatic fantasy quest but a modular QA testing facility where each room tests a different engine feature (NPC conversations, locks and crafting, switches, riddles, combat, and teleporters), and tells Alex to click the FAQ Info Console on her desk for details instead of asking her questions\",\n)"
+  "init_script": "tw.vars.set(\"vera_greeted\", True)\ntw.story.direct(\n    \"Narrate how Vera the Reception Bot\u2014a thoroughly exhausted, sarcastic chrome android slumped behind the reception desk\u2014lets out a loud, static-laced mechanical sigh as Alex Vale arrives in the Entry Hall, tapping her clipboard with a metallic finger.\"\n)\ntw.npcs.say_directed(\n    \"RECEPTION_BOT\",\n    \"in an extremely annoyed, deadpan sarcastic tone, welcomes Alex to the Test-Lab, briefly explains that this is not a dramatic fantasy quest but a modular QA testing facility where each room tests a different engine feature (NPC conversations, locks and crafting, switches, riddles, combat, and teleporters), and tells Alex to click the FAQ Info Console on her desk for details instead of asking her questions\",\n)\n\ndef rooster_crow(event=None):\n    tw.npcs.say(\"NPC_ROOSTER\", \"KIKERIKIII! COCK-A-DOODLE-DOO! 06:00 AM! Dawn has broken over the timeline!\")\n    tw.story.direct(\"Barnaby the Chrono-Rooster flaps his brass clockwork wings vigorously, his pendulum tail clicking as his loud morning crow echoes through the lab.\")\n\n\ndef cat_meow(event=None):\n    tw.npcs.say(\"NPC_CAT\", \"MREEEOW! MIAUUUU! It is 18:00! Dusk has fallen! Where is my temporal salmon?!\")\n    tw.story.direct(\"Schr\\u00f6dinger the Dusk Cat stretches lazily on the warm tachyon coil, purring like a miniature turbine before letting out a demanding evening meow.\")\n\n\ndef paradox_alarm(event=None):\n    tw.story.system(\"=== TEMPORAL PARADOX ALERT ===\")\n    tw.story.direct(\"Amber strobe lights flash across the vaulted ceiling as an emergency klaxon sounds in the Time Machine Lab!\")\n    tw.npcs.say_directed(\"PROF_CHRONOS\", \"in a comically panicked scholarly voice, yells that the ten-minute paradox countdown has reached zero and checks three pocket watches at once to make sure reality hasn't folded in half\")\n\n\nif not tw.time.has_timer(\"ROOSTER_MORNING\"):\n    tw.time.every(\"24h\", rooster_crow, timer_id=\"ROOSTER_MORNING\", start=1320)\n\nif not tw.time.has_timer(\"CAT_EVENING\"):\n    tw.time.every(\"24h\", cat_meow, timer_id=\"CAT_EVENING\", start=600)"
 }
