@@ -6,7 +6,7 @@
     "title": "Test-Lab",
     "teaser": "A compact three-room QA test lab for conversation, item mechanics, switches, and turn-based combat.",
     "cover_appearance": "clean stone and brass testing laboratory, workbench with gears, training arena doors, warm lighting",
-    "version": "1.0.9",
+    "version": "1.1.0",
     "creator": "Jean Schmitz",
     "copyright": "Copyright (c) 2026 by Jean Schmitz",
     "license": "CC BY-NC 4.0",
@@ -447,10 +447,10 @@
   ],
   "exits": [
     {
-      "id": "01a196a6-e9ab-73b0-b02c-7b8e22f752a8",
+      "id": "01a198f2-54c5-78d9-aee3-a24326a04b23",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "COMBAT_LAB",
-      "label": "To Combat Lab",
+      "label": "Old rusty gate",
       "exit_type": "bidirectional",
       "is_locked": false,
       "is_revealed": true,
@@ -470,7 +470,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a196a6-e9ac-799f-a07f-2f8beea433aa",
+      "id": "01a198f2-54c6-71a6-8b33-6ae4965fa14c",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "SOCIAL_HALL",
       "label": "Hallway",
@@ -493,10 +493,10 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a196a6-e9ad-79c6-ba9b-e8425b7ac4b7",
+      "id": "01a198f2-54c7-742c-b6fe-34927d2a72b2",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "SWITCH_LAB",
-      "label": "To Switch Lab",
+      "label": "Iron door",
       "exit_type": "bidirectional",
       "is_locked": false,
       "is_revealed": true,
@@ -516,7 +516,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a196a6-e9ae-7b8a-823f-029bfe060022",
+      "id": "01a198f2-54c8-7a21-91b3-c0154fcf5dab",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "WORKSHOP",
       "label": "Wooden door",
@@ -539,13 +539,14 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a196a6-e9af-7f75-8196-bd6b2adef23f",
+      "id": "01a198f2-54c9-71e8-aff9-7049468bb500",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "RIDDLE_LAB",
-      "label": "To Alchemy Lab",
+      "label": "Door with runes",
       "exit_type": "bidirectional",
       "is_locked": false,
-      "lock_description": null,
+      "is_revealed": true,
+      "lock_description": "",
       "code_to_unlock": "",
       "item_to_unlock": "",
       "rule_to_unlock": "",
@@ -561,16 +562,17 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a196b9-bafc-7562-9b2a-f2cb821cfae6",
+      "id": "01a198f2-54ca-72a1-a706-7232c48417d2",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "TIME_MACHINE_LAB",
-      "label": "To Time Machine Lab",
+      "label": "Glowing door",
       "exit_type": "bidirectional",
       "is_locked": false,
-      "lock_description": null,
-      "code_to_unlock": null,
-      "item_to_unlock": null,
-      "rule_to_unlock": null,
+      "is_revealed": true,
+      "lock_description": "",
+      "code_to_unlock": "",
+      "item_to_unlock": "",
+      "rule_to_unlock": "",
       "unlock_expression": null,
       "on_open_exit_script": null,
       "on_open_exit_text": null,
@@ -583,7 +585,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a196a6-e9b0-7276-8480-0b6bd943f04a",
+      "id": "01a198f2-54cb-7e73-b07a-6a0c9cc45a87",
       "from_scene_id": "WORKSHOP",
       "to_scene_id": "LOCKED_ROOM",
       "label": "The locked door",
@@ -629,6 +631,7 @@
       "max_mana": 0,
       "stamina": 20,
       "max_stamina": 20,
+      "voice": "bIHbv24MWmeRgasZH58o",
       "is_attackable": true,
       "is_killable": true,
       "inventory": [],
@@ -703,12 +706,45 @@
       "max_mana": 20,
       "stamina": 90,
       "max_stamina": 90,
+      "voice": "1BfrkuYXmEwp8AWqSLWk",
       "is_attackable": true,
       "is_killable": true,
       "inventory": [
-        "JANITOR_MOP",
-        "JANITOR_SOAP",
-        "JANITOR_KEYS"
+        {
+          "id": "JANITOR_MOP",
+          "name": "Edgar's Heavy Industrial Mop",
+          "description": "A heavy two-handed industrial mop with a stout varnished ash handle and thick, absorbent grey yarn strands. Surprisingly balanced and packs a heavy bludgeoning blow.",
+          "image_url": "/data/adventures/library/01a198f2-53b3-7766-9598-29acd4dab37a/01a196a6-e74f-723b-9a86-eb3133d70ade_janitor-mop_a962cbe1.jpg",
+          "item_type": "WEAPON",
+          "slot": "MainHand",
+          "text_log_content": "A heavy two-handed industrial mop with a stout varnished ash handle and thick, absorbent grey yarn strands. Surprisingly balanced and packs a heavy bludgeoning blow.",
+          "stat_modifier_strength": 0,
+          "hp_change": 0,
+          "stamina_change": 0,
+          "mana_change": 0
+        },
+        {
+          "id": "JANITOR_SOAP",
+          "name": "Flask of Industrial Floor Cleaner",
+          "description": "A bottle of pungent, foaming floor detergent carried by Edgar. Consuming it restores 15 HP (though it leaves your mouth tasting of aggressive pine disinfectant).",
+          "image_url": "/data/adventures/library/01a198f2-53b3-7766-9598-29acd4dab37a/01a196a6-e74f-723b-9a86-eb3133d70ade_janitor-soap_715826c1.jpg",
+          "item_type": "CONSUMABLE",
+          "text_log_content": "A bottle of pungent, foaming floor detergent carried by Edgar. Consuming it restores 15 HP (though it leaves your mouth tasting of aggressive pine disinfectant).",
+          "hp_change": 0,
+          "stamina_change": 0,
+          "mana_change": 0
+        },
+        {
+          "id": "JANITOR_KEYS",
+          "name": "Edgar's Master Keyring",
+          "description": "A heavy brass keyring holding dozens of labeled and unlabeled keys for utility closets and maintenance hatches across the testing facility.",
+          "image_url": "/data/adventures/library/01a198f2-53b3-7766-9598-29acd4dab37a/01a196a6-e74f-723b-9a86-eb3133d70ade_janitor-keys_7130c492.jpg",
+          "item_type": "PICKABLE",
+          "text_log_content": "A heavy brass keyring holding dozens of labeled and unlabeled keys for utility closets and maintenance hatches across the testing facility.",
+          "hp_change": 0,
+          "stamina_change": 0,
+          "mana_change": 0
+        }
       ],
       "metadata_json": {
         "attack_mode": "PASSIVE",
@@ -827,7 +863,7 @@
       "max_mana": 0,
       "stamina": 40,
       "max_stamina": 40,
-      "voice": "pFZP5JQG7iQjIQuC4Bku",
+      "voice": "0rEo3eAjssGDUCXHYENf",
       "is_attackable": true,
       "is_killable": false,
       "inventory": [],
@@ -857,12 +893,44 @@
       "max_mana": 0,
       "stamina": 95,
       "max_stamina": 95,
+      "voice": "Vs5CmVCVJwW4odQS2pVf",
       "is_attackable": true,
       "is_killable": true,
       "inventory": [
-        "PRIMITIVE_SLING",
-        "MAMMOTH_JERKY",
-        "KNAPPED_FLINT"
+        {
+          "id": "PRIMITIVE_SLING",
+          "name": "Grokh's Hunting Slingshot",
+          "description": "A supple leather sling crafted from braided mammoth hide and cured with woodsmoke. Whirls with lethal velocity to launch polished stones.",
+          "image_url": "/data/adventures/library/01a198f2-53b3-7766-9598-29acd4dab37a/01a196a6-e74f-723b-9a86-eb3133d70ade_primitive-sling_7ee59d17.jpg",
+          "item_type": "WEAPON",
+          "slot": "MainHand",
+          "text_log_content": "A supple leather sling crafted from braided mammoth hide and cured with woodsmoke. Whirls with lethal velocity to launch polished stones.",
+          "hp_change": 0,
+          "stamina_change": 0,
+          "mana_change": 0
+        },
+        {
+          "id": "MAMMOTH_JERKY",
+          "name": "Smoked Mammoth Jerky",
+          "description": "Tough, salt-crusted strips of prehistoric mammoth meat. Hard to chew, but consuming it restores 20 HP.",
+          "image_url": "/data/adventures/library/01a198f2-53b3-7766-9598-29acd4dab37a/01a196a6-e74f-723b-9a86-eb3133d70ade_mammoth-jerky_8fb7afbf.jpg",
+          "item_type": "CONSUMABLE",
+          "text_log_content": "Tough, salt-crusted strips of prehistoric mammoth meat. Hard to chew, but consuming it restores 20 HP.",
+          "hp_change": 0,
+          "stamina_change": 0,
+          "mana_change": 0
+        },
+        {
+          "id": "KNAPPED_FLINT",
+          "name": "Polished River Flint",
+          "description": "A beautifully flaked, razor-sharp river flint core carried by Grokh as ammunition and a cutting tool.",
+          "image_url": "/data/adventures/library/01a198f2-53b3-7766-9598-29acd4dab37a/01a196a6-e74f-723b-9a86-eb3133d70ade_knapped-flint_bff287a3.jpg",
+          "item_type": "PICKABLE",
+          "text_log_content": "A beautifully flaked, razor-sharp river flint core carried by Grokh as ammunition and a cutting tool.",
+          "hp_change": 0,
+          "stamina_change": 0,
+          "mana_change": 0
+        }
       ],
       "metadata_json": {
         "attack_mode": "PASSIVE",
@@ -952,9 +1020,14 @@
       "max_mana": 100,
       "stamina": 100,
       "max_stamina": 100,
+      "voice": "oR4uRy4fHDUGGISL0Rev",
       "is_attackable": true,
       "is_killable": false,
       "inventory": [],
+      "metadata_json": {
+        "special_actions": [],
+        "attack_mode": "PASSIVE"
+      },
       "on_interact_script": "talk_to_grandmaster_li()"
     },
     {
@@ -1042,9 +1115,14 @@
       "character": "Aloof, sleepy, demanding, vocal only when it is 18:00 dinner time.",
       "hp": 20,
       "max_hp": 20,
+      "voice": "bICR68fw9p7rUiAEAgn6",
       "is_attackable": true,
       "is_killable": false,
       "inventory": [],
+      "metadata_json": {
+        "special_actions": [],
+        "attack_mode": "PASSIVE"
+      },
       "on_interact_script": "if tw.time.hour == 18:\n    tw.npcs.say(\"NPC_CAT\", \"MREEEOW! MIAUUU! It is 18:00! Dusk has fallen! Where is my temporal fish dinner?!\")\n    tw.story.narrate(\"Schr\u00f6dinger rubs vigorously against your shins, her amber chronometer collar chiming insistently.\")\nelse:\n    tw.npcs.say(\"NPC_CAT\", \"Purrrr... Wake me at 18:00. Not a minute earlier... (\" + time_lab_clock_str() + \")\")\n    tw.story.narrate(\"Schr\u00f6dinger opens one lazy slit of an emerald eye, turns around on the warm tachyon coil, and goes back to sleep.\")"
     },
     {
@@ -1063,9 +1141,14 @@
       "character": "Punctual, pompous, proud, easily offended if someone calls him a common chicken.",
       "hp": 20,
       "max_hp": 20,
+      "voice": "Vs5CmVCVJwW4odQS2pVf",
       "is_attackable": true,
       "is_killable": false,
       "inventory": [],
+      "metadata_json": {
+        "special_actions": [],
+        "attack_mode": "PASSIVE"
+      },
       "on_interact_script": "if tw.time.hour == 6:\n    tw.npcs.say(\"NPC_ROOSTER\", \"KIKERIKI! COCK-A-DOODLE-DOO! Right on time! It is 06:00 in the morning!\")\n    tw.story.narrate(\"Barnaby puffs his polished brass feathers proudly, his pendulum tail swinging at top speed.\")\nelse:\n    tw.npcs.say(\"NPC_ROOSTER\", \"Tick-tock, cluck! It is not 06:00 yet! Current time is \" + time_lab_clock_str() + \". Come back at dawn or use the Time Machine!\")\n    tw.story.narrate(\"Barnaby consults his internal pendulum and clicks his brass beak dismissively.\")"
     },
     {
@@ -1120,9 +1203,14 @@
       "character": "Eccentric, enthusiastic, professorial, obsessed with punctuality, eager to explain every nuance of time dilation and scheduled timers.",
       "hp": 40,
       "max_hp": 40,
+      "voice": "1BfrkuYXmEwp8AWqSLWk",
       "is_attackable": true,
       "is_killable": false,
       "inventory": [],
+      "metadata_json": {
+        "special_actions": [],
+        "attack_mode": "PASSIVE"
+      },
       "on_interact_script": "tw.dialog.tree(CHRONOS_DIALOG_TREE, speaker=\"Prof. Timothy Chronos\")"
     },
     {
@@ -1190,7 +1278,7 @@
           "id": "MAGE_VIAL",
           "name": "Mage's Mana Vial",
           "description": "A crystalline vial of mana draught carried by Spark Mage Ilya. Consuming it restores 15 Mana.",
-          "image_url": "/data/adventures/library/01a196a6-e74f-723b-9a86-eb3133d70ade/01a1842e-91c4-75fc-8323-d42e64857464_mage-vial_f7e1c4f0.jpg",
+          "image_url": "/data/adventures/library/01a198f2-53b3-7766-9598-29acd4dab37a/01a1842e-91c4-75fc-8323-d42e64857464_mage-vial_f7e1c4f0.jpg",
           "item_type": "CONSUMABLE",
           "text_log_content": "A crystalline vial of mana draught carried by Spark Mage Ilya. Consuming it restores 15 Mana.",
           "stat_modifier_strength": 0,
@@ -1207,7 +1295,7 @@
           "id": "MAGE_CHARM",
           "name": "Mage's Charm",
           "description": "A silver neck charm carried by Spark Mage Ilya. Equipping it in the Neck slot grants +1 Intelligence.",
-          "image_url": "/data/adventures/library/01a196a6-e74f-723b-9a86-eb3133d70ade/01a1842e-91c4-75fc-8323-d42e64857464_mage-charm_47582e60.jpg",
+          "image_url": "/data/adventures/library/01a198f2-53b3-7766-9598-29acd4dab37a/01a1842e-91c4-75fc-8323-d42e64857464_mage-charm_47582e60.jpg",
           "item_type": "WEARABLE",
           "slot": "Neck",
           "text_log_content": "A silver neck charm carried by Spark Mage Ilya. Equipping it in the Neck slot grants +1 Intelligence.",
@@ -1364,7 +1452,7 @@
           "id": "GUARD_BANDAGE",
           "name": "Guard's Healing Vial",
           "description": "A compact healing vial carried by Training Guard Harlan. Consuming it restores 15 HP.",
-          "image_url": "/data/adventures/library/01a196a6-e74f-723b-9a86-eb3133d70ade/01a1842e-91c4-75fc-8323-d42e64857464_guard-bandage_af297d45.jpg",
+          "image_url": "/data/adventures/library/01a198f2-53b3-7766-9598-29acd4dab37a/01a1842e-91c4-75fc-8323-d42e64857464_guard-bandage_af297d45.jpg",
           "item_type": "CONSUMABLE",
           "text_log_content": "A compact healing vial carried by Training Guard Harlan. Consuming it restores 15 HP.",
           "stat_modifier_strength": 0,
@@ -1381,7 +1469,7 @@
           "id": "GUARD_BADGE",
           "name": "Guard Badge",
           "description": "A stamped iron guard badge carried by Training Guard Harlan as a verifiable loot item.",
-          "image_url": "/data/adventures/library/01a196a6-e74f-723b-9a86-eb3133d70ade/01a1842e-91c4-75fc-8323-d42e64857464_guard-badge_ad72aafa.jpg",
+          "image_url": "/data/adventures/library/01a198f2-53b3-7766-9598-29acd4dab37a/01a1842e-91c4-75fc-8323-d42e64857464_guard-badge_ad72aafa.jpg",
           "item_type": "PICKABLE",
           "text_log_content": "A stamped iron guard badge carried by Training Guard Harlan as a verifiable loot item.",
           "stat_modifier_strength": 0,
@@ -1398,7 +1486,7 @@
           "id": "GUARD_SWORD",
           "name": "Guard's Training Sword",
           "description": "A sturdy short training sword carried and equipped by Training Guard Harlan.",
-          "image_url": "/data/adventures/library/01a196a6-e74f-723b-9a86-eb3133d70ade/01a1842e-91c4-75fc-8323-d42e64857464_guard-sword_cd82bf5b.jpg",
+          "image_url": "/data/adventures/library/01a198f2-53b3-7766-9598-29acd4dab37a/01a1842e-91c4-75fc-8323-d42e64857464_guard-sword_cd82bf5b.jpg",
           "item_type": "WEAPON",
           "slot": "MainHand",
           "text_log_content": "A sturdy short training sword carried and equipped by Training Guard Harlan.",
@@ -2233,7 +2321,7 @@
       "hp_change": 0,
       "stamina_change": 0,
       "mana_change": 0,
-      "text_log_content": "My new apprentice is an idiot, so I am writing this down one last time before I turn him into a newt.\n\n1. The petrified toad fears fire. Keep it as far from the charred oak as the table allows!\n2. The clockwork heart needs a place at the very edge of the table, or its ticking cracks the centrepiece.\n3. The gambler's gold die lies directly to the left of the nightshade. Gambling and a quick death belong together.\n4. The heart's old mechanism stalls the moment dried herbs or loaded gold lie right ",
+      "text_log_content": "My new apprentice is an idiot, so I am writing this down one last time before I turn him into a newt.\n\n1. The petrified toad fears fire. Keep it as far from the charred oak as the table allows!\n2. The clockwork heart needs a place at the very edge of the table, or its ticking cracks the centrepiece.\n3. The gambler's gold die lies directly to the left of the nightshade. Gambling and a quick death belong together.\n4. The heart's old mechanism stalls the moment dried herbs or loaded gold lie right",
       "text_log_format": "DOCUMENT"
     },
     {
@@ -2529,7 +2617,7 @@
       "hp_change": 0,
       "stamina_change": 0,
       "mana_change": 0,
-      "text_log_content": "",
+      "text_log_content": "A newspaper printed on shimmering quantum paper. The ink shifts and rearranges itself to reflect future events depending on what day and hour it currently is.",
       "text_log_format": "DOCUMENT",
       "on_read_script": "h = tw.time.hour\nd = tw.time.day\nif d == 1 and h < 12:\n    headline = \"EDITION DAY 1 (MORNING): Alex Vale Arrives at Test-Lab! Local bots brace for unprecedented quality assurance poking.\"\nelif d == 1 and h < 18:\n    headline = \"EDITION DAY 1 (AFTERNOON): Tachyon emissions detected in Time Machine Lab. Experts advise not stepping on the cat.\"\nelif d == 1:\n    headline = \"EDITION DAY 1 (EVENING): 18:00 Dusk Bell Rings! Schr\u00f6dinger the Dusk Cat spotted hunting temporal treats.\"\nelse:\n    headline = \"EDITION DAY \" + str(d) + \" (\" + time_lab_clock_str() + \"): Barnaby the Rooster hailed as interdimensional icon. Time travelers report dizziness!\"\ntw.story.narrate(\"You inspect the shimmering quantum ink of The Tomorrow Chronicle:\\n\\n\" + headline)"
     },
@@ -2605,10 +2693,10 @@
       "name": "Edgar's Master Keyring",
       "description": "A heavy brass keyring holding dozens of labeled and unlabeled keys for utility closets and maintenance hatches across the testing facility.",
       "appearance": "heavy circular brass ring with dozens of jangling keys",
-      "current_scene_id": "COMBAT_LAB",
+      "current_scene_id": "INVENTORY",
       "image_url": "assets/01a196a6-e74f-723b-9a86-eb3133d70ade_janitor-keys_7130c492.jpg",
       "item_type": "PICKABLE",
-      "is_in_inventory": false,
+      "is_in_inventory": true,
       "is_hidden": false,
       "is_portable": true,
       "is_final_state": false,
@@ -2623,13 +2711,13 @@
       "name": "Edgar's Heavy Industrial Mop",
       "description": "A heavy two-handed industrial mop with a stout varnished ash handle and thick, absorbent grey yarn strands. Surprisingly balanced and packs a heavy bludgeoning blow.",
       "appearance": "long ash handle, dripping grey yarn mop head, brass clamping collar",
-      "current_scene_id": "COMBAT_LAB",
+      "current_scene_id": "INVENTORY",
       "image_url": "assets/01a196a6-e74f-723b-9a86-eb3133d70ade_janitor-mop_a962cbe1.jpg",
       "item_type": "WEAPON",
       "wearable_slots": [
         "MainHand"
       ],
-      "is_in_inventory": false,
+      "is_in_inventory": true,
       "is_hidden": false,
       "is_portable": true,
       "combination_ingredients": [],
@@ -2637,7 +2725,7 @@
       "stat_modifier_strength": 0,
       "inventory": [],
       "metadata_json": {
-        "damage_dice": "2d8",
+        "damage_dice": "1d8",
         "weapon_cost_type": "stamina",
         "weapon_cost_value": 20,
         "weapon_category": "MELEE",
@@ -2654,10 +2742,10 @@
       "name": "Flask of Industrial Floor Cleaner",
       "description": "A bottle of pungent, foaming floor detergent carried by Edgar. Consuming it restores 15 HP (though it leaves your mouth tasting of aggressive pine disinfectant).",
       "appearance": "square amber plastic bottle, foaming green liquid, caution biohazard label",
-      "current_scene_id": "COMBAT_LAB",
+      "current_scene_id": "INVENTORY",
       "image_url": "assets/01a196a6-e74f-723b-9a86-eb3133d70ade_janitor-soap_715826c1.jpg",
       "item_type": "CONSUMABLE",
-      "is_in_inventory": false,
+      "is_in_inventory": true,
       "is_hidden": false,
       "is_portable": true,
       "is_final_state": false,
@@ -2846,6 +2934,11 @@
       "is_portable": true,
       "is_final_state": false,
       "inventory": [],
+      "metadata_json": {
+        "damage_dice": "1d8",
+        "weapon_cost_type": "stamina",
+        "weapon_cost_value": 20
+      },
       "hp_change": 0,
       "stamina_change": 0,
       "mana_change": 0
@@ -3432,7 +3525,7 @@
       "description": "Successfully manipulated space-time and experienced dawn and dusk in the Time Machine Lab.",
       "tier": "silver",
       "requirement": "",
-      "is_earned": true
+      "is_earned": false
     },
     {
       "key": "AWARD_KEY_MASTER",
