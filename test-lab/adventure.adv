@@ -6,7 +6,7 @@
     "title": "Test-Lab",
     "teaser": "A compact three-room QA test lab for conversation, item mechanics, switches, and turn-based combat.",
     "cover_appearance": "clean stone and brass testing laboratory, workbench with gears, training arena doors, warm lighting",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "creator": "Jean Schmitz",
     "copyright": "Copyright (c) 2026 by Jean Schmitz",
     "license": "CC BY-NC 4.0",
@@ -383,7 +383,7 @@
       "on_enter_scene_text": null,
       "on_leave_scene_script": null,
       "on_leave_scene_text": null,
-      "helpers_script": "ABSURD_ITEMS = [\n    (\"RUBBER_CHICKEN\", \"Squeaky Rubber Chicken\"),\n    (\"TIN_FOIL_CROWN\", \"Tin-Foil Conspiracy Crown\"),\n    (\"SELF_STIRRING_TEACUP\", \"Clockwork Self-Stirring Teacup\"),\n    (\"PHILOSOPHICAL_PET_ROCK\", \"Googly-Eyed Pet Rock\"),\n]\n\nABSURD_GIFT_REACTIONS = {\n    \"NORA\": {\n        \"RUBBER_CHICKEN\": \"adjusts her spectacles in disbelief, records 'one vulcanized avian acoustic device' in her ledger, and asks what citation this could possibly support\",\n        \"TIN_FOIL_CROWN\": \"reluctantly accepts the Tin-Foil Conspiracy Crown, sets it beside her inkwell, and insists she is only keeping it to debunk its cranial-shielding claims\",\n        \"SELF_STIRRING_TEACUP\": \"holds the violently whirring teacup at arm's length and warns Alex that a single drop of tea on her archival parchment will be logged as sabotage\",\n        \"PHILOSOPHICAL_PET_ROCK\": \"accepts Sir Reginald the Googly-Eyed Pet Rock with unexpected fondness, noting that a silent stone makes an ideal research assistant\",\n    },\n    \"BRAM\": {\n        \"RUBBER_CHICKEN\": \"gives the Squeaky Rubber Chicken an experimental squeeze, laughs at the honk, and says he will use it to wake up apprentices in the workshop\",\n        \"TIN_FOIL_CROWN\": \"claps the Tin-Foil Conspiracy Crown onto his head over his braided beard and jokes that maybe now it will block out Nora's endless nitpicking\",\n        \"SELF_STIRRING_TEACUP\": \"grins approvingly at the over-torqued miniature turbine on the teacup and immediately starts planning how to weld a pressure gauge onto it\",\n        \"PHILOSOPHICAL_PET_ROCK\": \"hefts Sir Reginald the Pet Rock in his scarred palm, nods with respect at its solid ballast, and promises to build it a proper iron pedestal\",\n    },\n    \"VESPER\": {\n        \"RUBBER_CHICKEN\": \"accepts the Squeaky Rubber Chicken with a poised bow and suggests using it as a talking-stick to interrupt heated debates at the table\",\n        \"TIN_FOIL_CROWN\": \"accepts the Tin-Foil Conspiracy Crown with diplomatic grace, calling it an avant-garde symbol of transparency and open-minded inquiry\",\n        \"SELF_STIRRING_TEACUP\": \"cradles the vibrating Clockwork Self-Stirring Teacup with practiced composure, praising its enthusiasm while subtly shielding their coat from spray\",\n        \"PHILOSOPHICAL_PET_ROCK\": \"welcomes Sir Reginald the Googly-Eyed Pet Rock as an impartial fifth mediator whose neutrality at the table is beyond question\",\n    },\n    \"UNIT_SEVEN\": {\n        \"RUBBER_CHICKEN\": \"accepts the Squeaky Rubber Chicken, compresses it once to measure its decibel output, and asks whether it should be filed under 'musical instruments' or 'distress beacons'\",\n        \"TIN_FOIL_CROWN\": \"places the Tin-Foil Conspiracy Crown atop its brass chassis and reports a zero-percent change in electromagnetic shielding but a twelve-percent increase in flair\",\n        \"SELF_STIRRING_TEACUP\": \"synchronizes its optical lens with the spinning teacup turbine and compliments the device's admirable commitment to rotational efficiency\",\n        \"PHILOSOPHICAL_PET_ROCK\": \"cradles Sir Reginald the Googly-Eyed Pet Rock like a cherished younger sibling and promises to teach it advanced binary small talk\",\n    },\n}\n\n\ndef on_pickup_absurd_item(item_id):\n    if item_id == \"RUBBER_CHICKEN\":\n        tw.story.direct(\n            \"Narrate how pulling the Squeaky Rubber Chicken from the crate causes it to let out a long, tragic, ear-splitting rubber wheeze that makes the whole table turn and stare.\"\n        )\n        tw.npcs.say_directed(\n            \"BRAM\",\n            \"snorts with laughter and bluntly asks if that squeaky rubber bird is what QA calls a calibrated workshop tool\",\n        )\n        tw.npcs.say_directed(\n            \"UNIT_SEVEN\",\n            \"logs the acoustic anomaly and dryly asks for clarification on why a poultry specimen has been vulcanized\",\n        )\n        return\n\n    if item_id == \"TIN_FOIL_CROWN\":\n        tw.story.direct(\n            \"Narrate how the Tin-Foil Conspiracy Crown crinkles loudly as Alex lifts it from the crate, its bent copper antennae wobbling in the lamplight.\"\n        )\n        tw.npcs.say_directed(\n            \"NORA\",\n            \"adjusts her round spectacles and skeptically demands peer-reviewed sources for tin-foil thought-shielding\",\n        )\n        tw.npcs.say_directed(\n            \"VESPER\",\n            \"diplomatically compliments the bold, reflective silhouette of the tin-foil headgear\",\n        )\n        return\n\n    if item_id == \"SELF_STIRRING_TEACUP\":\n        tw.story.direct(\n            \"Narrate how the Clockwork Self-Stirring Teacup whirs to life in Alex's hand, its miniature turbine spinning with unnecessary mechanical fury.\"\n        )\n        tw.npcs.say_directed(\n            \"VESPER\",\n            \"winces politely at the mechanical violence being inflicted upon traditional tea etiquette\",\n        )\n        tw.npcs.say_directed(\n            \"BRAM\",\n            \"grumbles approvingly that whoever geared a teacup to three thousand RPM had more torque than sense\",\n        )\n        return\n\n    if item_id == \"PHILOSOPHICAL_PET_ROCK\":\n        tw.story.direct(\n            \"Narrate how Alex lifts the Googly-Eyed Pet Rock labeled 'SIR REGINALD', its oversized plastic eyes rattling in opposite directions.\"\n        )\n        tw.npcs.say_directed(\n            \"UNIT_SEVEN\",\n            \"respectfully greets Sir Reginald as a fellow non-biological entity of admirable stoicism\",\n        )\n        tw.npcs.say_directed(\n            \"NORA\",\n            \"dryly remarks that the pet rock's testimony about the workshop door is already more consistent than Bram's\",\n        )\n\n\ndef on_social_npc_receive_item(npc_id, item_ids):\n    npc = tw.npcs.get(npc_id)\n    if not item_ids:\n        return\n    for item_id in item_ids:\n        item_name = dict(ABSURD_ITEMS).get(item_id, item_id)\n        reaction = ABSURD_GIFT_REACTIONS.get(npc_id, {}).get(\n            item_id,\n            \"inspects the \" + item_name + \" with curious appreciation and offers an in-character comment on receiving it from Alex\",\n        )\n        tw.story.direct(\n            \"Narrate a funny, lively scene as \" + npc.name + \" receives the \" + item_name + \" from Alex at the table in the Conversation Hall.\"\n        )\n        tw.npcs.say_directed(npc_id, reaction)\n\n\ndef on_social_npc_interact(npc_id):\n    tw.npcs.say_directed(\n        npc_id,\n        \"greets Alex warmly at the round oak table in the Conversation Hall, shares their current thoughts on the ongoing experiments, and chats in character\",\n    )\n\n\ndef on_absurd_item_interact(item_id):\n    if item_id == \"RUBBER_CHICKEN\":\n        tw.story.narrate(\"You give the Squeaky Rubber Chicken an experimental squeeze. It emits a loud, mournful HONK that echoes through the Conversation Hall.\")\n        tw.story.direct(\"Narrate the seated testers briefly turning their heads at the rubber chicken honk.\")\n    elif item_id == \"TIN_FOIL_CROWN\":\n        tw.story.narrate(\"You adjust the Tin-Foil Conspiracy Crown on your head. Its copper antennae wobble as you scan the room for telepathic surveillance.\")\n    elif item_id == \"SELF_STIRRING_TEACUP\":\n        tw.story.narrate(\"You tap the rim of the Clockwork Teacup. The internal turbine whirs furiously for several seconds before clicking off.\")\n    elif item_id == \"PHILOSOPHICAL_PET_ROCK\":\n        tw.story.narrate(\"You gaze into Sir Reginald's googly plastic eyes. Sir Reginald stares back with ancient, immovable tranquility.\")\n\n\ndef on_choose_npc_action(answ):\n    # 0 = angry, 1 = happy, 2 = sing, 3 = ongoing poison, 4 = heal all, 5 = leave unchanged\n    if answ == 0:\n        old_mood, new_mood = \"very happy\", \"very angry\"\n        text, direction = \"The round is getting very angry!\", \"says what they think about Alex\"\n    elif answ == 1:\n        old_mood, new_mood = \"very angry\", \"very happy\"\n        text, direction = \"The round is getting very happy!\", \"says what they think about Alex\"\n    elif answ == 2:\n        old_mood, new_mood = None, None\n        text, direction = \"The whole round bursts into song!\", \"sings a verse about Alex\"\n    elif answ == 3:\n        tw.vars.set(\"social_hall_poison_active\", True)\n        tw.story.narrate(\n            \"A cloud of acrid green test-toxin hisses from the panel vents! Every NPC in the Conversation Hall is poisoned (-10 HP, ongoing poison active).\"\n        )\n        for npc in tw.scene.npcs:\n            if npc.is_defeated or npc.is_hidden:\n                continue\n            npc.damage(10)\n            if not npc.has_trait(\"poisoned\"):\n                npc.add_trait(\"poisoned\")\n            tw.npcs.say_directed(\n                npc.id,\n                \"coughs or sparks indignantly and comments in character on what they think of Alex unleashing ongoing poison gas in the Conversation Hall\",\n            )\n        return\n    elif answ == 4:\n        tw.vars.set(\"social_hall_poison_active\", False)\n        tw.story.narrate(\n            \"A warm golden restorative mist washes over the table, neutralizing all toxins and restoring every NPC in the Conversation Hall to full health!\"\n        )\n        for npc in tw.scene.npcs:\n            if npc.is_hidden:\n                continue\n            if npc.is_defeated:\n                npc.is_defeated = False\n            if npc.has_trait(\"poisoned\"):\n                npc.remove_trait(\"poisoned\")\n            npc.heal(100)\n            tw.npcs.say_directed(\n                npc.id,\n                \"reacts in character with relief and comments on what they think about finally being healed and cured of the test toxin\",\n            )\n        return\n    else:\n        tw.story.narrate(\"You leave the panel untouched. Nothing changes at the table.\")\n        return\n\n    tw.story.narrate(text)\n    for npc in tw.scene.npcs:\n        if npc.is_defeated or npc.is_hidden:\n            continue\n        if new_mood:\n            if npc.has_trait(old_mood):\n                npc.remove_trait(old_mood)\n            npc.add_trait(new_mood)\n            tw.log.info(f\"Trait '{new_mood}' set on NPC: {npc.id}\")\n        tw.npcs.say_directed(npc.id, direction)"
+      "helpers_script": "ABSURD_ITEMS = [\n    (\"RUBBER_CHICKEN\", \"Squeaky Rubber Chicken\"),\n    (\"TIN_FOIL_CROWN\", \"Tin-Foil Conspiracy Crown\"),\n    (\"SELF_STIRRING_TEACUP\", \"Clockwork Self-Stirring Teacup\"),\n    (\"PHILOSOPHICAL_PET_ROCK\", \"Googly-Eyed Pet Rock\"),\n]\n\nABSURD_GIFT_REACTIONS = {\n    \"NORA\": {\n        \"RUBBER_CHICKEN\": \"adjusts her spectacles in disbelief, records 'one vulcanized avian acoustic device' in her ledger, and asks what citation this could possibly support\",\n        \"TIN_FOIL_CROWN\": \"reluctantly accepts the Tin-Foil Conspiracy Crown, sets it beside her inkwell, and insists she is only keeping it to debunk its cranial-shielding claims\",\n        \"SELF_STIRRING_TEACUP\": \"holds the violently whirring teacup at arm's length and warns Alex that a single drop of tea on her archival parchment will be logged as sabotage\",\n        \"PHILOSOPHICAL_PET_ROCK\": \"accepts Sir Reginald the Googly-Eyed Pet Rock with unexpected fondness, noting that a silent stone makes an ideal research assistant\",\n    },\n    \"BRAM\": {\n        \"RUBBER_CHICKEN\": \"gives the Squeaky Rubber Chicken an experimental squeeze, laughs at the honk, and says he will use it to wake up apprentices in the workshop\",\n        \"TIN_FOIL_CROWN\": \"claps the Tin-Foil Conspiracy Crown onto his head over his braided beard and jokes that maybe now it will block out Nora's endless nitpicking\",\n        \"SELF_STIRRING_TEACUP\": \"grins approvingly at the over-torqued miniature turbine on the teacup and immediately starts planning how to weld a pressure gauge onto it\",\n        \"PHILOSOPHICAL_PET_ROCK\": \"hefts Sir Reginald the Pet Rock in his scarred palm, nods with respect at its solid ballast, and promises to build it a proper iron pedestal\",\n    },\n    \"VESPER\": {\n        \"RUBBER_CHICKEN\": \"accepts the Squeaky Rubber Chicken with a poised bow and suggests using it as a talking-stick to interrupt heated debates at the table\",\n        \"TIN_FOIL_CROWN\": \"accepts the Tin-Foil Conspiracy Crown with diplomatic grace, calling it an avant-garde symbol of transparency and open-minded inquiry\",\n        \"SELF_STIRRING_TEACUP\": \"cradles the vibrating Clockwork Self-Stirring Teacup with practiced composure, praising its enthusiasm while subtly shielding their coat from spray\",\n        \"PHILOSOPHICAL_PET_ROCK\": \"welcomes Sir Reginald the Googly-Eyed Pet Rock as an impartial fifth mediator whose neutrality at the table is beyond question\",\n    },\n    \"UNIT_SEVEN\": {\n        \"RUBBER_CHICKEN\": \"accepts the Squeaky Rubber Chicken, compresses it once to measure its decibel output, and asks whether it should be filed under 'musical instruments' or 'distress beacons'\",\n        \"TIN_FOIL_CROWN\": \"places the Tin-Foil Conspiracy Crown atop its brass chassis and reports a zero-percent change in electromagnetic shielding but a twelve-percent increase in flair\",\n        \"SELF_STIRRING_TEACUP\": \"synchronizes its optical lens with the spinning teacup turbine and compliments the device's admirable commitment to rotational efficiency\",\n        \"PHILOSOPHICAL_PET_ROCK\": \"cradles Sir Reginald the Googly-Eyed Pet Rock like a cherished younger sibling and promises to teach it advanced binary small talk\",\n    },\n}\n\n\ndef on_pickup_absurd_item(item_id):\n    if item_id == \"RUBBER_CHICKEN\":\n        tw.story.direct(\n            \"Narrate how pulling the Squeaky Rubber Chicken from the crate causes it to let out a long, tragic, ear-splitting rubber wheeze that makes the whole table turn and stare.\"\n        )\n        tw.npcs.say_directed(\n            \"BRAM\",\n            \"snorts with laughter and bluntly asks if that squeaky rubber bird is what QA calls a calibrated workshop tool\",\n        )\n        tw.npcs.say_directed(\n            \"UNIT_SEVEN\",\n            \"logs the acoustic anomaly and dryly asks for clarification on why a poultry specimen has been vulcanized\",\n        )\n        return\n\n    if item_id == \"TIN_FOIL_CROWN\":\n        tw.story.direct(\n            \"Narrate how the Tin-Foil Conspiracy Crown crinkles loudly as Alex lifts it from the crate, its bent copper antennae wobbling in the lamplight.\"\n        )\n        tw.npcs.say_directed(\n            \"NORA\",\n            \"adjusts her round spectacles and skeptically demands peer-reviewed sources for tin-foil thought-shielding\",\n        )\n        tw.npcs.say_directed(\n            \"VESPER\",\n            \"diplomatically compliments the bold, reflective silhouette of the tin-foil headgear\",\n        )\n        return\n\n    if item_id == \"SELF_STIRRING_TEACUP\":\n        tw.story.direct(\n            \"Narrate how the Clockwork Self-Stirring Teacup whirs to life in Alex's hand, its miniature turbine spinning with unnecessary mechanical fury.\"\n        )\n        tw.npcs.say_directed(\n            \"VESPER\",\n            \"winces politely at the mechanical violence being inflicted upon traditional tea etiquette\",\n        )\n        tw.npcs.say_directed(\n            \"BRAM\",\n            \"grumbles approvingly that whoever geared a teacup to three thousand RPM had more torque than sense\",\n        )\n        return\n\n    if item_id == \"PHILOSOPHICAL_PET_ROCK\":\n        tw.story.direct(\n            \"Narrate how Alex lifts the Googly-Eyed Pet Rock labeled 'SIR REGINALD', its oversized plastic eyes rattling in opposite directions.\"\n        )\n        tw.npcs.say_directed(\n            \"UNIT_SEVEN\",\n            \"respectfully greets Sir Reginald as a fellow non-biological entity of admirable stoicism\",\n        )\n        tw.npcs.say_directed(\n            \"NORA\",\n            \"dryly remarks that the pet rock's testimony about the workshop door is already more consistent than Bram's\",\n        )\n\n\ndef on_social_npc_receive_item(npc_id, item_ids):\n    npc = tw.npcs.get(npc_id)\n    if not item_ids:\n        return\n    for item_id in item_ids:\n        item_name = dict(ABSURD_ITEMS).get(item_id, item_id)\n        reaction = ABSURD_GIFT_REACTIONS.get(npc_id, {}).get(\n            item_id,\n            \"inspects the \" + item_name + \" with curious appreciation and offers an in-character comment on receiving it from Alex\",\n        )\n        tw.story.direct(\n            \"Narrate a funny, lively scene as \" + npc.name + \" receives the \" + item_name + \" from Alex at the table in the Conversation Hall.\"\n        )\n        tw.npcs.say_directed(npc_id, reaction)\n        npc.say_directed(\"Thanks for the item but gives it back to player\")\n        tw.story.system(npc.name + \" gives \" + item_name + \" back to you.\")\n        npc.give_to_player(item_id)\n\ndef on_social_npc_interact(npc_id):\n    tw.npcs.say_directed(\n        npc_id,\n        \"greets Alex warmly at the round oak table in the Conversation Hall, shares their current thoughts on the ongoing experiments, and chats in character\",\n    )\n\n\ndef on_absurd_item_interact(item_id):\n    if item_id == \"RUBBER_CHICKEN\":\n        tw.story.narrate(\"You give the Squeaky Rubber Chicken an experimental squeeze. It emits a loud, mournful HONK that echoes through the Conversation Hall.\")\n        tw.story.direct(\"Narrate the seated testers briefly turning their heads at the rubber chicken honk.\")\n    elif item_id == \"TIN_FOIL_CROWN\":\n        tw.story.narrate(\"You adjust the Tin-Foil Conspiracy Crown on your head. Its copper antennae wobble as you scan the room for telepathic surveillance.\")\n    elif item_id == \"SELF_STIRRING_TEACUP\":\n        tw.story.narrate(\"You tap the rim of the Clockwork Teacup. The internal turbine whirs furiously for several seconds before clicking off.\")\n    elif item_id == \"PHILOSOPHICAL_PET_ROCK\":\n        tw.story.narrate(\"You gaze into Sir Reginald's googly plastic eyes. Sir Reginald stares back with ancient, immovable tranquility.\")\n\n\ndef on_choose_npc_action(answ):\n    # 0 = angry, 1 = happy, 2 = sing, 3 = ongoing poison, 4 = heal all, 5 = leave unchanged\n    if answ == 0:\n        old_mood, new_mood = \"very happy\", \"very angry\"\n        text, direction = \"The round is getting very angry!\", \"says what they think about Alex\"\n    elif answ == 1:\n        old_mood, new_mood = \"very angry\", \"very happy\"\n        text, direction = \"The round is getting very happy!\", \"says what they think about Alex\"\n    elif answ == 2:\n        old_mood, new_mood = None, None\n        text, direction = \"The whole round bursts into song!\", \"sings a verse about Alex\"\n    elif answ == 3:\n        tw.vars.set(\"social_hall_poison_active\", True)\n        tw.story.narrate(\n            \"A cloud of acrid green test-toxin hisses from the panel vents! Every NPC in the Conversation Hall is poisoned (-10 HP, ongoing poison active).\"\n        )\n        for npc in tw.scene.npcs:\n            if npc.is_defeated or npc.is_hidden:\n                continue\n            npc.damage(10)\n            if not npc.has_trait(\"poisoned\"):\n                npc.add_trait(\"poisoned\")\n            tw.npcs.say_directed(\n                npc.id,\n                \"coughs or sparks indignantly and comments in character on what they think of Alex unleashing ongoing poison gas in the Conversation Hall\",\n            )\n        return\n    elif answ == 4:\n        tw.vars.set(\"social_hall_poison_active\", False)\n        tw.story.narrate(\n            \"A warm golden restorative mist washes over the table, neutralizing all toxins and restoring every NPC in the Conversation Hall to full health!\"\n        )\n        for npc in tw.scene.npcs:\n            if npc.is_hidden:\n                continue\n            if npc.is_defeated:\n                npc.is_defeated = False\n            if npc.has_trait(\"poisoned\"):\n                npc.remove_trait(\"poisoned\")\n            npc.heal(100)\n            tw.npcs.say_directed(\n                npc.id,\n                \"reacts in character with relief and comments on what they think about finally being healed and cured of the test toxin\",\n            )\n        return\n    else:\n        tw.story.narrate(\"You leave the panel untouched. Nothing changes at the table.\")\n        return\n\n    tw.story.narrate(text)\n    for npc in tw.scene.npcs:\n        if npc.is_defeated or npc.is_hidden:\n            continue\n        if new_mood:\n            if npc.has_trait(old_mood):\n                npc.remove_trait(old_mood)\n            npc.add_trait(new_mood)\n            tw.log.info(f\"Trait '{new_mood}' set on NPC: {npc.id}\")\n        tw.npcs.say_directed(npc.id, direction)"
     },
     {
       "id": "SWITCH_LAB",
@@ -466,7 +466,7 @@
   ],
   "exits": [
     {
-      "id": "01a1aa94-c8af-7223-a7d9-137499d1a48f",
+      "id": "01a1acce-3891-7866-8082-22f33a67efe3",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "COMBAT_LAB",
       "label": "Old rusty gate",
@@ -489,7 +489,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a1aa94-c8b0-719f-9a73-2b0a8d9fd207",
+      "id": "01a1acce-3892-7aad-8646-2b37505b8b75",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "SOCIAL_HALL",
       "label": "Hallway",
@@ -512,7 +512,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a1aa94-c8b1-7519-a593-fabbe371b107",
+      "id": "01a1acce-3893-7ee1-8705-b9d54e23c9cc",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "SWITCH_LAB",
       "label": "Iron door",
@@ -535,7 +535,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a1aa94-c8b2-7a9b-9970-81d61eb354d8",
+      "id": "01a1acce-3894-7b8f-ba48-18c0dbb54b9b",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "WORKSHOP",
       "label": "Wooden door",
@@ -558,7 +558,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a1aa94-c8b3-794a-9e28-00e3993716ce",
+      "id": "01a1acce-3895-7d4f-b206-839141d88639",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "RIDDLE_LAB",
       "label": "Door with runes",
@@ -581,7 +581,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a1aa94-c8b4-7107-84d3-fe6ed9a19c74",
+      "id": "01a1acce-3896-7dca-9cf9-2e1fce622f99",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "TIME_MACHINE_LAB",
       "label": "Glowing door",
@@ -604,7 +604,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a1abab-5e29-70b6-bb7f-62d0d36074f5",
+      "id": "01a1acce-3897-7151-885e-d493f340cae9",
       "from_scene_id": "RIDDLE_LAB",
       "to_scene_id": "GUILD_VAULT",
       "label": "Secret passage behind the gargoyle",
@@ -612,8 +612,8 @@
       "is_locked": true,
       "is_revealed": false,
       "lock_description": "A solid section of the wall behind the gargoyle bust is sealed flush. No seams or latch can be seen.",
-      "code_to_unlock": null,
-      "item_to_unlock": null,
+      "code_to_unlock": "",
+      "item_to_unlock": "",
       "rule_to_unlock": "Solve the casket puzzle and pull the brass lever.",
       "unlock_expression": null,
       "on_open_exit_script": null,
@@ -627,7 +627,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a1aa94-c8b5-7c28-92a8-3143da809888",
+      "id": "01a1acce-3898-7f26-83b8-dc1991a6143b",
       "from_scene_id": "WORKSHOP",
       "to_scene_id": "LOCKED_ROOM",
       "label": "The locked door",
@@ -756,7 +756,7 @@
           "id": "JANITOR_MOP",
           "name": "Edgar's Heavy Industrial Mop",
           "description": "A heavy two-handed industrial mop with a stout varnished ash handle and thick, absorbent grey yarn strands. Surprisingly balanced and packs a heavy bludgeoning blow.",
-          "image_url": "/data/adventures/library/01a1aa94-c5c5-7da2-83cd-6004534621ed/01a196a6-e74f-723b-9a86-eb3133d70ade_janitor-mop_a962cbe1.jpg",
+          "image_url": "/data/adventures/library/01a1acce-3763-7509-8086-becc658db5bf/01a196a6-e74f-723b-9a86-eb3133d70ade_janitor-mop_a962cbe1.jpg",
           "item_type": "WEAPON",
           "slot": "MainHand",
           "text_log_content": "A heavy two-handed industrial mop with a stout varnished ash handle and thick, absorbent grey yarn strands. Surprisingly balanced and packs a heavy bludgeoning blow.",
@@ -769,7 +769,7 @@
           "id": "JANITOR_SOAP",
           "name": "Flask of Industrial Floor Cleaner",
           "description": "A bottle of pungent, foaming floor detergent carried by Edgar. Consuming it restores 15 HP (though it leaves your mouth tasting of aggressive pine disinfectant).",
-          "image_url": "/data/adventures/library/01a1aa94-c5c5-7da2-83cd-6004534621ed/01a196a6-e74f-723b-9a86-eb3133d70ade_janitor-soap_715826c1.jpg",
+          "image_url": "/data/adventures/library/01a1acce-3763-7509-8086-becc658db5bf/01a196a6-e74f-723b-9a86-eb3133d70ade_janitor-soap_715826c1.jpg",
           "item_type": "CONSUMABLE",
           "text_log_content": "A bottle of pungent, foaming floor detergent carried by Edgar. Consuming it restores 15 HP (though it leaves your mouth tasting of aggressive pine disinfectant).",
           "hp_change": 0,
@@ -780,7 +780,7 @@
           "id": "JANITOR_KEYS",
           "name": "Edgar's Master Keyring",
           "description": "A heavy brass keyring holding dozens of labeled and unlabeled keys for utility closets and maintenance hatches across the testing facility.",
-          "image_url": "/data/adventures/library/01a1aa94-c5c5-7da2-83cd-6004534621ed/01a196a6-e74f-723b-9a86-eb3133d70ade_janitor-keys_7130c492.jpg",
+          "image_url": "/data/adventures/library/01a1acce-3763-7509-8086-becc658db5bf/01a196a6-e74f-723b-9a86-eb3133d70ade_janitor-keys_7130c492.jpg",
           "item_type": "PICKABLE",
           "text_log_content": "A heavy brass keyring holding dozens of labeled and unlabeled keys for utility closets and maintenance hatches across the testing facility.",
           "hp_change": 0,
@@ -943,7 +943,7 @@
           "id": "PRIMITIVE_SLING",
           "name": "Grokh's Hunting Slingshot",
           "description": "A supple leather sling crafted from braided mammoth hide and cured with woodsmoke. Whirls with lethal velocity to launch polished stones.",
-          "image_url": "/data/adventures/library/01a1aa94-c5c5-7da2-83cd-6004534621ed/01a196a6-e74f-723b-9a86-eb3133d70ade_primitive-sling_7ee59d17.jpg",
+          "image_url": "/data/adventures/library/01a1acce-3763-7509-8086-becc658db5bf/01a196a6-e74f-723b-9a86-eb3133d70ade_primitive-sling_7ee59d17.jpg",
           "item_type": "WEAPON",
           "slot": "MainHand",
           "text_log_content": "A supple leather sling crafted from braided mammoth hide and cured with woodsmoke. Whirls with lethal velocity to launch polished stones.",
@@ -955,7 +955,7 @@
           "id": "MAMMOTH_JERKY",
           "name": "Smoked Mammoth Jerky",
           "description": "Tough, salt-crusted strips of prehistoric mammoth meat. Hard to chew, but consuming it restores 20 HP.",
-          "image_url": "/data/adventures/library/01a1aa94-c5c5-7da2-83cd-6004534621ed/01a196a6-e74f-723b-9a86-eb3133d70ade_mammoth-jerky_8fb7afbf.jpg",
+          "image_url": "/data/adventures/library/01a1acce-3763-7509-8086-becc658db5bf/01a196a6-e74f-723b-9a86-eb3133d70ade_mammoth-jerky_8fb7afbf.jpg",
           "item_type": "CONSUMABLE",
           "text_log_content": "Tough, salt-crusted strips of prehistoric mammoth meat. Hard to chew, but consuming it restores 20 HP.",
           "hp_change": 0,
@@ -966,7 +966,7 @@
           "id": "KNAPPED_FLINT",
           "name": "Polished River Flint",
           "description": "A beautifully flaked, razor-sharp river flint core carried by Grokh as ammunition and a cutting tool.",
-          "image_url": "/data/adventures/library/01a1aa94-c5c5-7da2-83cd-6004534621ed/01a196a6-e74f-723b-9a86-eb3133d70ade_knapped-flint_bff287a3.jpg",
+          "image_url": "/data/adventures/library/01a1acce-3763-7509-8086-becc658db5bf/01a196a6-e74f-723b-9a86-eb3133d70ade_knapped-flint_bff287a3.jpg",
           "item_type": "PICKABLE",
           "text_log_content": "A beautifully flaked, razor-sharp river flint core carried by Grokh as ammunition and a cutting tool.",
           "hp_change": 0,
@@ -1320,7 +1320,7 @@
           "id": "MAGE_VIAL",
           "name": "Mage's Mana Vial",
           "description": "A crystalline vial of mana draught carried by Spark Mage Ilya. Consuming it restores 15 Mana.",
-          "image_url": "/data/adventures/library/01a1aa94-c5c5-7da2-83cd-6004534621ed/01a1842e-91c4-75fc-8323-d42e64857464_mage-vial_f7e1c4f0.jpg",
+          "image_url": "/data/adventures/library/01a1acce-3763-7509-8086-becc658db5bf/01a1842e-91c4-75fc-8323-d42e64857464_mage-vial_f7e1c4f0.jpg",
           "item_type": "CONSUMABLE",
           "text_log_content": "A crystalline vial of mana draught carried by Spark Mage Ilya. Consuming it restores 15 Mana.",
           "stat_modifier_strength": 0,
@@ -1337,7 +1337,7 @@
           "id": "MAGE_CHARM",
           "name": "Mage's Charm",
           "description": "A silver neck charm carried by Spark Mage Ilya. Equipping it in the Neck slot grants +1 Intelligence.",
-          "image_url": "/data/adventures/library/01a1aa94-c5c5-7da2-83cd-6004534621ed/01a1842e-91c4-75fc-8323-d42e64857464_mage-charm_47582e60.jpg",
+          "image_url": "/data/adventures/library/01a1acce-3763-7509-8086-becc658db5bf/01a1842e-91c4-75fc-8323-d42e64857464_mage-charm_47582e60.jpg",
           "item_type": "WEARABLE",
           "slot": "Neck",
           "text_log_content": "A silver neck charm carried by Spark Mage Ilya. Equipping it in the Neck slot grants +1 Intelligence.",
@@ -1494,7 +1494,7 @@
           "id": "GUARD_BANDAGE",
           "name": "Guard's Healing Vial",
           "description": "A compact healing vial carried by Training Guard Harlan. Consuming it restores 15 HP.",
-          "image_url": "/data/adventures/library/01a1aa94-c5c5-7da2-83cd-6004534621ed/01a1842e-91c4-75fc-8323-d42e64857464_guard-bandage_af297d45.jpg",
+          "image_url": "/data/adventures/library/01a1acce-3763-7509-8086-becc658db5bf/01a1842e-91c4-75fc-8323-d42e64857464_guard-bandage_af297d45.jpg",
           "item_type": "CONSUMABLE",
           "text_log_content": "A compact healing vial carried by Training Guard Harlan. Consuming it restores 15 HP.",
           "stat_modifier_strength": 0,
@@ -1511,7 +1511,7 @@
           "id": "GUARD_BADGE",
           "name": "Guard Badge",
           "description": "A stamped iron guard badge carried by Training Guard Harlan as a verifiable loot item.",
-          "image_url": "/data/adventures/library/01a1aa94-c5c5-7da2-83cd-6004534621ed/01a1842e-91c4-75fc-8323-d42e64857464_guard-badge_ad72aafa.jpg",
+          "image_url": "/data/adventures/library/01a1acce-3763-7509-8086-becc658db5bf/01a1842e-91c4-75fc-8323-d42e64857464_guard-badge_ad72aafa.jpg",
           "item_type": "PICKABLE",
           "text_log_content": "A stamped iron guard badge carried by Training Guard Harlan as a verifiable loot item.",
           "stat_modifier_strength": 0,
@@ -1528,7 +1528,7 @@
           "id": "GUARD_SWORD",
           "name": "Guard's Training Sword",
           "description": "A sturdy short training sword carried and equipped by Training Guard Harlan.",
-          "image_url": "/data/adventures/library/01a1aa94-c5c5-7da2-83cd-6004534621ed/01a1842e-91c4-75fc-8323-d42e64857464_guard-sword_cd82bf5b.jpg",
+          "image_url": "/data/adventures/library/01a1acce-3763-7509-8086-becc658db5bf/01a1842e-91c4-75fc-8323-d42e64857464_guard-sword_cd82bf5b.jpg",
           "item_type": "WEAPON",
           "slot": "MainHand",
           "text_log_content": "A sturdy short training sword carried and equipped by Training Guard Harlan.",
@@ -2208,7 +2208,12 @@
         "ITEM_COLD_COLA"
       ],
       "metadata_json": {
-        "max_items": 2
+        "max_items": 2,
+        "discovery_visibility": {
+          "mentioned_in_scene": true,
+          "listed_in_discoveries": true,
+          "lootable": false
+        }
       },
       "hp_change": 0,
       "stamina_change": 0,
@@ -2228,7 +2233,7 @@
       "switch_disabled_states": [
         "DISPENSE"
       ],
-      "switch_status_text": "The beverage dispenser needs some electrical power first.",
+      "switch_status_text": "",
       "switch_transitions": [
         {
           "from": "STANDBY",
@@ -2265,7 +2270,12 @@
       "inventory": [],
       "metadata_json": {
         "min_items": 2,
-        "max_items": 2
+        "max_items": 2,
+        "discovery_visibility": {
+          "mentioned_in_scene": true,
+          "listed_in_discoveries": true,
+          "lootable": false
+        }
       },
       "hp_change": 0,
       "stamina_change": 0,
@@ -2285,7 +2295,7 @@
       "switch_disabled_states": [
         "ON"
       ],
-      "switch_status_text": "Insert the Ceramic Fuse and Insulated Power Cable into the 2 slots to unlock Power On.",
+      "switch_status_text": "",
       "switch_transitions": [
         {
           "from": "OFF",
@@ -2324,7 +2334,12 @@
       "inventory": [],
       "metadata_json": {
         "min_items": 1,
-        "max_items": 1
+        "max_items": 1,
+        "discovery_visibility": {
+          "mentioned_in_scene": true,
+          "listed_in_discoveries": true,
+          "lootable": false
+        }
       },
       "hp_change": 0,
       "stamina_change": 0,
@@ -2347,7 +2362,7 @@
         "DEFROST",
         "COOK"
       ],
-      "switch_status_text": "The microwave needs some electrical power first.",
+      "switch_status_text": "",
       "switch_transitions": [
         {
           "from": "",
@@ -2861,7 +2876,12 @@
       "inventory": [],
       "metadata_json": {
         "min_items": 3,
-        "max_items": 3
+        "max_items": 3,
+        "discovery_visibility": {
+          "mentioned_in_scene": true,
+          "listed_in_discoveries": true,
+          "lootable": false
+        }
       },
       "hp_change": 0,
       "stamina_change": 0,
@@ -2881,7 +2901,7 @@
       "switch_disabled_states": [
         "POP"
       ],
-      "switch_status_text": "The popcorn machine needs some electrical power first.",
+      "switch_status_text": "",
       "switch_transitions": [
         {
           "from": "OFF",
@@ -3084,7 +3104,7 @@
         "CHANNEL-NEWS",
         "CHANNEL-SITCOM"
       ],
-      "switch_status_text": "The TV has no electrical power yet.",
+      "switch_status_text": "",
       "switch_transitions": [
         {
           "to": "CHANNEL-SPORT",
@@ -3633,7 +3653,7 @@
       "switch_disabled_states": [
         "ON"
       ],
-      "switch_status_text": "The TV needs some electrical power first.",
+      "switch_status_text": "",
       "switch_transitions": [
         {
           "from": "OFF",
@@ -3957,7 +3977,7 @@
       "description": "Successfully manipulated space-time and experienced dawn and dusk in the Time Machine Lab.",
       "tier": "silver",
       "requirement": "",
-      "is_earned": false
+      "is_earned": true
     },
     {
       "key": "AWARD_KEY_MASTER",
@@ -4049,18 +4069,19 @@
       "id": "SEQ_ENTRY_HALL",
       "order": 1,
       "title": "Reception & Orientation",
-      "description": "Check in at the reception desk in the Entry Hall and review the facility test protocols.",
-      "walkthrough": "Talk to Vera the Reception Bot at the front desk.",
-      "end_condition": "Reception check-in completed.",
+      "description": "Check in at the reception desk in the Entry Hall and review facility test protocols with Vera.",
+      "walkthrough": "Talk to Vera the Reception Bot at the front desk or read the FAQ info console.",
+      "end_condition": "Alex Vale leaves the reception and enters any of the test facilities.",
       "exp_reward": 25,
+      "activation_scene_id": "ENTRY_HALL",
+      "required_scene_id": "",
       "required_item_id": "",
-      "required_scene_id": "ENTRY_HALL",
       "required_defeated_npc_id": "",
-      "guard_expression": "",
+      "guard_expression": "tw.scene.id != 'ENTRY_HALL'",
       "on_start_sequence_script": "",
       "on_start_sequence_text": "Welcome to the Reception & Orientation phase. Review test guidelines with Vera.",
       "on_end_sequence_script": "",
-      "on_end_sequence_text": "Reception protocol completed.",
+      "on_end_sequence_text": "Reception protocol completed. You have entered the testing facilities.",
       "helpers_script": "",
       "soft_rules": [],
       "scripts": []
@@ -4069,18 +4090,19 @@
       "id": "SEQ_WORKSHOP",
       "order": 2,
       "title": "Workshop & Item Lab",
-      "description": "Inspect crafting stations, combine ingredients, and examine stored tools in the Item Lab.",
-      "walkthrough": "Explore the workshop tables, containers, and workbench recipes.",
-      "end_condition": "Workshop exploration completed.",
+      "description": "Inspect crafting stations, combine ingredients on the workbench, and examine containers in the Item Lab.",
+      "walkthrough": "Combine the Brass Rod and Copper Wire to craft the Test Probe, or find the Secret Room Key in the crate.",
+      "end_condition": "Craft the Test Probe or locate the Secret Room Key.",
       "exp_reward": 50,
+      "activation_scene_id": "WORKSHOP",
+      "required_scene_id": "",
       "required_item_id": "",
-      "required_scene_id": "WORKSHOP",
       "required_defeated_npc_id": "",
-      "guard_expression": "",
+      "guard_expression": "tw.inventory.has('TEST_PROBE') or tw.inventory.has('SECRET_ROOM_KEY') or tw.inventory.has('RESEARCH_TOKEN')",
       "on_start_sequence_script": "",
       "on_start_sequence_text": "You entered the Item Lab. Time to put crafting and containers through their paces.",
       "on_end_sequence_script": "",
-      "on_end_sequence_text": "Workshop testing completed.",
+      "on_end_sequence_text": "Workshop testing completed. Crafting mechanics verified.",
       "helpers_script": "",
       "soft_rules": [],
       "scripts": []
@@ -4089,12 +4111,13 @@
       "id": "SEQ_LOCKED_ROOM",
       "order": 3,
       "title": "Restricted Storage Chamber",
-      "description": "Bypass the lock from the Item Lab and inspect the quarantined holding area.",
-      "walkthrough": "Unlock the door from the Workshop using the Secret Room Key and explore inside.",
-      "end_condition": "Restricted storage chamber inspected.",
+      "description": "Bypass the locked door from the Item Lab using the Secret Room Key and inspect the quarantined holding area.",
+      "walkthrough": "Unlock the door from the Workshop using the Secret Room Key and examine the locked chest inside.",
+      "end_condition": "Restricted storage chamber unlocked and inspected.",
       "exp_reward": 75,
+      "activation_scene_id": "LOCKED_ROOM",
+      "required_scene_id": "",
       "required_item_id": "",
-      "required_scene_id": "LOCKED_ROOM",
       "required_defeated_npc_id": "",
       "guard_expression": "",
       "on_start_sequence_script": "",
@@ -4113,8 +4136,9 @@
       "walkthrough": "Read the Guild Master's Diary, match items to caskets, and pull the Confirmation Lever.",
       "end_condition": "The casket riddle is solved.",
       "exp_reward": 100,
+      "activation_scene_id": "RIDDLE_LAB",
+      "required_scene_id": "",
       "required_item_id": "",
-      "required_scene_id": "RIDDLE_LAB",
       "required_defeated_npc_id": "",
       "guard_expression": "tw.vars.get('lab_solved', False) == True",
       "on_start_sequence_script": "",
@@ -4133,8 +4157,9 @@
       "walkthrough": "Step through the secret passage from the Riddle Lab and claim the Guild Master's Signet Ring.",
       "end_condition": "The signet ring is acquired.",
       "exp_reward": 150,
+      "activation_scene_id": "GUILD_VAULT",
+      "required_scene_id": "",
       "required_item_id": "GUILDMASTER_RING",
-      "required_scene_id": "GUILD_VAULT",
       "required_defeated_npc_id": "",
       "guard_expression": "tw.inventory.has('GUILDMASTER_RING')",
       "on_start_sequence_script": "",
@@ -4150,17 +4175,18 @@
       "order": 6,
       "title": "Switch & Circuitry Lab",
       "description": "Test electrical levers, circuit breakers, and state latches in the Switch Lab.",
-      "walkthrough": "Interact with the power switches and verify circuit behaviors.",
-      "end_condition": "Switch mechanisms tested.",
+      "walkthrough": "Make popcorn in the popcorn machine, repair the broken remote, or switch on the TV.",
+      "end_condition": "Switch mechanisms or popcorn crafting verified.",
       "exp_reward": 50,
+      "activation_scene_id": "SWITCH_LAB",
+      "required_scene_id": "",
       "required_item_id": "",
-      "required_scene_id": "SWITCH_LAB",
       "required_defeated_npc_id": "",
-      "guard_expression": "",
+      "guard_expression": "tw.inventory.has('ITEM_POPCORN') or tw.inventory.has('ITEM_WORKING_REMOTE') or tw.switches.is_on('SW_TV')",
       "on_start_sequence_script": "",
       "on_start_sequence_text": "Switch Lab online. Circuit switches and latches ready for inspection.",
       "on_end_sequence_script": "",
-      "on_end_sequence_text": "Switch tests complete.",
+      "on_end_sequence_text": "Switch mechanisms successfully verified.",
       "helpers_script": "",
       "soft_rules": [],
       "scripts": []
@@ -4169,12 +4195,13 @@
       "id": "SEQ_COMBAT_LAB",
       "order": 7,
       "title": "Combat Training Arena",
-      "description": "Test combat encounters and battle mechanics against Grokh in the Combat Lab.",
-      "walkthrough": "Equip practice gear and spar with Grokh the caveman.",
-      "end_condition": "Combat trial finished.",
+      "description": "Test combat encounters and turn-based battle mechanics against Grokh the caveman in the Combat Lab.",
+      "walkthrough": "Equip practice gear and defeat Grokh the caveman in sparring.",
+      "end_condition": "Grokh the caveman is defeated in sparring.",
       "exp_reward": 100,
+      "activation_scene_id": "COMBAT_LAB",
+      "required_scene_id": "",
       "required_item_id": "",
-      "required_scene_id": "COMBAT_LAB",
       "required_defeated_npc_id": "GROKH_CAVEMAN",
       "guard_expression": "tw.npcs.is_defeated('GROKH_CAVEMAN')",
       "on_start_sequence_script": "",
@@ -4190,11 +4217,12 @@
       "order": 8,
       "title": "Conversation & Social Hall",
       "description": "Engage the laboratory staff and test interactive dialogue branching and social mechanics.",
-      "walkthrough": "Speak with NPCs in the Social Hall and explore dialogue choices.",
-      "end_condition": "Social interactions evaluated.",
+      "walkthrough": "Speak with Bram, Nora, Unit Seven or Vesper at the round oak table, and test dialogue branches.",
+      "end_condition": "Social interactions evaluated with researchers.",
       "exp_reward": 50,
+      "activation_scene_id": "SOCIAL_HALL",
+      "required_scene_id": "",
       "required_item_id": "",
-      "required_scene_id": "SOCIAL_HALL",
       "required_defeated_npc_id": "",
       "guard_expression": "",
       "on_start_sequence_script": "",
@@ -4210,11 +4238,12 @@
       "order": 9,
       "title": "Teleportation Field",
       "description": "Calibrate and trigger experimental matter displacement across test coordinates.",
-      "walkthrough": "Operate the teleport console and observe test transport cycles.",
-      "end_condition": "Teleport trials completed.",
+      "walkthrough": "Operate the teleport console with Professor Pip Fenwick and complete 3 test transport cycles.",
+      "end_condition": "Complete 3 teleport displacement trials.",
       "exp_reward": 75,
+      "activation_scene_id": "TELEPORT_LAB",
+      "required_scene_id": "",
       "required_item_id": "",
-      "required_scene_id": "TELEPORT_LAB",
       "required_defeated_npc_id": "",
       "guard_expression": "tw.vars.get('teleport_attempt', 0) >= 3",
       "on_start_sequence_script": "",
@@ -4230,13 +4259,14 @@
       "order": 10,
       "title": "Temporal Distortion Lab",
       "description": "Calibrate Professor Chronos's time manipulation console and test temporal shifts.",
-      "walkthrough": "Consult Professor Chronos and test dawn/dusk cycles on the console.",
-      "end_condition": "Temporal experiments verified.",
+      "walkthrough": "Flip the Paradox Hourglass 3 times or test the Chronos-5000 console.",
+      "end_condition": "Temporal experiments verified (3 hourglass flips).",
       "exp_reward": 100,
+      "activation_scene_id": "TIME_MACHINE_LAB",
+      "required_scene_id": "",
       "required_item_id": "",
-      "required_scene_id": "TIME_MACHINE_LAB",
       "required_defeated_npc_id": "",
-      "guard_expression": "",
+      "guard_expression": "tw.vars.get('hourglass_flips', 0) >= 3",
       "on_start_sequence_script": "",
       "on_start_sequence_text": "Temporal Distortion Lab active. Tachyon coils spinning at nominal speed.",
       "on_end_sequence_script": "",
@@ -4257,5 +4287,5 @@
       "is_active": true
     }
   ],
-  "init_script": "tw.vars.set(\"vera_greeted\", True)\ntw.story.direct(\n    \"Narrate how Vera the Reception Bot\u2014a thoroughly exhausted, sarcastic chrome android slumped behind the reception desk\u2014lets out a loud, static-laced mechanical sigh as Alex Vale arrives in the Entry Hall, tapping her clipboard with a metallic finger.\"\n)\ntw.npcs.say_directed(\n    \"RECEPTION_BOT\",\n    \"in an extremely annoyed, deadpan sarcastic tone, welcomes Alex to the Test-Lab, briefly explains that this is not a dramatic fantasy quest but a modular QA testing facility where each room tests a different engine feature (NPC conversations, locks and crafting, switches, riddles, combat, and teleporters), and tells Alex to click the FAQ Info Console on her desk for details instead of asking her questions\",\n)\n\ndef rooster_crow(event=None):\n    tw.npcs.say(\"NPC_ROOSTER\", \"KIKERIKIII! COCK-A-DOODLE-DOO! 06:00 AM! Dawn has broken over the timeline!\")\n    tw.story.direct(\"Barnaby the Chrono-Rooster flaps his brass clockwork wings vigorously, his pendulum tail clicking as his loud morning crow echoes through the lab.\")\n\n\ndef cat_meow(event=None):\n    tw.npcs.say(\"NPC_CAT\", \"MREEEOW! MIAUUUU! It is 18:00! Dusk has fallen! Where is my temporal salmon?!\")\n    tw.story.direct(\"Schr\\u00f6dinger the Dusk Cat stretches lazily on the warm tachyon coil, purring like a miniature turbine before letting out a demanding evening meow.\")\n\n\ndef paradox_alarm(event=None):\n    tw.story.system(\"=== TEMPORAL PARADOX ALERT ===\")\n    tw.story.direct(\"Amber strobe lights flash across the vaulted ceiling as an emergency klaxon sounds in the Time Machine Lab!\")\n    tw.npcs.say_directed(\"PROF_CHRONOS\", \"in a comically panicked scholarly voice, yells that the ten-minute paradox countdown has reached zero and checks three pocket watches at once to make sure reality hasn't folded in half\")\n\n\nif not tw.time.has_timer(\"ROOSTER_MORNING\"):\n    tw.time.every(\"24h\", rooster_crow, timer_id=\"ROOSTER_MORNING\", start=1320)\n\nif not tw.time.has_timer(\"CAT_EVENING\"):\n    tw.time.every(\"24h\", cat_meow, timer_id=\"CAT_EVENING\", start=600)"
+  "init_script": "tw.vars.set(\"vera_greeted\", True)\ntw.story.direct(\n    \"Narrate how Vera the Reception Bot\u2014a thoroughly exhausted, sarcastic chrome android slumped behind the reception desk\u2014lets out a loud, static-laced mechanical sigh as Alex Vale arrives in the Entry Hall, tapping her clipboard with a metallic finger.\"\n)\ntw.npcs.say_directed(\n    \"RECEPTION_BOT\",\n    \"in an extremely annoyed, deadpan sarcastic tone, welcomes Alex to the Test-Lab, briefly explains that this is not a dramatic fantasy quest but a modular QA testing facility where each room tests a different engine feature (NPC conversations, locks and crafting, switches, riddles, combat, and teleporters), and tells Alex to click the FAQ Info Console on her desk for details instead of asking her questions\",\n)\n\n\ndef rooster_crow(event=None):\n    rooster = tw.npcs.get(\"NPC_ROOSTER\")\n    if rooster.is_with_player:\n        rooster.say(\"KIKERIKIII! COCK-A-DOODLE-DOO! 06:00 AM! Dawn has broken over the timeline!\")\n        tw.story.direct(\"Barnaby the Chrono-Rooster flaps his brass clockwork wings vigorously, his pendulum tail clicking as his loud morning crow echoes through the lab.\")\n    else:\n        tw.story.direct(\"From down the corridor toward the Time Machine Lab, the faint, metallic crowing of a mechanical rooster echoes through the facility.\")\n\n\ndef cat_meow(event=None):\n    cat = tw.npcs.get(\"NPC_CAT\")\n    if cat.is_with_player:\n        cat.say(\"MREEEOW! MIAUUUU! It is 18:00! Dusk has fallen! Where is my temporal salmon?!\")\n        tw.story.direct(\"Schr\u00f6dinger the Dusk Cat stretches lazily on the warm tachyon coil, purring like a miniature turbine before letting out a demanding evening meow.\")\n    else:\n        tw.story.direct(\"From the direction of the Time Machine Lab, a faint, muffled feline meow echoes through the facility.\")\n\n\ndef paradox_alarm(event=None):\n    tw.story.system(\"=== TEMPORAL PARADOX ALERT ===\")\n    chronos = tw.npcs.get(\"PROF_CHRONOS\")\n    if chronos.is_with_player:\n        tw.story.direct(\"Amber strobe lights flash across the vaulted ceiling as an emergency klaxon sounds in the Time Machine Lab!\")\n        chronos.say_directed(\"in a comically panicked scholarly voice, yells that the ten-minute paradox countdown has reached zero and checks three pocket watches at once to make sure reality hasn't folded in half\")\n    else:\n        tw.story.direct(\"An emergency klaxon wails faintly in the distance from the Time Machine Lab, accompanied by the muffled scholarly panic of Professor Chronos.\")\n\n\nif not tw.time.has_timer(\"ROOSTER_MORNING\"):\n    tw.time.every(\"24h\", rooster_crow, timer_id=\"ROOSTER_MORNING\", start=1320)\n\nif not tw.time.has_timer(\"CAT_EVENING\"):\n    tw.time.every(\"24h\", cat_meow, timer_id=\"CAT_EVENING\", start=600)"
 }
