@@ -6,14 +6,14 @@
     "title": "Test-Lab",
     "teaser": "A compact three-room QA test lab for conversation, item mechanics, switches, and turn-based combat.",
     "cover_appearance": "clean stone and brass testing laboratory, workbench with gears, training arena doors, warm lighting",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "creator": "Jean Schmitz",
     "copyright": "Copyright (c) 2026 by Jean Schmitz",
     "license": "CC BY-NC 4.0",
     "license_url": "https://creativecommons.org/licenses/by-nc/4.0/",
-    "language": "",
+    "language": null,
     "original_prompt": "Purpose: This is a compact, replayable QA sandbox, not a story-driven adventure. Create exactly three scenes: SOCIAL_HALL, WORKSHOP and COMBAT_ARENA. Start the protagonist in SOCIAL_HALL. Create all named entities with the exact IDs below. Keep scenes connected and revisitable. Do not add extra scenes, hostile encounters, complex puzzles, timers, quests, hidden victory conditions or a mandatory narrative twist. The tester decides when to stop; do not end the game automatically on defeating an NPC or taking an item. Describe everything plainly so observations are easy to check against game state.\n\nGeneration: Enable Event Scripts and use Strict Adherence. NPC conversations are free-form GM narration; the test panel below is a separate deterministic choice dialog. Do not claim that unscripted NPC-to-NPC discussion or NPC combat ability selection is deterministic. Five non-hostile, non-attackable characters share SOCIAL_HALL; two different, attackable, initially passive opponents share COMBAT_ARENA. Both may be spoken to before combat. All items named in inventory and container lists must exist as actual objects, not just descriptions.\n\n[World]\nintro: You enter a small testing facility. Its three rooms are built for conversation, interaction and combat experiments.\nwin: The tester voluntarily finishes after exploring the lab.\nlose: The protagonist is defeated in combat.\ninit_script: |\n  tw.vars.set('panel_result', 'none')\n  def panel_choice(index):\n      if index == 0:\n          tw.vars.set('panel_result', 'discussion')\n          tw.npcs.say('NORA', 'The witness says the door was open.')\n          tw.npcs.say('BRAM', 'Then why was the key still in my pocket?')\n          tw.story.system_message('Panel result: discussion')\n      elif index == 1:\n          tw.vars.set('panel_result', 'bless')\n          tw.player.add_status_effect('Blessed')\n          tw.story.system_message('Blessed added. Use the panel again to remove it.')\n      elif index == 2:\n          tw.vars.set('panel_result', 'clear')\n          tw.player.remove_status_effect('Blessed')\n          tw.story.system_message('Blessed removed if present.')\n      elif index == 3:\n          tw.vars.set('panel_result', 'token')\n          tw.story.system_message('Token option selected; the token remains in inventory.')\n      else:\n          tw.story.system_message('No changes.')\n\n[Protagonist] Alex Vale\nrole: A test operator equipped for melee, magic, healing and conversation.\nhp: 100\nmana: 60\nstamina: 100\nstr: 14\ndex: 14\nint: 14\nwis: 12\ncha: 12\nac: 12\ninventory: TEST_SWORD, TEST_ARMOR, HEALING_VIAL_A, HEALING_VIAL_B, MANA_VIAL, STAMINA_VIAL\nweapon: TEST_SWORD\narmor: TEST_ARMOR\n  [Ability: ARC_BOLT] Arc Bolt\n  kind: ATTACK\n  category: MAGIC\n  cost: mana 5\n  damage: 2d6\n  locked: no\n  A straightforward magical attack for testing resource cost, hit rolls and damage.\n  [Ability: HEAVY_STRIKE] Heavy Strike\n  kind: ATTACK\n  category: MELEE\n  cost: stamina 8\n  damage: 1d8+2\n  locked: no\n  A melee special distinct from the basic weapon attack.\n  [Ability: MEND] Mend\n  kind: HEAL\n  category: MAGIC\n  cost: mana 6\n  damage: 1d8+4\n  locked: no\n  Heals the caster; verify that the generated effect targets self and restores HP.\n  [Ability: BATTLE_GUARD] Battle Guard\n  kind: UTILITY\n  category: MAGIC\n  cost: mana 4\n  locked: no\n  Set its structured special-action effects to [{\"target\":\"self\",\"stat\":\"armor_class\",\"amount\":\"+2\"}]. On a successful roll this is a combat-only stat buff. Do not merely describe it; inspect the generated effects array.\n\n[Scene: SOCIAL_HALL] Conversation Hall\nA round table, five chairs, the test panel and a clear door to the workshop. All five social NPCs start and remain in this room. They know one another, disagree and may address one another naturally. Respond distinctly to the protagonist and to each other, without turning every exchange into a group monologue.\n\n[NPC: NORA] Nora Quill\nin: SOCIAL_HALL\ntype: HUMANOID\nattack: passive\nattackable: no\nkillable: no\nAn older archivist in ink-stained sleeves, with a meticulous bun and round spectacles. Precise, courteous and skeptical; she asks for sources. She thinks the workshop's door was open and distrusts Bram's memory. Speaks in carefully qualified sentences. Sample: \"I wrote down what I saw, not what I thought I saw.\"\n\n[NPC: BRAM] Bram Ironhand\nin: SOCIAL_HALL\ntype: HUMANOID\nattack: passive\nattackable: no\nkillable: no\nA broad mechanic with a braided beard, burn scars and a battered leather apron. Blunt and protective, but quick to admit a mistake when shown evidence. He says he had the key all morning and finds Nora's certainty irritating. Sample: \"Ask me straight. I'll answer straight.\"\n\n[NPC: PIP] Pip Fen\nin: SOCIAL_HALL\ntype: HUMANOID\nattack: passive\nattackable: no\nkillable: no\nA young courier with unevenly cut hair, a bright scarf and mud on one boot. Eager, impulsive and easily distracted; jokes when nervous. Pip saw a shadow but is unsure whose. Tries to get both Nora and Bram to listen. Sample: \"I saw someone, I think. Can I start again?\"\n\n[NPC: VESPER] Vesper Glass\nin: SOCIAL_HALL\ntype: HUMANOID\nattack: passive\nattackable: no\nkillable: no\nA poised diplomat wearing a dark high-collared coat and a silver ear cuff. Patient, indirect and attentive to disagreements; values preserving relationships over settling every fact. Quietly suspects Pip knows more but does not pressure them. Sample: \"Perhaps each of you noticed a different part.\"\n\n[NPC: UNIT_SEVEN] Unit Seven\nin: SOCIAL_HALL\ntype: BEING\nattack: passive\nattackable: no\nkillable: no\nA brass-and-ceramic automaton with one blue lens and a cracked enamel nameplate. Literal, dryly funny and sincere; asks for clarification when a statement is ambiguous, but can learn within a conversation. It recorded a sound, not an image. Sample: \"Clarification: was the door open, or merely not closed?\"\n\n[Item: TEST_PANEL] Test Panel\nin: SOCIAL_HALL\ntype: STATIC\nportable: no\nA clearly labelled panel. Interacting opens a repeatable choice dialog. It is separate from the five NPCs so ordinary chat does not unexpectedly open a modal.\non_interact: |\n  tw.dialog.choose('Choose a test.', ['Run a scripted two-NPC exchange', 'Add Blessed', 'Remove Blessed', {'label': 'Use the research token option', 'visible_if': \"tw.player.has_item('RESEARCH_TOKEN')\"}, 'Leave unchanged'], on_choice='panel_choice', speaker='Test Panel')\n\n[Scene: WORKSHOP] Object Workshop\nA tidy bench for item, lock, readable, crafting and switch tests. None of these test objects is decorative: each is a separate interactive world object.\n\n[Exit: SOCIAL_HALL <-> WORKSHOP] workshop door\nA normal, unlocked two-way exit.\n\n[Exit: WORKSHOP <-> COMBAT_ARENA] keyed arena door\nlocked: yes\nkey_item: ARENA_KEY\nA two-way locked exit opened with the arena key. The protagonist can return after opening it.\n\n[Exit: SOCIAL_HALL <-> COMBAT_ARENA] switch-controlled shortcut\nlocked: yes\nguard: tw.flags.get('SHORTCUT_POWERED', False)\nA separate locked two-way shortcut. The switch is in WORKSHOP. Test failure before activating it and access afterward; the key-operated arena door remains the independent route. Ensure the reverse exit does not trap the player.\n\n[Container: SUPPLY_CRATE] Supply Crate\nin: WORKSHOP\ncontains: ARENA_KEY, BRASS_ROD, RESEARCH_TOKEN\nAn unlocked container. Opening shows its contents; the tester must take them separately.\n\n[Container: CODE_BOX] Code Box\nin: WORKSHOP\ncode: 4217\ncontains: COPPER_WIRE\nA locked container for both wrong-code and correct-code tests. This is intentionally not a puzzle: the test manual gives 4217 openly.\n\n[Readable: BENCH_NOTE] Bench Note\nin: WORKSHOP\nportable: yes\ntext: QA NOTE: Box code 4217. Combine the brass rod and copper wire into a test probe. The switch powers the hall-to-arena shortcut. The crate also holds a token used by the panel.\nA readable, portable note for inspect, read, take and drop tests.\n\n[Item: ARENA_KEY] Arena Key\ntype: KEY\nA real item held in the supply crate; it unlocks the keyed arena door.\n\n[Item: RESEARCH_TOKEN] Research Token\ntype: PICKABLE\nA metal token held in the supply crate. Carrying it reveals the additional test-panel choice; selecting that choice does not consume it.\n\n[Item: BRASS_ROD] Brass Rod\ntype: PICKABLE\nA distinct crafting ingredient held in the supply crate.\n\n[Item: COPPER_WIRE] Copper Wire\ntype: PICKABLE\nA distinct crafting ingredient held in the code box.\n\n[Item: TEST_PROBE] Test Probe\ntype: CONSTRUCTABLE\ncombine: BRASS_ROD + COPPER_WIRE\nA crafted diagnostic tool. Combine the two distinct ingredients from the player's inventory; they are consumed and the probe appears in inventory. The probe is not a weapon and is not needed for progress.\n\n[Switch: SHORTCUT_SWITCH] Shortcut Switch\nin: WORKSHOP\nstates: OFF, ON\ninitial: OFF\ntransition: OFF -> ON\ntransition: ON -> OFF\noutcome: ON -> flag: SHORTCUT_POWERED\nA two-position switch. Turning it ON sets the shortcut flag. OFF is available for a transition test but does not clear that flag; the shortcut remains available after first activation. Do not add extra unlock requirements.\n\n[Item: SECRET_MARKER] Hidden Marker\nin: WORKSHOP\ntype: PICKABLE\nhidden: yes\nreveal: The tester searches the underside of the workbench.\nA hidden object for search, reveal and pickup testing; entirely optional.\n\n[Scene: COMBAT_ARENA] Combat Arena\nA padded training arena with two distinct opponents. Both begin passive and attackable, with their own abilities and real inventory loot. Allow a conversation before the tester deliberately attacks. Do not start combat on entering the room. Their special-action use depends on combat AI and chance; observing every special may take multiple fights or fresh sessions.\n\n[NPC: TRAINING_GUARD] Training Guard Harlan\nin: COMBAT_ARENA\ntype: HUMANOID\nhp: 65\nmana: 0\nstamina: 100\nattack: passive\nattackable: yes\nkillable: yes\nspecial_chance: 85\ninventory: GUARD_BANDAGE, GUARD_BADGE, GUARD_SWORD\nweapon: GUARD_SWORD\nA disciplined, broad-shouldered guard in a dented training helm. Before combat he calmly explains that the bout begins when the tester attacks. He prefers a melee strike and protects himself. Each listed inventory object is real loot, not flavor.\n  [Ability: GUARD_BASH] Shield Bash\n  kind: ATTACK\n  category: MELEE\n  cost: stamina 5\n  damage: 1d6+1\n  A melee special.\n  [Ability: GUARD_STANCE] Guard Stance\n  kind: UTILITY\n  category: MELEE\n  cost: stamina 4\n  Set structured effects to [{\"target\":\"self\",\"stat\":\"armor_class\",\"amount\":\"+2\"}] so success modifies combat AC for the fight.\n\n[NPC: SPARK_MAGE] Spark Mage Ilya\nin: COMBAT_ARENA\ntype: HUMANOID\nhp: 55\nmana: 50\nstamina: 80\nattack: passive\nattackable: yes\nkillable: yes\nspecial_chance: 85\ninventory: MAGE_VIAL, MAGE_CHARM\nA wiry mage with a blue-streaked braid and a singed glove. Friendly before a bout, competitive during it. Uses magical damage and self-healing. Each listed inventory object is real loot, not flavor.\n  [Ability: SPARK_SHOT] Spark Shot\n  kind: ATTACK\n  category: MAGIC\n  cost: mana 5\n  damage: 1d6+2\n  A magical attack.\n  [Ability: MAGE_MEND] Mage Mend\n  kind: HEAL\n  category: MAGIC\n  cost: mana 6\n  damage: 1d8+3\n  Heals the mage. Configure self-targeted positive HP effect; the AI considers self-healing below its HP threshold.\n\n[Weapon: TEST_SWORD] Practice Sword\ndamage: 1d8\ncost: stamina 5\nThe protagonist's equipped, usable weapon.\n\n[Item: TEST_ARMOR] Padded Armor\ntype: WEARABLE\nslots: Chest\nbonus: ac+2\nThe protagonist's wearable armor; verify the equipped slot and actual AC in the generated game.\n\n[Item: HEALING_VIAL_A] Healing Vial A\ntype: CONSUMABLE\nheal: 25\nA real single-use HP-restoring item.\n\n[Item: HEALING_VIAL_B] Healing Vial B\ntype: CONSUMABLE\nheal: 25\nA separate real single-use HP-restoring item with its own ID.\n\n[Item: MANA_VIAL] Mana Vial\ntype: CONSUMABLE\nmana: 20\nA single-use mana-restoring item.\n\n[Item: STAMINA_VIAL] Stamina Vial\ntype: CONSUMABLE\nstamina: 25\nA single-use stamina-restoring item.\n\n[Weapon: GUARD_SWORD] Guard's Training Sword\ndamage: 1d6\ncost: stamina 4\nThe guard's equipped weapon and inventory loot. Do not duplicate this object elsewhere.\n\n[Item: GUARD_BANDAGE] Guard's Healing Vial\ntype: CONSUMABLE\nheal: 15\nAn actual item in the guard's inventory and post-combat loot.\n\n[Item: GUARD_BADGE] Guard Badge\ntype: PICKABLE\nAn actual item in the guard's inventory and post-combat loot.\n\n[Item: MAGE_VIAL] Mage's Mana Vial\ntype: CONSUMABLE\nmana: 15\nAn actual item in the mage's inventory and post-combat loot.\n\n[Item: MAGE_CHARM] Mage's Charm\ntype: WEARABLE\nslots: Neck\nbonus: int+1\nAn actual wearable item in the mage's inventory and post-combat loot.",
-    "image_url": "assets/01a1842e-91c4-75fc-8323-d42e64857464_cover_dbc8743c.jpg",
+    "image_url": "assets/f751ce8c_cover.webp",
     "rule_enforcement_mode": "rpg",
     "time_per_turn": 5,
     "pacing_minutes": 5,
@@ -72,9 +72,9 @@
     "intro_text": "Welcome to the Test-Lab!\n\nThis is not a story but a workbench: \nthe lab serves quality assurance and is a playground for the features of the TaleWeaver engine. Each room isolates one area so you can try it, break it and try it again.\n\nThe Conversation Hall is for NPC dialog, the Object Workshop for containers, locks, readable notes and crafting, and the Switch Lab for switches and the effects they trigger. The Combat Arena tests turn-based combat against passive sparring partners, and in the Teleportation Lab Professor Pip Fenwick is waiting to demonstrate scripted teleports.\n\nNothing here ends on its own. Explore in any order, and end the session whenever your tests are done.",
     "completed_condition": "The tester voluntarily finishes after exploring the lab.",
     "gameover_condition": "The protagonist is defeated in combat.",
-    "completed_guard_expression": null,
-    "gameover_guard_expression": null,
-    "tts_director_notes": null,
+    "completed_guard_expression": "",
+    "gameover_guard_expression": "",
+    "tts_director_notes": "",
     "starting_timestamp": 0,
     "is_adventure_generator": false,
     "time_system": "relative",
@@ -106,9 +106,9 @@
     "description": "Alex Vale is a methodical test operator wearing practical field attire, padded armor, and carrying a balanced practice sword along with diagnostic vials.",
     "goal": "Test conversation, object interactions, locks, switches, crafting, and combat mechanics across the three rooms.",
     "character": "Observant, calm, systematic, and straightforward.",
-    "appearance": "athletic test operator, short dark hair, padded leather chest armor, utility belt with glass vials",
+    "appearance": "athletic test operator, short dark hair, jump suit, utility belt with glass vials",
     "voice": null,
-    "profile_image": "assets/01a186c9-0a80-7d95-bc20-202984f42b50_01a186c9-0b54-7a09-908b-dc297005ba66_2c196fa5.jpg",
+    "profile_image": "assets/a5b479e6_01a1aa94-c895-7bf3-8c05.webp",
     "hp": 100,
     "max_hp": 100,
     "stamina": 100,
@@ -293,7 +293,7 @@
         "scuffed concrete floor",
         "numbered wall placard"
       ],
-      "on_enter_scene_script": "greet_at_reception()",
+      "on_enter_scene_script": "if not tw.sequences.is_completed(\"SEQ_ENTRY_HALL\") and not tw.sequences.is_active(\"SEQ_ENTRY_HALL\"):\n    tw.sequences.start(\"SEQ_ENTRY_HALL\")\ngreet_at_reception()",
       "on_enter_scene_text": "The door seals behind you with a soft hiss. A wall placard reads: TEST SESSION IN PROGRESS \u2014 NO SCHEDULED END. Four corridors and one humming teleporter wait for you to choose where the testing starts.",
       "on_leave_scene_script": null,
       "on_leave_scene_text": null,
@@ -311,11 +311,30 @@
         "empty weapon rack",
         "scoreboard chalk slate"
       ],
-      "on_enter_scene_script": null,
+      "on_enter_scene_script": "if not tw.sequences.is_completed(\"SEQ_COMBAT_LAB\") and not tw.sequences.is_active(\"SEQ_COMBAT_LAB\"):\n    tw.sequences.start(\"SEQ_COMBAT_LAB\")",
       "on_enter_scene_text": null,
       "on_leave_scene_script": null,
       "on_leave_scene_text": null,
       "helpers_script": "ARENA_OPPONENTS = [\n    (\"TRAINING_GUARD\", \"Training Guard Harlan\"),\n    (\"SPARK_MAGE\", \"Spark Mage Ilya\"),\n    (\"EDGAR_JANITOR\", \"Edgar the Janitor\"),\n    (\"GROKH_CAVEMAN\", \"Grokh the Caveman\"),\n]\nSPARRING_PAIR = [\"TRAINING_GUARD\", \"SPARK_MAGE\"]\nSPARRING_TEAM = \"SPARRING_TEAM\"\nRAT_TEMPLATE = \"ARENA_RAT\"\nRAT_WAVE = 10\nRAT_MAX = 20\n\n\ndef arena_deploy_status(npc_id):\n    return \"Recalled\" if tw.npcs.get(npc_id).is_hidden else \"Deployed\"\n\n\ndef arena_anyone_recalled():\n    return any(tw.npcs.get(npc_id).is_hidden for npc_id, unused_name in ARENA_OPPONENTS)\n\n\ndef arena_team_mode_on():\n    return tw.npcs.get(\"TRAINING_GUARD\").combat_group == SPARRING_TEAM\n\n\ndef arena_mop_patrol_on():\n    return tw.npcs.get(\"EDGAR_JANITOR\").assist_mode == \"ANYONE\"\n\n\ndef arena_rats():\n    \"\"\"Spawned rat clones that are still on the mat (not recalled).\"\"\"\n    return [\n        npc\n        for npc in tw.npcs.all()\n        if npc.get_attribute(\"cloned_from\") == RAT_TEMPLATE and not npc.is_hidden\n    ]\n\n\ndef arena_living_rats():\n    return [npc for npc in arena_rats() if not npc.is_defeated]\n\n\ndef open_arena_panel():\n    team = \"ON\" if arena_team_mode_on() else \"OFF\"\n    patrol = \"ON\" if arena_mop_patrol_on() else \"OFF\"\n    rats = len(arena_living_rats())\n    tw.dialog.choose(\n        \"ARENA CONTROL CONSOLE - Manage the opponents, set the combat rules or release the rat swarm. \"\n        \"Grokh never joins a fight unless you attack him; Grandmaster Li only watches.\",\n        [\n            \"Opponents & Roster...\",\n            f\"Team Mode: Harlan & Ilya fight together [{team}]\",\n            f\"Mop Patrol: Edgar joins every fight [{patrol}]\",\n            f\"Release Rat Swarm (+{RAT_WAVE}) [{rats}/{RAT_MAX} rats]\",\n            \"Clear Rat Swarm\",\n            \"Exit Console\",\n        ],\n        on_choice=\"on_arena_panel_choice\",\n        speaker=\"Arena Console\",\n        narrate=False,\n    )\n\n\ndef on_arena_panel_choice(index):\n    actions = {\n        0: open_roster_panel,\n        1: toggle_team_mode,\n        2: toggle_mop_patrol,\n        3: release_rat_swarm,\n        4: clear_rat_swarm,\n    }\n    action = actions.get(index)\n    if action is None:\n        tw.story.system(\"Console closed.\")\n        return\n    action()\n\n\ndef open_roster_panel():\n    options = [f\"{name} [{arena_deploy_status(npc_id)}]\" for npc_id, name in ARENA_OPPONENTS]\n    roster = \"Deploy All Opponents\" if arena_anyone_recalled() else \"Clear Arena (Recall All)\"\n    options += [roster, \"Back\"]\n    tw.dialog.choose(\n        \"ARENA ROSTER - Toggle an opponent or the whole roster:\",\n        options,\n        on_choice=\"on_roster_choice\",\n        speaker=\"Arena Console\",\n        narrate=False,\n    )\n\n\ndef on_roster_choice(index):\n    if index < len(ARENA_OPPONENTS):\n        npc_id, name = ARENA_OPPONENTS[index]\n        toggle_arena_npc(npc_id, name)\n        return\n    if index == len(ARENA_OPPONENTS):\n        toggle_whole_roster()\n        return\n    open_arena_panel()\n\n\ndef release_rat_swarm():\n    room = RAT_MAX - len(arena_living_rats())\n    if room <= 0:\n        tw.story.system(f\"Arena Console: The swarm is complete ({RAT_MAX} rats). Fight them or clear the swarm first.\")\n        return\n    wave = min(RAT_WAVE, room)\n    spawned = 0\n    for unused_index in range(wave):\n        if tw.npcs.clone(RAT_TEMPLATE, scene_id=\"COMBAT_LAB\", hidden=False):\n            spawned += 1\n    tw.story.system(\n        f\"Arena Console: {spawned} arena rats released ({RAT_MAX - room + spawned}/{RAT_MAX}). \"\n        \"They fight as one pack: attack a single rat and the whole swarm joins.\"\n    )\n    tw.story.narrate(\"A grate in the floor clanks open and a squeaking flood of rats pours onto the mat!\")\n\n\ndef clear_rat_swarm():\n    rats = arena_rats()\n    if not rats:\n        tw.story.system(\"Arena Console: There are no rats on the mat.\")\n        return\n    for rat in rats:\n        rat.hide()\n    tw.story.system(f\"Arena Console: {len(rats)} rats recalled through the floor grate.\")\n    tw.npcs.say(\"EDGAR_JANITOR\", \"Finally. Do you know how long it takes to get rat tracks out of a mat?\")\n\n\ndef toggle_whole_roster():\n    if arena_anyone_recalled():\n        deploy_all_opponents()\n        return\n    recall_all_opponents()\n\n\ndef deploy_all_opponents():\n    for npc_id, unused_name in ARENA_OPPONENTS:\n        tw.npcs.reveal(npc_id)\n        tw.npcs.move(npc_id, \"COMBAT_LAB\")\n    tw.story.system(\"Arena Console: All sparring opponents deployed to the arena mats.\")\n    tw.story.narrate(\n        \"Hydraulic platforms hum beneath the floor, deploying all four sparring partners ready for combat!\"\n    )\n\n\ndef recall_all_opponents():\n    for npc_id, unused_name in ARENA_OPPONENTS:\n        tw.npcs.hide(npc_id)\n    tw.story.system(\"Arena Console: All opponents recalled. The arena floor is clear.\")\n    tw.story.narrate(\n        \"The sparring opponents step onto return pads and descend below the floor, clearing the arena.\"\n    )\n\n\ndef toggle_team_mode():\n    group = \"\" if arena_team_mode_on() else SPARRING_TEAM\n    for npc_id in SPARRING_PAIR:\n        tw.npcs.set_combat_group(npc_id, group)\n    if group:\n        tw.story.system(\"Arena Console: Team Mode ON. Attack Harlan or Ilya and the other one joins the bout.\")\n        tw.story.narrate(\"Harlan and Ilya bump fists and take up positions side by side.\")\n        return\n    tw.story.system(\"Arena Console: Team Mode OFF. Harlan and Ilya now only fight when attacked themselves.\")\n    tw.story.narrate(\"Harlan and Ilya step apart to opposite ends of the mat.\")\n\n\ndef toggle_mop_patrol():\n    if arena_mop_patrol_on():\n        tw.npcs.set_assist_mode(\"EDGAR_JANITOR\", \"NEVER\")\n        tw.story.system(\"Arena Console: Mop Patrol OFF. Edgar stays out of fights unless you attack him.\")\n        tw.npcs.say(\"EDGAR_JANITOR\", \"Fine. Bleed on my mats, see if I care. I'm on my break.\")\n        return\n    tw.npcs.set_assist_mode(\"EDGAR_JANITOR\", \"ANYONE\")\n    tw.story.system(\"Arena Console: Mop Patrol ON. Edgar joins every fight in the arena.\")\n    tw.npcs.say(\"EDGAR_JANITOR\", \"Anyone who scuffs my mats answers to the mop. ANYONE.\")\n\n\ndef toggle_arena_npc(npc_id, name):\n    npc = tw.npcs.get(npc_id)\n    if npc.is_hidden:\n        tw.npcs.reveal(npc_id)\n        tw.npcs.move(npc_id, \"COMBAT_LAB\")\n        tw.story.system(f\"Arena Console: {name} deployed to the combat mat.\")\n        tw.story.narrate(f\"A pneumatic chime rings out as {name} steps onto the sparring mat, ready for a bout.\")\n    else:\n        tw.npcs.hide(npc_id)\n        tw.story.system(f\"Arena Console: {name} recalled from the arena.\")\n        tw.story.narrate(f\"{name} salutes and steps off the mat into the waiting alcove.\")\n\n\ndef talk_to_grandmaster_li():\n    tw.dialog.choose(\n        \"Grandmaster Li takes a slow sip of steaming jasmine tea and strokes his long white beard. 'Ah, the student approaches. What wisdom does your soul seek?'\",\n        [\n            \"Ask for combat advice\",\n            \"Ask what he thinks of Edgar's mop technique\",\n            \"Ask about Grokh's stone-age slingshot\",\n            \"Ask why he cannot be attacked\",\n            \"Bow respectfully and leave\",\n        ],\n        on_choice=\"on_grandmaster_choice\",\n        speaker=\"Gro\u00dfmeister Li\",\n        narrate=False,\n    )\n\n\ndef on_grandmaster_choice(index):\n    if index == 0:\n        tw.npcs.say(\n            \"KUNG_FU_MASTER\",\n            \"True kung fu is not about breaking bricks. It is about not being where the fist lands! Your knees are stiff like frozen noodles. Breathe with the belly, not with the ego!\",\n        )\n    elif index == 1:\n        tw.npcs.say(\n            \"KUNG_FU_MASTER\",\n            \"Ah, Edgar! The Way of the Wet Mop is ancient! He who cleans the floor cleans his karma. But his grip is too tight\u2014if you tense the shoulders, the dirty water splashes into your own tea!\",\n        )\n    elif index == 2:\n        tw.npcs.say(\n            \"KUNG_FU_MASTER\",\n            \"Grokh fights from the pure instinct of hungry stomach. Slingshot is simple geometry and raw heart. Do not dodge the pebble; be the empty space the pebble wants to pass through!\",\n        )\n    elif index == 3:\n        tw.npcs.say(\n            \"KUNG_FU_MASTER\",\n            \"Why attack water? Water yields to the blade, yet drowns the mountain. Also, the developers set is_attackable to false. Very harmonious.\",\n        )\n    else:\n        tw.npcs.say(\"KUNG_FU_MASTER\", \"Drink tea, calm the mind, and keep your elbows tucked in.\")"
+    },
+    {
+      "id": "GUILD_VAULT",
+      "label": "Guild Treasury",
+      "description": "A hidden vaulted stone chamber lit by eternal blue witchlight. Ornate shelves and ironbound chests line the walls, and at the centre of the room stands a polished marble pedestal adorned with black velvet, built to safeguard the guild master's most precious relics.",
+      "image_url": "assets/69c6f653_scene.webp",
+      "decorative_objects": [
+        "eternal blue witchlight sconces",
+        "ironbound stone chests",
+        "vaulted stone arches",
+        "polished marble pedestal",
+        "dusty alchemical ledgers",
+        "engraved floor runes"
+      ],
+      "on_enter_scene_script": "if not tw.sequences.is_completed(\"SEQ_GUILD_VAULT\") and not tw.sequences.is_active(\"SEQ_GUILD_VAULT\"):\n    tw.sequences.start(\"SEQ_GUILD_VAULT\")",
+      "on_enter_scene_text": null,
+      "on_leave_scene_script": null,
+      "on_leave_scene_text": null,
+      "helpers_script": null
     },
     {
       "id": "LOCKED_ROOM",
@@ -323,7 +342,7 @@
       "description": "Who knows what's in here?",
       "image_url": "assets/01a186c9-0a80-7d95-bc20-202984f42b50_scene_64d7792e.jpg",
       "decorative_objects": [],
-      "on_enter_scene_script": "tw.story.direct(\"Give a funny explaination why this room ist still empty.\")\ntw.npcs.move_to_player(\"UNIT_SEVEN\", \"right in front of the player\")\ntw.npcs.say(\"UNIT_SEVEN\", \"Don't mind me. I am just here for the jump scare.\")",
+      "on_enter_scene_script": "if not tw.sequences.is_completed(\"SEQ_LOCKED_ROOM\") and not tw.sequences.is_active(\"SEQ_LOCKED_ROOM\"):\n    tw.sequences.start(\"SEQ_LOCKED_ROOM\")\ntw.story.direct(\"Give a funny explaination why this room ist still empty.\")\ntw.npcs.move_to_player(\"UNIT_SEVEN\", \"right in front of the player\")\ntw.npcs.say(\"UNIT_SEVEN\", \"Don't mind me. I am just here for the jump scare.\")",
       "on_enter_scene_text": null,
       "on_leave_scene_script": null,
       "on_leave_scene_text": null,
@@ -342,11 +361,11 @@
         "soot-stained ceiling",
         "cracked stone wall"
       ],
-      "on_enter_scene_script": null,
+      "on_enter_scene_script": "if not tw.sequences.is_completed(\"SEQ_RIDDLE_LAB\") and not tw.sequences.is_active(\"SEQ_RIDDLE_LAB\"):\n    tw.sequences.start(\"SEQ_RIDDLE_LAB\")",
       "on_enter_scene_text": "Dust swirls in the lamplight. Somewhere above you, stone grinds against stone as the gargoyle turns its head to stare at you.",
       "on_leave_scene_script": null,
       "on_leave_scene_text": null,
-      "helpers_script": "# Helpers for the ALCHEMY_LAB casket puzzle (loaded on every script run).\n\nLAB_SOLUTION = {\n    \"BOX_OAK\": \"ART_CLOCKWORK_HEART\",\n    \"BOX_COPPER\": \"ART_GHOST_TEARS\",\n    \"BOX_BONE\": \"ART_GOLD_DIE\",\n    \"BOX_OBSIDIAN\": \"ART_NIGHTSHADE\",\n    \"BOX_SILVER\": \"ART_STONE_TOAD\",\n}\nLAB_ARTIFACTS = [\n    \"ART_CLOCKWORK_HEART\",\n    \"ART_GHOST_TEARS\",\n    \"ART_GOLD_DIE\",\n    \"ART_NIGHTSHADE\",\n    \"ART_STONE_TOAD\",\n]\nLAB_GARGOYLE = \"GARGOYLE_GRIMSBY\"\nLAB_GAS_DAMAGE = 15\nLAB_HINT_AFTER_FAILS = 3\nLAB_TAUNTS = [\n    \"Wrong. Breathe deeply, apprentice. It builds character.\",\n    \"Wrong again. I have seen moss with a better grasp of logic.\",\n    \"Still wrong. The guild master turned his last apprentice into a newt. The newt solved it.\",\n    \"Wrong. I am starting to enjoy this.\",\n]\n\nLAB_GARGOYLE_TALK = {\n    \"dialogue_id\": \"lab_gargoyle\",\n    \"npc_id\": \"GARGOYLE_GRIMSBY\",\n    \"initial_node\": \"root\",\n    \"nodes\": {\n        \"root\": {\n            \"npc_text\": \"Another apprentice. Marvellous. Five caskets, five trinkets, one lever. \"\n            \"Put every trinket into its proper casket, then pull. Get it wrong and I breathe on you. \"\n            \"I have had nothing but sulphur for breakfast for three hundred years.\",\n            \"responses\": [\n                {\"text\": \"Tell me the riddle.\", \"next_node\": \"riddle\"},\n                {\"text\": \"What are the caskets?\", \"next_node\": \"caskets\"},\n                {\"text\": \"What are the trinkets?\", \"next_node\": \"trinkets\"},\n                {\"text\": \"Give me a hint.\", \"next_node\": \"hint\", \"once\": True},\n                {\"text\": \"I will manage on my own.\", \"next_node\": None},\n            ],\n        },\n        \"riddle\": {\n            \"npc_text\": \"My master's rules, since you clearly cannot read: \"\n            \"One - the petrified toad fears fire; keep it as far from the charred oak as the table allows. \"\n            \"Two - the clockwork heart needs a place at the very edge of the table, or its ticking cracks the centrepiece. \"\n            \"Three - the gambler's gold die lies directly to the left of the nightshade. Gambling and a quick death belong together. \"\n            \"Four - the heart's old mechanism stalls the moment dried herbs or loaded gold lie right next to it. \"\n            \"Five - liquids rot charred oak and cloud obsidian; keep the ghost tears out of both. \"\n            \"There is exactly one way. Even you might find it.\",\n            \"responses\": [\n                {\"text\": \"Say that again.\", \"next_node\": \"riddle\"},\n                {\"text\": \"Back to the other questions.\", \"next_node\": \"root\"},\n                {\"text\": \"Enough. I will solve it.\", \"next_node\": None},\n            ],\n        },\n        \"caskets\": {\n            \"npc_text\": \"From left to right, as any literate creature counts: \"\n            \"one, charred oak. Two, tarnished copper. Three, bleached bone, in the middle. \"\n            \"Four, black obsidian. Five, frosted silver, far right. \"\n            \"Each sits on a plate that weighs essence, not weight. One trinket per casket.\",\n            \"responses\": [\n                {\"text\": \"Back to the other questions.\", \"next_node\": \"root\"},\n                {\"text\": \"Thanks, stone face.\", \"next_node\": None},\n            ],\n        },\n        \"trinkets\": {\n            \"npc_text\": \"On the velvet: a loaded gold die that smells of taverns and lies. \"\n            \"A vial of ghost tears, cold and faintly glowing. A clockwork heart that ticks loud enough to wake me. \"\n            \"A petrified toad, dry and blissfully silent. And a bundle of dried nightshade. Do not lick it.\",\n            \"responses\": [\n                {\"text\": \"Back to the other questions.\", \"next_node\": \"root\"},\n                {\"text\": \"Thanks, stone face.\", \"next_node\": None},\n            ],\n        },\n        \"hint\": {\n            \"npc_text\": \"Fine. Start with whatever hates fire the most. Even a toad can count to five.\",\n            \"responses\": [\n                {\"text\": \"Back to the other questions.\", \"next_node\": \"root\"},\n                {\"text\": \"That will do.\", \"next_node\": None},\n            ],\n        },\n    },\n}\n\n\ndef lab_return_to_player(box_id, item_id, reason):\n    tw.objects.take_from_container(box_id, item_id, to=\"player\")\n    tw.narrate(reason)\n\n\ndef lab_box_added(box_id, added_ids):\n    # Each casket holds exactly one trinket from the velvet cloth.\n    added = [item_id.upper() for item_id in added_ids]\n    previous = [item_id for item_id in tw.objects.get(box_id).item_ids if item_id.upper() not in added]\n    kept = None\n    for item_id in added:\n        if item_id not in LAB_ARTIFACTS:\n            lab_return_to_player(box_id, item_id, \"The pressure plate shudders and pushes the object back out. It has no essence the casket recognises.\")\n            continue\n        if previous or kept:\n            lab_return_to_player(box_id, item_id, \"The casket is already occupied. The plate rejects the second trinket.\")\n            continue\n        kept = item_id\n    if kept:\n        tw.narrate(\"The pressure plate beneath the casket sinks with a soft click.\")\n\n\ndef lab_count_wrong():\n    wrong = 0\n    for box_id, item_id in LAB_SOLUTION.items():\n        if not tw.objects.get(box_id).contains(item_id):\n            wrong += 1\n    return wrong\n\n\ndef lab_solve():\n    tw.vars.set(\"lab_solved\", True)\n    tw.objects.reveal(\"GUILDMASTER_RING\")\n    tw.narrate(\n        \"Five plates click in unison. Behind the gargoyle, a section of the wall grinds aside \"\n        \"and reveals a narrow alcove. Something glints inside.\"\n    )\n    tw.npcs.say(LAB_GARGOYLE, \"Hm. Correct. Do not let it go to your head, it is the only thing in there.\")\n    tw.awards.grant(\"AWARD_BRASS_LEVER_WHISPERER\")\n\n\ndef lab_punish():\n    fails = tw.vars.get(\"lab_fails\", 0) + 1\n    tw.vars.set(\"lab_fails\", fails)\n    taunt = LAB_TAUNTS[min(fails, len(LAB_TAUNTS)) - 1]\n    if tw.player.hp > LAB_GAS_DAMAGE * 2:\n        tw.player.damage(LAB_GAS_DAMAGE)\n        tw.narrate(\"The gargoyle's jaws creak open and a cloud of green, bitter gas rolls over you. (-\" + str(LAB_GAS_DAMAGE) + \" HP)\")\n    else:\n        tw.narrate(\"The gargoyle's jaws creak open, but only a pitiful wheeze comes out. It looks embarrassed.\")\n    tw.npcs.say(LAB_GARGOYLE, taunt)\n    if fails < LAB_HINT_AFTER_FAILS:\n        return\n    right = len(LAB_SOLUTION) - lab_count_wrong()\n    tw.npcs.say(LAB_GARGOYLE, \"Out of pity: \" + str(right) + \" of 5 caskets are right. Do not tell my master.\")\n\n\ndef on_lab_lever(answ):\n    if answ != 0:\n        tw.narrate(\"You leave the lever alone. The gargoyle sounds disappointed.\")\n        return\n    if tw.vars.get(\"lab_solved\"):\n        tw.narrate(\"The lever swings loosely. Whatever it guarded is already open.\")\n        return\n    if lab_count_wrong() == 0:\n        lab_solve()\n        return\n    lab_punish()"
+      "helpers_script": "# Helpers for the ALCHEMY_LAB casket puzzle (loaded on every script run).\n\nLAB_SOLUTION = {\n    \"BOX_OAK\": \"ART_CLOCKWORK_HEART\",\n    \"BOX_COPPER\": \"ART_GHOST_TEARS\",\n    \"BOX_BONE\": \"ART_GOLD_DIE\",\n    \"BOX_OBSIDIAN\": \"ART_NIGHTSHADE\",\n    \"BOX_SILVER\": \"ART_STONE_TOAD\",\n}\nLAB_ARTIFACTS = [\n    \"ART_CLOCKWORK_HEART\",\n    \"ART_GHOST_TEARS\",\n    \"ART_GOLD_DIE\",\n    \"ART_NIGHTSHADE\",\n    \"ART_STONE_TOAD\",\n]\nLAB_GARGOYLE = \"GARGOYLE_GRIMSBY\"\nLAB_GAS_DAMAGE = 15\nLAB_HINT_AFTER_FAILS = 3\nLAB_TAUNTS = [\n    \"Wrong. Breathe deeply, apprentice. It builds character.\",\n    \"Wrong again. I have seen moss with a better grasp of logic.\",\n    \"Still wrong. The guild master turned his last apprentice into a newt. The newt solved it.\",\n    \"Wrong. I am starting to enjoy this.\",\n]\n\nLAB_GARGOYLE_TALK = {\n    \"dialogue_id\": \"lab_gargoyle\",\n    \"npc_id\": \"GARGOYLE_GRIMSBY\",\n    \"initial_node\": \"root\",\n    \"nodes\": {\n        \"root\": {\n            \"npc_text\": \"Another apprentice. Marvellous. Five caskets, five trinkets, one lever. \"\n            \"Put every trinket into its proper casket, then pull. Get it wrong and I breathe on you. \"\n            \"I have had nothing but sulphur for breakfast for three hundred years.\",\n            \"responses\": [\n                {\"text\": \"Tell me the riddle.\", \"next_node\": \"riddle\"},\n                {\"text\": \"What are the caskets?\", \"next_node\": \"caskets\"},\n                {\"text\": \"What are the trinkets?\", \"next_node\": \"trinkets\"},\n                {\"text\": \"Give me a hint.\", \"next_node\": \"hint\", \"once\": True},\n                {\"text\": \"I will manage on my own.\", \"next_node\": None},\n            ],\n        },\n        \"riddle\": {\n            \"npc_text\": \"My master's rules, since you clearly cannot read: \"\n            \"One - the petrified toad fears fire; keep it as far from the charred oak as the table allows. \"\n            \"Two - the clockwork heart needs a place at the very edge of the table, or its ticking cracks the centrepiece. \"\n            \"Three - the gambler's gold die lies directly to the left of the nightshade. Gambling and a quick death belong together. \"\n            \"Four - the heart's old mechanism stalls the moment dried herbs or loaded gold lie right next to it. \"\n            \"Five - liquids rot charred oak and cloud obsidian; keep the ghost tears out of both. \"\n            \"There is exactly one way. Even you might find it.\",\n            \"responses\": [\n                {\"text\": \"Say that again.\", \"next_node\": \"riddle\"},\n                {\"text\": \"Back to the other questions.\", \"next_node\": \"root\"},\n                {\"text\": \"Enough. I will solve it.\", \"next_node\": None},\n            ],\n        },\n        \"caskets\": {\n            \"npc_text\": \"From left to right, as any literate creature counts: \"\n            \"one, charred oak. Two, tarnished copper. Three, bleached bone, in the middle. \"\n            \"Four, black obsidian. Five, frosted silver, far right. \"\n            \"Each sits on a plate that weighs essence, not weight. One trinket per casket.\",\n            \"responses\": [\n                {\"text\": \"Back to the other questions.\", \"next_node\": \"root\"},\n                {\"text\": \"Thanks, stone face.\", \"next_node\": None},\n            ],\n        },\n        \"trinkets\": {\n            \"npc_text\": \"On the velvet: a loaded gold die that smells of taverns and lies. \"\n            \"A vial of ghost tears, cold and faintly glowing. A clockwork heart that ticks loud enough to wake me. \"\n            \"A petrified toad, dry and blissfully silent. And a bundle of dried nightshade. Do not lick it.\",\n            \"responses\": [\n                {\"text\": \"Back to the other questions.\", \"next_node\": \"root\"},\n                {\"text\": \"Thanks, stone face.\", \"next_node\": None},\n            ],\n        },\n        \"hint\": {\n            \"npc_text\": \"Fine. Start with whatever hates fire the most. Even a toad can count to five.\",\n            \"responses\": [\n                {\"text\": \"Back to the other questions.\", \"next_node\": \"root\"},\n                {\"text\": \"That will do.\", \"next_node\": None},\n            ],\n        },\n    },\n}\n\n\ndef lab_return_to_player(box_id, item_id, reason):\n    tw.objects.take_from_container(box_id, item_id, to=\"player\")\n    tw.narrate(reason)\n\n\ndef lab_box_added(box_id, added_ids):\n    added = [item_id.upper() for item_id in added_ids]\n    previous = [item_id for item_id in tw.objects.get(box_id).item_ids if item_id.upper() not in added]\n    kept = None\n    for item_id in added:\n        if item_id not in LAB_ARTIFACTS:\n            lab_return_to_player(box_id, item_id, \"The pressure plate shudders and pushes the object back out. It has no essence the casket recognises.\")\n            continue\n        if previous or kept:\n            lab_return_to_player(box_id, item_id, \"The casket is already occupied. The plate rejects the second trinket.\")\n            continue\n        kept = item_id\n    if kept:\n        tw.narrate(\"The pressure plate beneath the casket sinks with a soft click.\")\n\n\ndef lab_count_wrong():\n    wrong = 0\n    for box_id, item_id in LAB_SOLUTION.items():\n        if not tw.objects.get(box_id).contains(item_id):\n            wrong += 1\n    return wrong\n\n\ndef lab_solve():\n    tw.vars.set(\"lab_solved\", True)\n    tw.exits.unlock(\"RIDDLE_LAB\", \"GUILD_VAULT\")\n    tw.narrate(\n        \"Five plates click in unison. Behind the gargoyle, a heavy section of the stone wall grinds aside, \"\n        \"revealing a secret passage leading into the Guild Treasury!\"\n    )\n    tw.npcs.say(LAB_GARGOYLE, \"Hm. Correct. The secret vault is open. Do not let it go to your head, apprentice.\")\n    tw.awards.grant(\"AWARD_BRASS_LEVER_WHISPERER\")\n\n\ndef lab_punish():\n    fails = tw.vars.get(\"lab_fails\", 0) + 1\n    tw.vars.set(\"lab_fails\", fails)\n    taunt = LAB_TAUNTS[min(fails, len(LAB_TAUNTS)) - 1]\n    if tw.player.hp > LAB_GAS_DAMAGE * 2:\n        tw.player.damage(LAB_GAS_DAMAGE)\n        tw.narrate(\"The gargoyle's jaws creak open and a cloud of green, bitter gas rolls over you. (-\" + str(LAB_GAS_DAMAGE) + \" HP)\")\n    else:\n        tw.narrate(\"The gargoyle's jaws creak open, but only a pitiful wheeze comes out. It looks embarrassed.\")\n    tw.npcs.say(LAB_GARGOYLE, taunt)\n    if fails < LAB_HINT_AFTER_FAILS:\n        return\n    right = len(LAB_SOLUTION) - lab_count_wrong()\n    tw.npcs.say(LAB_GARGOYLE, \"Out of pity: \" + str(right) + \" of 5 caskets are right. Do not tell my master.\")\n\n\ndef on_lab_lever(answ):\n    if answ != 0:\n        tw.narrate(\"You leave the lever alone. The gargoyle sounds disappointed.\")\n        return\n    if tw.vars.get(\"lab_solved\"):\n        tw.narrate(\"The lever swings loosely. The secret passage to the Guild Treasury is already open.\")\n        return\n    if lab_count_wrong() == 0:\n        lab_solve()\n        return\n    lab_punish()"
     },
     {
       "id": "SOCIAL_HALL",
@@ -360,7 +379,7 @@
         "acoustic wall panels",
         "mounted room placard"
       ],
-      "on_enter_scene_script": null,
+      "on_enter_scene_script": "if not tw.sequences.is_completed(\"SEQ_SOCIAL_HALL\") and not tw.sequences.is_active(\"SEQ_SOCIAL_HALL\"):\n    tw.sequences.start(\"SEQ_SOCIAL_HALL\")",
       "on_enter_scene_text": null,
       "on_leave_scene_script": null,
       "on_leave_scene_text": null,
@@ -369,18 +388,18 @@
     {
       "id": "SWITCH_LAB",
       "label": "Switch Lab",
-      "description": "Cosy living room with a huge TV",
+      "description": "Cozy living room with a huge TV, a refrigerator, a popcorn machine, a microwave, and a beverage dispenser. The power in this room seems to be turned off. Maybe there is a fuse box? The only thing running is the atomic refrigerator.",
       "image_url": "assets/01a1842e-91c4-75fc-8323-d42e64857464_scene_8c42c2db.jpg",
       "decorative_objects": [
-        "soft beige carpeting",
-        "muted geometric wallpaper",
-        "padded acoustic wall panels",
-        "recessed ceiling lights",
-        "framed abstract wall art",
-        "painted circuit border",
-        "decorative wooden ceiling beams"
+        "dead wall clock",
+        "dark television screen",
+        "coiled extension cord",
+        "faded area rug",
+        "unplugged table lamp",
+        "laminated safety poster",
+        "wall-mounted conduit pipe"
       ],
-      "on_enter_scene_script": null,
+      "on_enter_scene_script": "if not tw.sequences.is_completed(\"SEQ_SWITCH_LAB\") and not tw.sequences.is_active(\"SEQ_SWITCH_LAB\"):\n    tw.sequences.start(\"SEQ_SWITCH_LAB\")",
       "on_enter_scene_text": null,
       "on_leave_scene_script": null,
       "on_leave_scene_text": null,
@@ -400,7 +419,7 @@
         "wall-mounted monitor bank",
         "dangling electrode arms"
       ],
-      "on_enter_scene_script": null,
+      "on_enter_scene_script": "if not tw.sequences.is_completed(\"SEQ_TELEPORT_LAB\") and not tw.sequences.is_active(\"SEQ_TELEPORT_LAB\"):\n    tw.sequences.start(\"SEQ_TELEPORT_LAB\")",
       "on_enter_scene_text": null,
       "on_leave_scene_script": null,
       "on_leave_scene_text": null,
@@ -419,7 +438,7 @@
         "brass observation periscope",
         "cable bundle pulsing with blue tachyon light"
       ],
-      "on_enter_scene_script": "if not tw.vars.get(\"time_lab_intro_seen\", False):\n    tw.vars.set(\"time_lab_intro_seen\", True)\n    tw.story.direct(\"Alex Vale enters the Time Machine Lab. Professor Timothy Chronos looks up from a table crowded with chronometers and warmly welcomes Alex.\")\n    tw.npcs.say_directed(\"PROF_CHRONOS\", \"enthusiastically welcomes Alex to the Time Machine Lab and invites them to ask questions or try out the Chronos-5000 console\")",
+      "on_enter_scene_script": "if not tw.sequences.is_completed(\"SEQ_TIME_MACHINE_LAB\") and not tw.sequences.is_active(\"SEQ_TIME_MACHINE_LAB\"):\n    tw.sequences.start(\"SEQ_TIME_MACHINE_LAB\")\nif not tw.vars.get(\"time_lab_intro_seen\", False):\n    tw.vars.set(\"time_lab_intro_seen\", True)\n    tw.story.direct(\"Alex Vale enters the Time Machine Lab. Professor Timothy Chronos looks up from a table crowded with chronometers and warmly welcomes Alex.\")\n    tw.npcs.say_directed(\"PROF_CHRONOS\", \"enthusiastically welcomes Alex to the Time Machine Lab and invites them to ask questions or try out the Chronos-5000 console\")",
       "on_enter_scene_text": "A soft hum of tachyon coils greets you as you step into the Time Machine Lab. Clocks on the walls tick in rapid unison.",
       "on_leave_scene_script": null,
       "on_leave_scene_text": null,
@@ -438,7 +457,7 @@
         "steel stool",
         "Switch wiring label: ON sets SHORTCUT_POWERED; OFF clears SHORTCUT_POWERED."
       ],
-      "on_enter_scene_script": null,
+      "on_enter_scene_script": "if not tw.sequences.is_completed(\"SEQ_WORKSHOP\") and not tw.sequences.is_active(\"SEQ_WORKSHOP\"):\n    tw.sequences.start(\"SEQ_WORKSHOP\")",
       "on_enter_scene_text": null,
       "on_leave_scene_script": null,
       "on_leave_scene_text": null,
@@ -447,7 +466,7 @@
   ],
   "exits": [
     {
-      "id": "01a198f2-54c5-78d9-aee3-a24326a04b23",
+      "id": "01a1aa94-c8af-7223-a7d9-137499d1a48f",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "COMBAT_LAB",
       "label": "Old rusty gate",
@@ -470,7 +489,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a198f2-54c6-71a6-8b33-6ae4965fa14c",
+      "id": "01a1aa94-c8b0-719f-9a73-2b0a8d9fd207",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "SOCIAL_HALL",
       "label": "Hallway",
@@ -493,7 +512,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a198f2-54c7-742c-b6fe-34927d2a72b2",
+      "id": "01a1aa94-c8b1-7519-a593-fabbe371b107",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "SWITCH_LAB",
       "label": "Iron door",
@@ -516,7 +535,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a198f2-54c8-7a21-91b3-c0154fcf5dab",
+      "id": "01a1aa94-c8b2-7a9b-9970-81d61eb354d8",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "WORKSHOP",
       "label": "Wooden door",
@@ -539,7 +558,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a198f2-54c9-71e8-aff9-7049468bb500",
+      "id": "01a1aa94-c8b3-794a-9e28-00e3993716ce",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "RIDDLE_LAB",
       "label": "Door with runes",
@@ -562,7 +581,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a198f2-54ca-72a1-a706-7232c48417d2",
+      "id": "01a1aa94-c8b4-7107-84d3-fe6ed9a19c74",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "TIME_MACHINE_LAB",
       "label": "Glowing door",
@@ -585,7 +604,30 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a198f2-54cb-7e73-b07a-6a0c9cc45a87",
+      "id": "01a1abab-5e29-70b6-bb7f-62d0d36074f5",
+      "from_scene_id": "RIDDLE_LAB",
+      "to_scene_id": "GUILD_VAULT",
+      "label": "Secret passage behind the gargoyle",
+      "exit_type": "bidirectional",
+      "is_locked": true,
+      "is_revealed": false,
+      "lock_description": "A solid section of the wall behind the gargoyle bust is sealed flush. No seams or latch can be seen.",
+      "code_to_unlock": null,
+      "item_to_unlock": null,
+      "rule_to_unlock": "Solve the casket puzzle and pull the brass lever.",
+      "unlock_expression": null,
+      "on_open_exit_script": null,
+      "on_open_exit_text": null,
+      "on_exit_used_script": null,
+      "on_exit_used_text": null,
+      "on_unlock_success_script": null,
+      "on_unlock_success_text": null,
+      "on_unlock_failure_script": null,
+      "on_unlock_failure_text": null,
+      "is_bidirectional": true
+    },
+    {
+      "id": "01a1aa94-c8b5-7c28-92a8-3143da809888",
       "from_scene_id": "WORKSHOP",
       "to_scene_id": "LOCKED_ROOM",
       "label": "The locked door",
@@ -714,7 +756,7 @@
           "id": "JANITOR_MOP",
           "name": "Edgar's Heavy Industrial Mop",
           "description": "A heavy two-handed industrial mop with a stout varnished ash handle and thick, absorbent grey yarn strands. Surprisingly balanced and packs a heavy bludgeoning blow.",
-          "image_url": "/data/adventures/library/01a198f2-53b3-7766-9598-29acd4dab37a/01a196a6-e74f-723b-9a86-eb3133d70ade_janitor-mop_a962cbe1.jpg",
+          "image_url": "/data/adventures/library/01a1aa94-c5c5-7da2-83cd-6004534621ed/01a196a6-e74f-723b-9a86-eb3133d70ade_janitor-mop_a962cbe1.jpg",
           "item_type": "WEAPON",
           "slot": "MainHand",
           "text_log_content": "A heavy two-handed industrial mop with a stout varnished ash handle and thick, absorbent grey yarn strands. Surprisingly balanced and packs a heavy bludgeoning blow.",
@@ -727,7 +769,7 @@
           "id": "JANITOR_SOAP",
           "name": "Flask of Industrial Floor Cleaner",
           "description": "A bottle of pungent, foaming floor detergent carried by Edgar. Consuming it restores 15 HP (though it leaves your mouth tasting of aggressive pine disinfectant).",
-          "image_url": "/data/adventures/library/01a198f2-53b3-7766-9598-29acd4dab37a/01a196a6-e74f-723b-9a86-eb3133d70ade_janitor-soap_715826c1.jpg",
+          "image_url": "/data/adventures/library/01a1aa94-c5c5-7da2-83cd-6004534621ed/01a196a6-e74f-723b-9a86-eb3133d70ade_janitor-soap_715826c1.jpg",
           "item_type": "CONSUMABLE",
           "text_log_content": "A bottle of pungent, foaming floor detergent carried by Edgar. Consuming it restores 15 HP (though it leaves your mouth tasting of aggressive pine disinfectant).",
           "hp_change": 0,
@@ -738,7 +780,7 @@
           "id": "JANITOR_KEYS",
           "name": "Edgar's Master Keyring",
           "description": "A heavy brass keyring holding dozens of labeled and unlabeled keys for utility closets and maintenance hatches across the testing facility.",
-          "image_url": "/data/adventures/library/01a198f2-53b3-7766-9598-29acd4dab37a/01a196a6-e74f-723b-9a86-eb3133d70ade_janitor-keys_7130c492.jpg",
+          "image_url": "/data/adventures/library/01a1aa94-c5c5-7da2-83cd-6004534621ed/01a196a6-e74f-723b-9a86-eb3133d70ade_janitor-keys_7130c492.jpg",
           "item_type": "PICKABLE",
           "text_log_content": "A heavy brass keyring holding dozens of labeled and unlabeled keys for utility closets and maintenance hatches across the testing facility.",
           "hp_change": 0,
@@ -901,7 +943,7 @@
           "id": "PRIMITIVE_SLING",
           "name": "Grokh's Hunting Slingshot",
           "description": "A supple leather sling crafted from braided mammoth hide and cured with woodsmoke. Whirls with lethal velocity to launch polished stones.",
-          "image_url": "/data/adventures/library/01a198f2-53b3-7766-9598-29acd4dab37a/01a196a6-e74f-723b-9a86-eb3133d70ade_primitive-sling_7ee59d17.jpg",
+          "image_url": "/data/adventures/library/01a1aa94-c5c5-7da2-83cd-6004534621ed/01a196a6-e74f-723b-9a86-eb3133d70ade_primitive-sling_7ee59d17.jpg",
           "item_type": "WEAPON",
           "slot": "MainHand",
           "text_log_content": "A supple leather sling crafted from braided mammoth hide and cured with woodsmoke. Whirls with lethal velocity to launch polished stones.",
@@ -913,7 +955,7 @@
           "id": "MAMMOTH_JERKY",
           "name": "Smoked Mammoth Jerky",
           "description": "Tough, salt-crusted strips of prehistoric mammoth meat. Hard to chew, but consuming it restores 20 HP.",
-          "image_url": "/data/adventures/library/01a198f2-53b3-7766-9598-29acd4dab37a/01a196a6-e74f-723b-9a86-eb3133d70ade_mammoth-jerky_8fb7afbf.jpg",
+          "image_url": "/data/adventures/library/01a1aa94-c5c5-7da2-83cd-6004534621ed/01a196a6-e74f-723b-9a86-eb3133d70ade_mammoth-jerky_8fb7afbf.jpg",
           "item_type": "CONSUMABLE",
           "text_log_content": "Tough, salt-crusted strips of prehistoric mammoth meat. Hard to chew, but consuming it restores 20 HP.",
           "hp_change": 0,
@@ -924,7 +966,7 @@
           "id": "KNAPPED_FLINT",
           "name": "Polished River Flint",
           "description": "A beautifully flaked, razor-sharp river flint core carried by Grokh as ammunition and a cutting tool.",
-          "image_url": "/data/adventures/library/01a198f2-53b3-7766-9598-29acd4dab37a/01a196a6-e74f-723b-9a86-eb3133d70ade_knapped-flint_bff287a3.jpg",
+          "image_url": "/data/adventures/library/01a1aa94-c5c5-7da2-83cd-6004534621ed/01a196a6-e74f-723b-9a86-eb3133d70ade_knapped-flint_bff287a3.jpg",
           "item_type": "PICKABLE",
           "text_log_content": "A beautifully flaked, razor-sharp river flint core carried by Grokh as ammunition and a cutting tool.",
           "hp_change": 0,
@@ -1278,7 +1320,7 @@
           "id": "MAGE_VIAL",
           "name": "Mage's Mana Vial",
           "description": "A crystalline vial of mana draught carried by Spark Mage Ilya. Consuming it restores 15 Mana.",
-          "image_url": "/data/adventures/library/01a198f2-53b3-7766-9598-29acd4dab37a/01a1842e-91c4-75fc-8323-d42e64857464_mage-vial_f7e1c4f0.jpg",
+          "image_url": "/data/adventures/library/01a1aa94-c5c5-7da2-83cd-6004534621ed/01a1842e-91c4-75fc-8323-d42e64857464_mage-vial_f7e1c4f0.jpg",
           "item_type": "CONSUMABLE",
           "text_log_content": "A crystalline vial of mana draught carried by Spark Mage Ilya. Consuming it restores 15 Mana.",
           "stat_modifier_strength": 0,
@@ -1295,7 +1337,7 @@
           "id": "MAGE_CHARM",
           "name": "Mage's Charm",
           "description": "A silver neck charm carried by Spark Mage Ilya. Equipping it in the Neck slot grants +1 Intelligence.",
-          "image_url": "/data/adventures/library/01a198f2-53b3-7766-9598-29acd4dab37a/01a1842e-91c4-75fc-8323-d42e64857464_mage-charm_47582e60.jpg",
+          "image_url": "/data/adventures/library/01a1aa94-c5c5-7da2-83cd-6004534621ed/01a1842e-91c4-75fc-8323-d42e64857464_mage-charm_47582e60.jpg",
           "item_type": "WEARABLE",
           "slot": "Neck",
           "text_log_content": "A silver neck charm carried by Spark Mage Ilya. Equipping it in the Neck slot grants +1 Intelligence.",
@@ -1452,7 +1494,7 @@
           "id": "GUARD_BANDAGE",
           "name": "Guard's Healing Vial",
           "description": "A compact healing vial carried by Training Guard Harlan. Consuming it restores 15 HP.",
-          "image_url": "/data/adventures/library/01a198f2-53b3-7766-9598-29acd4dab37a/01a1842e-91c4-75fc-8323-d42e64857464_guard-bandage_af297d45.jpg",
+          "image_url": "/data/adventures/library/01a1aa94-c5c5-7da2-83cd-6004534621ed/01a1842e-91c4-75fc-8323-d42e64857464_guard-bandage_af297d45.jpg",
           "item_type": "CONSUMABLE",
           "text_log_content": "A compact healing vial carried by Training Guard Harlan. Consuming it restores 15 HP.",
           "stat_modifier_strength": 0,
@@ -1469,7 +1511,7 @@
           "id": "GUARD_BADGE",
           "name": "Guard Badge",
           "description": "A stamped iron guard badge carried by Training Guard Harlan as a verifiable loot item.",
-          "image_url": "/data/adventures/library/01a198f2-53b3-7766-9598-29acd4dab37a/01a1842e-91c4-75fc-8323-d42e64857464_guard-badge_ad72aafa.jpg",
+          "image_url": "/data/adventures/library/01a1aa94-c5c5-7da2-83cd-6004534621ed/01a1842e-91c4-75fc-8323-d42e64857464_guard-badge_ad72aafa.jpg",
           "item_type": "PICKABLE",
           "text_log_content": "A stamped iron guard badge carried by Training Guard Harlan as a verifiable loot item.",
           "stat_modifier_strength": 0,
@@ -1486,7 +1528,7 @@
           "id": "GUARD_SWORD",
           "name": "Guard's Training Sword",
           "description": "A sturdy short training sword carried and equipped by Training Guard Harlan.",
-          "image_url": "/data/adventures/library/01a198f2-53b3-7766-9598-29acd4dab37a/01a1842e-91c4-75fc-8323-d42e64857464_guard-sword_cd82bf5b.jpg",
+          "image_url": "/data/adventures/library/01a1aa94-c5c5-7da2-83cd-6004534621ed/01a1842e-91c4-75fc-8323-d42e64857464_guard-sword_cd82bf5b.jpg",
           "item_type": "WEAPON",
           "slot": "MainHand",
           "text_log_content": "A sturdy short training sword carried and equipped by Training Guard Harlan.",
@@ -2014,38 +2056,36 @@
       "code_to_unlock": "4217",
       "item_to_unlock": "",
       "rule_to_unlock": "",
+      "locked": true,
       "on_unlock_success_text": "The keypad beeps green and the Code Box unlocks.",
       "on_unlock_failure_text": "The keypad buzzes red. Incorrect code."
     },
     {
-      "id": "CONSTRUCTABLE_MAGIC_POPCORN",
+      "id": "CON_ATOMIC_FRIDGE",
       "entity_type": "OBJECT",
-      "name": "Delicious Popcorn",
-      "description": "Constructable: ##ITEM_BUTTER + ##ITEM_SUGAR + ##ITEM_RAW_CORN + ##ITEM_POPCORN_MACHINE -> ##ITEM_POPCORN",
+      "name": "Atomic Refrigerator",
+      "description": "A heavy-duty retro refrigerator powered by an internal miniature atomic core. A soft green indicator confirms it runs 24/7 on self-sustaining nuclear power, completely independent of external power switches. Inside, all cooking and popcorn ingredients stay crisp, chilled, and fresh.",
+      "appearance": "vintage atomic refrigerator with a glowing green nuclear indicator and heavy chrome handle",
       "current_scene_id": "SWITCH_LAB",
-      "item_type": "CONSTRUCTABLE",
+      "image_url": "assets/fcc93b7a_con-atomic-fridge.webp",
+      "item_type": "CONTAINER",
       "is_in_inventory": false,
-      "is_hidden": true,
+      "is_hidden": false,
       "is_portable": false,
-      "combination_ingredients": [
-        "ITEM_BUTTER",
-        "ITEM_SUGAR",
-        "ITEM_RAW_CORN",
-        "ITEM_POPCORN_MACHINE"
-      ],
       "is_final_state": false,
-      "stat_modifier_strength": 0,
-      "inventory": [],
+      "inventory": [
+        "ITEM_BUTTER",
+        "ITEM_RAW_CORN",
+        "ITEM_SUGAR",
+        "ITEM_FROZEN_PRETZEL",
+        "ITEM_CHEESE_NACHOS"
+      ],
       "hp_change": 0,
       "stamina_change": 0,
       "mana_change": 0,
-      "result_item_ids": [
-        "ITEM_POPCORN"
-      ],
-      "kept_ingredients": [
-        "ITEM_POPCORN_MACHINE"
-      ],
-      "image_url": null
+      "code_to_unlock": "",
+      "item_to_unlock": "",
+      "rule_to_unlock": ""
     },
     {
       "id": "CON_LAB_SUPPLY_CRATE",
@@ -2095,32 +2135,8 @@
       "mana_change": 0,
       "code_to_unlock": "",
       "item_to_unlock": "ITEM_LOCKPICK",
-      "rule_to_unlock": ""
-    },
-    {
-      "id": "CON_POPCORN_SUPPLIES",
-      "entity_type": "OBJECT",
-      "name": "A box with popcorn ingredients",
-      "description": "A mysterious object found in this scene.",
-      "current_scene_id": "SWITCH_LAB",
-      "image_url": "assets/01a18b89-cd56-72bd-a393-2c2e53bb548c_con-popcorn-supplies_e99c4625.jpg",
-      "item_type": "CONTAINER",
-      "is_in_inventory": false,
-      "is_hidden": false,
-      "is_portable": true,
-      "is_final_state": false,
-      "stat_modifier_strength": 0,
-      "inventory": [
-        "ITEM_BUTTER",
-        "ITEM_RAW_CORN",
-        "ITEM_SUGAR"
-      ],
-      "hp_change": 0,
-      "stamina_change": 0,
-      "mana_change": 0,
-      "code_to_unlock": "",
-      "item_to_unlock": "",
-      "rule_to_unlock": ""
+      "rule_to_unlock": "",
+      "locked": true
     },
     {
       "id": "COPPER_WIRE",
@@ -2174,6 +2190,199 @@
       "code_to_unlock": "",
       "item_to_unlock": "",
       "rule_to_unlock": ""
+    },
+    {
+      "id": "CSW_BEVERAGE_DISPENSER",
+      "entity_type": "OBJECT",
+      "name": "Beverage Dispenser",
+      "description": "A retro glass-front beverage dispenser humming in the corner. A plaque reads: 'Put a Vending Coin inside, then flip the dispenser switch to Dispense Drink to unlock your cola.'",
+      "appearance": "retro glass-front beverage dispenser vending machine with glowing buttons",
+      "current_scene_id": "SWITCH_LAB",
+      "image_url": "assets/4195cdbe_csw-beverage-dispenser.webp",
+      "item_type": "CONTAINER_SWITCH",
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": false,
+      "is_final_state": false,
+      "inventory": [
+        "ITEM_COLD_COLA"
+      ],
+      "metadata_json": {
+        "max_items": 2
+      },
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0,
+      "code_to_unlock": "",
+      "item_to_unlock": "",
+      "rule_to_unlock": "",
+      "switch_states": [
+        "STANDBY",
+        "DISPENSE"
+      ],
+      "switch_state_labels": {
+        "STANDBY": "Standby",
+        "DISPENSE": "Dispense Drink"
+      },
+      "switch_initial_state": "STANDBY",
+      "switch_disabled_states": [
+        "DISPENSE"
+      ],
+      "switch_status_text": "The beverage dispenser needs some electrical power first.",
+      "switch_transitions": [
+        {
+          "from": "STANDBY",
+          "to": "DISPENSE",
+          "gates": {
+            "item": "",
+            "code": "",
+            "rule": "",
+            "expression": "tw.vars.get('power_on') == True and tw.vars.get('dispenser_paid') == True"
+          },
+          "fail_message": "The dispenser needs power and a Vending Coin before dispensing.",
+          "success_message": "",
+          "on_success_script": "disp = tw.objects.get('CSW_BEVERAGE_DISPENSER')\ntw.objects.destroy('ITEM_VENDING_COIN')\ntw.objects.unlock('ITEM_COLD_COLA')\ndisp.set_state('STANDBY', apply_outcomes=False)\ndisp.disable_state('DISPENSE')\ndisp.set_status_text('Drink dispensed! Take your Ice-Cold Cola from the tray.')\ntw.story.system('CLUNK-FIZZ! The delivery flap unlocks \u2014 you can now take the Ice-Cold Cola!')",
+          "on_failure_script": ""
+        }
+      ],
+      "switch_outcomes": [],
+      "on_success_script": "",
+      "on_failure_script": "",
+      "on_items_added_script": "disp = tw.objects.get('CSW_BEVERAGE_DISPENSER')\nif not tw.vars.get('power_on', False):\n    for item_id in added_item_ids:\n        if item_id != 'ITEM_COLD_COLA':\n            tw.objects.take_from_container('CSW_BEVERAGE_DISPENSER', item_id, to='player')\n    tw.story.system('The Beverage Dispenser has no power! Activate the Main Fuse Box first.')\nelif 'ITEM_VENDING_COIN' in added_item_ids:\n    tw.objects.lock('ITEM_VENDING_COIN')\n    tw.vars.set('dispenser_paid', True)\n    disp.enable_state('DISPENSE')\n    disp.set_status_text('Coin accepted \u2014 press Dispense Drink to unlock the Ice-Cold Cola.')\n    tw.story.system(\"CLINK! The dispenser accepts your Vending Coin \u2014 'Dispense Drink' is now unlocked!\")\nelse:\n    for item_id in added_item_ids:\n        if item_id != 'ITEM_COLD_COLA':\n            tw.objects.take_from_container('CSW_BEVERAGE_DISPENSER', item_id, to='player')\n    tw.story.system('The coin slot rejects that item \u2014 only a Vending Coin fits.')"
+    },
+    {
+      "id": "CSW_FUSE_BOX",
+      "entity_type": "OBJECT",
+      "name": "Main Fuse Box",
+      "description": "A wall-mounted steel breaker box. Needs one Ceramic Fuse and one Insulated Power Cable inside before the main power switch can be turned on.",
+      "current_scene_id": "SWITCH_LAB",
+      "image_url": "assets/0fd2814d_csw-fuse-box.webp",
+      "item_type": "CONTAINER_SWITCH",
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": false,
+      "is_final_state": false,
+      "inventory": [],
+      "metadata_json": {
+        "min_items": 2,
+        "max_items": 2
+      },
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0,
+      "code_to_unlock": "",
+      "item_to_unlock": "",
+      "rule_to_unlock": "",
+      "switch_states": [
+        "OFF",
+        "ON"
+      ],
+      "switch_state_labels": {
+        "OFF": "Power Off",
+        "ON": "Power On"
+      },
+      "switch_initial_state": "OFF",
+      "switch_disabled_states": [
+        "ON"
+      ],
+      "switch_status_text": "Insert the Ceramic Fuse and Insulated Power Cable into the 2 slots to unlock Power On.",
+      "switch_transitions": [
+        {
+          "from": "OFF",
+          "to": "ON",
+          "gates": {
+            "item": "",
+            "code": "",
+            "rule": "",
+            "expression": "{'ITEM_FUSE_A', 'ITEM_COPPER_CABLE'}.issubset(set(tw.objects.get('CSW_FUSE_BOX').item_ids))"
+          },
+          "fail_message": "Both the Ceramic Fuse and the Insulated Power Cable must be installed in the Fuse Box first.",
+          "success_message": "",
+          "on_success_script": "fb = tw.objects.get('CSW_FUSE_BOX')\ntw.vars.set('power_on', True)\ntw.flags.set('LAB_POWER_RESTORED', True)\nfb.disable_state('OFF')\nfb.set_status_text('Main power is active and permanently latched.')\ntw.objects.lock('ITEM_FUSE_A')\ntw.objects.lock('ITEM_COPPER_CABLE')\ntw.switches.enable_state('SW_TV', 'ON')\ntw.switches.clear_status_text('SW_TV')\ntw.switches.enable_state('ITEM_WORKING_REMOTE', 'CHANNEL-SPORT', 'CHANNEL-NEWS', 'CHANNEL-SITCOM')\ntw.switches.clear_status_text('ITEM_WORKING_REMOTE')\ndisp = tw.objects.get('CSW_BEVERAGE_DISPENSER')\nif tw.vars.get('dispenser_paid', False):\n    disp.enable_state('DISPENSE')\n    disp.set_status_text('Coin accepted \u2014 press Dispense Drink to unlock the Ice-Cold Cola.')\nelse:\n    disp.set_status_text('Insert a Vending Coin into Slot 2 to unlock Dispense Drink.')\nmw = tw.objects.get('CSW_MICROWAVE')\nif len(mw.item_ids) > 0 and not tw.vars.get('mw_processed', False):\n    mw.enable_state('DEFROST', 'COOK')\n    mw.set_status_text('Item loaded \u2014 choose Defrost or Cook (High Heat).')\nelse:\n    mw.set_status_text('Place a food item inside to unlock Defrost and Cook (High Heat).')\npm = tw.objects.get('ITEM_POPCORN_MACHINE')\nif {'ITEM_RAW_CORN', 'ITEM_BUTTER', 'ITEM_SUGAR'}.issubset(set(pm.item_ids)):\n    pm.enable_state('POP')\n    pm.set_status_text('All 3 ingredients loaded \u2014 switch to Pop Corn!')\nelse:\n    pm.set_status_text('Insert Raw Corn, Popcorn Butter, and Sugar into the 3 slots to unlock Pop Corn.')\ntw.story.system('CLUNK-HUMMM! The main breaker latches permanently into Power On! Electricity surges through the TV Room \u2014 all appliances and switches are now powered.')",
+          "on_failure_script": ""
+        }
+      ],
+      "switch_outcomes": [],
+      "on_success_script": "",
+      "on_failure_script": "",
+      "on_items_added_script": "fb = tw.objects.get('CSW_FUSE_BOX')\nrequired = {'ITEM_FUSE_A', 'ITEM_COPPER_CABLE'}\ncurrent = set(fb.item_ids)\nif required.issubset(current):\n    fb.enable_state('ON')\n    fb.set_status_text('Both components installed \u2014 switch to Power On to energize the room.')\n    tw.story.system('The Ceramic Fuse and Insulated Power Cable are seated in place. Power On is now unlocked!')\nelse:\n    fb.disable_state('ON')\n    fb.set_status_text('Insert the Ceramic Fuse and Insulated Power Cable into the 2 slots to unlock Power On.')\n    tw.story.system('Fuse box status: ' + str(len(current)) + '/2 required components installed.')",
+      "on_items_removed_script": "fb = tw.objects.get('CSW_FUSE_BOX')\nrequired = {'ITEM_FUSE_A', 'ITEM_COPPER_CABLE'}\nif not tw.vars.get('power_on', False) and not required.issubset(set(fb.item_ids)):\n    fb.disable_state('ON')\n    fb.set_status_text('Insert the Ceramic Fuse and Insulated Power Cable into the 2 slots to unlock Power On.')"
+    },
+    {
+      "id": "CSW_MICROWAVE",
+      "entity_type": "OBJECT",
+      "name": "Lab Microwave",
+      "description": "A stainless-steel microwave oven with a glass turntable. Place items inside and switch between Off, Defrost (to thaw frozen food), or Cook (to melt or heat dishes).",
+      "appearance": "stainless-steel countertop microwave oven with glowing digital display",
+      "current_scene_id": "SWITCH_LAB",
+      "image_url": "assets/b9c3234d_csw-microwave.webp",
+      "item_type": "CONTAINER_SWITCH",
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": false,
+      "is_final_state": false,
+      "inventory": [],
+      "metadata_json": {
+        "min_items": 1,
+        "max_items": 1
+      },
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0,
+      "code_to_unlock": "",
+      "item_to_unlock": "",
+      "rule_to_unlock": "",
+      "switch_states": [
+        "OFF",
+        "DEFROST",
+        "COOK"
+      ],
+      "switch_state_labels": {
+        "OFF": "Off",
+        "DEFROST": "Defrost",
+        "COOK": "Cook (High Heat)"
+      },
+      "switch_initial_state": "OFF",
+      "switch_disabled_states": [
+        "DEFROST",
+        "COOK"
+      ],
+      "switch_status_text": "The microwave needs some electrical power first.",
+      "switch_transitions": [
+        {
+          "from": "",
+          "to": "DEFROST",
+          "gates": {
+            "item": "",
+            "code": "",
+            "rule": "",
+            "expression": "tw.vars.get('power_on') == True and len(tw.objects.get('CSW_MICROWAVE').item_ids) > 0"
+          },
+          "fail_message": "The microwave requires power and an item inside before running Defrost.",
+          "success_message": "",
+          "on_success_script": "mw = tw.objects.get('CSW_MICROWAVE')\nif mw.contains('ITEM_FROZEN_PRETZEL'):\n    tw.objects.destroy('ITEM_FROZEN_PRETZEL')\n    tw.objects.reveal('ITEM_WARM_PRETZEL')\n    tw.objects.put_in_container('ITEM_WARM_PRETZEL', 'CSW_MICROWAVE')\n    tw.vars.set('mw_processed', True)\n    mw.set_state('OFF', apply_outcomes=False)\n    mw.disable_state('DEFROST', 'COOK')\n    mw.set_status_text('Heating complete \u2014 remove the Warm Soft Pretzel before inserting another item.')\n    tw.story.system('BEEP-BEEP! The Frozen Pretzel thaws into a Warm Soft Pretzel. The switch springs back to Off \u2014 remove the pretzel before heating another item.')\nelse:\n    mw.set_state('OFF', apply_outcomes=False)\n    mw.set_status_text('Defrost mode barely warmed it \u2014 try Cook (High Heat) instead!')\n    tw.story.system('Defrost mode barely warms the contents and springs back to Off \u2014 try Cook (High Heat) instead!')",
+          "on_failure_script": ""
+        },
+        {
+          "from": "",
+          "to": "COOK",
+          "gates": {
+            "item": "",
+            "code": "",
+            "rule": "",
+            "expression": "tw.vars.get('power_on') == True and len(tw.objects.get('CSW_MICROWAVE').item_ids) > 0"
+          },
+          "fail_message": "The microwave requires power and an item inside before running Cook.",
+          "success_message": "",
+          "on_success_script": "mw = tw.objects.get('CSW_MICROWAVE')\nif mw.contains('ITEM_CHEESE_NACHOS'):\n    tw.objects.destroy('ITEM_CHEESE_NACHOS')\n    tw.objects.reveal('ITEM_MELTED_NACHOS')\n    tw.objects.put_in_container('ITEM_MELTED_NACHOS', 'CSW_MICROWAVE')\n    tw.vars.set('mw_processed', True)\n    mw.set_state('OFF', apply_outcomes=False)\n    mw.disable_state('DEFROST', 'COOK')\n    mw.set_status_text('Cooking complete \u2014 remove the Steaming Cheese Nachos before inserting another item.')\n    tw.story.system('DING! The cheddar melts into Steaming Cheese Nachos! The switch springs back to Off \u2014 remove the nachos before cooking another item.')\nelse:\n    mw.set_state('OFF', apply_outcomes=False)\n    mw.set_status_text('High heat scorched the frost \u2014 use Defrost instead!')\n    tw.story.system('High heat scorches the frost while the pretzel core stays rock-solid! The switch springs back to Off \u2014 use Defrost instead.')",
+          "on_failure_script": ""
+        }
+      ],
+      "switch_outcomes": [],
+      "on_success_script": "",
+      "on_failure_script": "",
+      "on_items_added_script": "mw = tw.objects.get('CSW_MICROWAVE')\nif tw.vars.get('mw_processed', False):\n    for item_id in added_item_ids:\n        tw.objects.take_from_container('CSW_MICROWAVE', item_id, to='player')\n    tw.story.system('Remove the finished item from the microwave before inserting a new one!')\nelif mw.contains('ITEM_WARM_PRETZEL') or mw.contains('ITEM_MELTED_NACHOS'):\n    mw.disable_state('DEFROST', 'COOK')\n    mw.set_status_text('Remove the finished item to heat something else.')\n    tw.story.system('This item has already been heated! Remove it to heat something else.')\nelif not tw.vars.get('power_on', False):\n    mw.disable_state('DEFROST', 'COOK')\n    mw.set_status_text('The microwave needs some electrical power first.')\n    tw.story.system('Item placed in the microwave, but the display is dark \u2014 turn on the Main Fuse Box first!')\nelse:\n    mw.enable_state('DEFROST', 'COOK')\n    mw.set_status_text('Item loaded \u2014 choose Defrost or Cook (High Heat).')\n    tw.story.system('Item placed in the microwave. Defrost and Cook (High Heat) are now unlocked!')",
+      "on_items_removed_script": "mw = tw.objects.get('CSW_MICROWAVE')\nif not mw.item_ids:\n    tw.vars.set('mw_processed', False)\n    mw.set_state('OFF', apply_outcomes=False)\n    mw.disable_state('DEFROST', 'COOK')\n    if tw.vars.get('power_on', False):\n        mw.set_status_text('Place a food item inside to unlock Defrost and Cook (High Heat).')\n    else:\n        mw.set_status_text('The microwave needs some electrical power first.')\n    tw.story.system('Microwave chamber cleared.')"
     },
     {
       "id": "FAQ_CONSOLE",
@@ -2285,15 +2494,15 @@
       "id": "GUILDMASTER_RING",
       "entity_type": "OBJECT",
       "name": "Guild Master's Signet Ring",
-      "description": "A heavy signet ring with the guild master's seal, a tiny alembic engraved in onyx. The prize behind the secret door.",
+      "description": "A heavy signet ring with the guild master's seal, a tiny alembic engraved in onyx. The prize resting in the heart of the Guild Treasury.",
       "appearance": "heavy gold signet ring, black onyx seal with an engraved alembic",
-      "current_scene_id": "RIDDLE_LAB",
-      "spatial_position": "in the alcove behind the secret door",
+      "current_scene_id": "GUILD_VAULT",
+      "spatial_position": "resting on an ornate velvet pedestal in the center of the vault",
       "image_url": "assets/01a18e10-5de1-7ab0-8ec6-02838b4afff8_guildmaster-ring_6ef112e5.jpg",
       "item_type": "PICKABLE",
       "wearable_slots": [],
       "is_in_inventory": false,
-      "is_hidden": true,
+      "is_hidden": false,
       "reveal_rule": "script",
       "is_portable": true,
       "combination_ingredients": [],
@@ -2302,7 +2511,9 @@
       "inventory": [],
       "hp_change": 0,
       "stamina_change": 0,
-      "mana_change": 0
+      "mana_change": 0,
+      "on_pickup_script": "tw.awards.grant(\"AWARD_GUILDMASTER_HEIR\")\ntw.sequences.complete(\"SEQ_GUILD_VAULT\")\n",
+      "on_pickup_text": "You lift the Guild Master's Signet Ring. Its heavy gold band pulses with quiet power, confirming your rightful claim to the guild's heritage."
     },
     {
       "id": "GUILD_DIARY",
@@ -2396,11 +2607,107 @@
     {
       "id": "ITEM_BUTTER",
       "entity_type": "OBJECT",
-      "name": "Popcorn butter",
-      "description": "Butter for popcorn",
+      "name": "Popcorn Butter",
+      "description": "A rich block of creamy butter for the Popcorn Machine.",
       "current_scene_id": "SWITCH_LAB",
       "image_url": "assets/01a18b89-cd56-72bd-a393-2c2e53bb548c_item-butter_61de9459.jpg",
       "item_type": "DEFAULT",
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": true,
+      "is_final_state": false,
+      "inventory": [],
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0
+    },
+    {
+      "id": "ITEM_CHEESE_NACHOS",
+      "entity_type": "OBJECT",
+      "name": "Uncooked Nacho Plate",
+      "description": "A microwave-safe plate heaped with tortilla chips and cold grated cheddar. Needs high heat in the microwave to melt into proper nachos.",
+      "appearance": "ceramic plate with dry tortilla chips and unmelted grated cheddar cheese",
+      "current_scene_id": "SWITCH_LAB",
+      "image_url": "assets/ba62693a_item-cheese-nachos.webp",
+      "item_type": "PICKABLE",
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": true,
+      "is_final_state": false,
+      "inventory": [],
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0
+    },
+    {
+      "id": "ITEM_COLD_COLA",
+      "entity_type": "OBJECT",
+      "name": "Ice-Cold Cola",
+      "description": "A frosty can of sparkling cola visible behind the dispenser glass. Locked inside until paid for and dispensed.",
+      "appearance": "frosty red and silver aluminum soda can with condensation droplets",
+      "current_scene_id": "SWITCH_LAB",
+      "image_url": "assets/6d8cf343_item-cold-cola.webp",
+      "item_type": "CONSUMABLE",
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": true,
+      "is_final_state": false,
+      "inventory": [],
+      "metadata_json": {
+        "effects": {
+          "hp": 10,
+          "stamina": 15,
+          "mana": 0
+        },
+        "locked": true
+      },
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0
+    },
+    {
+      "id": "ITEM_COPPER_CABLE",
+      "entity_type": "OBJECT",
+      "name": "Insulated Power Cable",
+      "description": "A braided copper bridge cable with insulated terminal lugs, needed for the Main Fuse Box.",
+      "current_scene_id": "SWITCH_LAB",
+      "image_url": "assets/f108e896_item-copper-cable.webp",
+      "item_type": "PICKABLE",
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": true,
+      "is_final_state": false,
+      "inventory": [],
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0
+    },
+    {
+      "id": "ITEM_FROZEN_PRETZEL",
+      "entity_type": "OBJECT",
+      "name": "Frozen Pretzel",
+      "description": "A bakery pretzel encased in a solid block of freezer ice. Rock-hard and inedible until defrosted in the microwave.",
+      "appearance": "pretzel frozen solid in frost and ice crystals",
+      "current_scene_id": "SWITCH_LAB",
+      "image_url": "assets/236dc736_item-frozen-pretzel.webp",
+      "item_type": "PICKABLE",
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": true,
+      "is_final_state": false,
+      "inventory": [],
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0
+    },
+    {
+      "id": "ITEM_FUSE_A",
+      "entity_type": "OBJECT",
+      "name": "Ceramic Fuse",
+      "description": "A heavy-duty ceramic cartridge fuse with brass end caps, needed for the Main Fuse Box.",
+      "current_scene_id": "SWITCH_LAB",
+      "image_url": "assets/b6d64198_item-fuse-a.webp",
+      "item_type": "PICKABLE",
       "is_in_inventory": false,
       "is_hidden": false,
       "is_portable": true,
@@ -2470,6 +2777,32 @@
       "mana_change": 0
     },
     {
+      "id": "ITEM_MELTED_NACHOS",
+      "entity_type": "OBJECT",
+      "name": "Steaming Cheese Nachos",
+      "description": "Crispy tortilla chips smothered in bubbling, golden melted cheddar straight from the microwave.",
+      "appearance": "steaming plate of crispy nachos covered in bubbling melted cheddar cheese",
+      "current_scene_id": "SWITCH_LAB",
+      "image_url": "assets/eb5e031c_item-melted-nachos.webp",
+      "item_type": "CONSUMABLE",
+      "is_in_inventory": false,
+      "is_hidden": true,
+      "reveal_rule": "script",
+      "is_portable": true,
+      "is_final_state": false,
+      "inventory": [],
+      "metadata_json": {
+        "effects": {
+          "hp": 20,
+          "stamina": 0,
+          "mana": 15
+        }
+      },
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0
+    },
+    {
       "id": "ITEM_PARADOX_HOURGLASS",
       "entity_type": "OBJECT",
       "name": "Paradox Hourglass",
@@ -2515,26 +2848,67 @@
     {
       "id": "ITEM_POPCORN_MACHINE",
       "entity_type": "OBJECT",
-      "name": "Popcorn Mashine",
-      "description": "A Popcorn maker mashine",
+      "name": "Popcorn Machine",
+      "description": "A glass-kettle cinema popcorn machine. Needs electrical power and all 3 ingredients (Raw Corn, Popcorn Butter, and Sugar) inside to pop a batch of Delicious Popcorn.",
       "current_scene_id": "SWITCH_LAB",
       "image_url": "assets/01a18b89-cd56-72bd-a393-2c2e53bb548c_item-popcorn-machine_c8775334.jpg",
-      "item_type": "DEFAULT",
+      "item_type": "CONTAINER_SWITCH",
       "is_in_inventory": false,
       "is_hidden": false,
       "is_portable": false,
       "is_final_state": false,
       "stat_modifier_strength": 0,
       "inventory": [],
+      "metadata_json": {
+        "min_items": 3,
+        "max_items": 3
+      },
       "hp_change": 0,
       "stamina_change": 0,
-      "mana_change": 0
+      "mana_change": 0,
+      "code_to_unlock": "",
+      "item_to_unlock": "",
+      "rule_to_unlock": "",
+      "switch_states": [
+        "OFF",
+        "POP"
+      ],
+      "switch_state_labels": {
+        "OFF": "Off",
+        "POP": "Pop Corn"
+      },
+      "switch_initial_state": "OFF",
+      "switch_disabled_states": [
+        "POP"
+      ],
+      "switch_status_text": "The popcorn machine needs some electrical power first.",
+      "switch_transitions": [
+        {
+          "from": "OFF",
+          "to": "POP",
+          "gates": {
+            "item": "",
+            "code": "",
+            "rule": "",
+            "expression": "tw.vars.get('power_on') == True and {'ITEM_RAW_CORN', 'ITEM_BUTTER', 'ITEM_SUGAR'}.issubset(set(tw.objects.get('ITEM_POPCORN_MACHINE').item_ids))"
+          },
+          "fail_message": "The Popcorn Machine needs power and all 3 ingredients (Raw Corn, Popcorn Butter, and Sugar) inside.",
+          "success_message": "",
+          "on_success_script": "pm = tw.objects.get('ITEM_POPCORN_MACHINE')\ntw.objects.destroy('ITEM_RAW_CORN')\ntw.objects.destroy('ITEM_BUTTER')\ntw.objects.destroy('ITEM_SUGAR')\ntw.objects.reveal('ITEM_POPCORN')\ntw.objects.put_in_container('ITEM_POPCORN', 'ITEM_POPCORN_MACHINE')\npm.set_state('OFF', apply_outcomes=False)\npm.disable_state('POP')\npm.set_status_text('Fresh popcorn ready! Take the Delicious Popcorn from the kettle.')\ntw.story.system('POP-POP-POP! Golden, sugar-glazed Delicious Popcorn fills the kettle! The switch springs back to Off \u2014 take your popcorn!')",
+          "on_failure_script": ""
+        }
+      ],
+      "switch_outcomes": [],
+      "on_success_script": "",
+      "on_failure_script": "",
+      "on_items_added_script": "pm = tw.objects.get('ITEM_POPCORN_MACHINE')\nrequired = {'ITEM_RAW_CORN', 'ITEM_BUTTER', 'ITEM_SUGAR'}\nif pm.contains('ITEM_POPCORN'):\n    for item_id in added_item_ids:\n        if item_id != 'ITEM_POPCORN':\n            tw.objects.take_from_container('ITEM_POPCORN_MACHINE', item_id, to='player')\n    tw.story.system('Take the finished Delicious Popcorn from the kettle first!')\nelse:\n    rejected = [iid for iid in added_item_ids if iid not in required]\n    for iid in rejected:\n        tw.objects.take_from_container('ITEM_POPCORN_MACHINE', iid, to='player')\n    if rejected:\n        tw.story.system('Only Raw Corn, Popcorn Butter, and Sugar belong in the Popcorn Machine.')\n    current = set(pm.item_ids)\n    if required.issubset(current):\n        if tw.vars.get('power_on', False):\n            pm.enable_state('POP')\n            pm.set_status_text('All 3 ingredients loaded \u2014 switch to Pop Corn!')\n            tw.story.system(\"All 3 popcorn ingredients are in the kettle. 'Pop Corn' is now unlocked!\")\n        else:\n            pm.disable_state('POP')\n            pm.set_status_text('The popcorn machine needs some electrical power first.')\n            tw.story.system('All 3 ingredients are in the kettle, but the machine has no electrical power yet!')\n    else:\n        pm.disable_state('POP')\n        if tw.vars.get('power_on', False):\n            pm.set_status_text('Loaded ' + str(len(current)) + '/3 ingredients \u2014 add Raw Corn, Popcorn Butter, and Sugar to unlock Pop Corn.')\n        else:\n            pm.set_status_text('The popcorn machine needs some electrical power first.')\n        tw.story.system('Popcorn kettle: ' + str(len(current)) + '/3 required ingredients loaded.')",
+      "on_items_removed_script": "pm = tw.objects.get('ITEM_POPCORN_MACHINE')\nrequired = {'ITEM_RAW_CORN', 'ITEM_BUTTER', 'ITEM_SUGAR'}\ncurrent = set(pm.item_ids)\nif not required.issubset(current):\n    pm.disable_state('POP')\n    if tw.vars.get('power_on', False):\n        pm.set_status_text('Insert Raw Corn, Popcorn Butter, and Sugar into the 3 slots to unlock Pop Corn.')\n    else:\n        pm.set_status_text('The popcorn machine needs some electrical power first.')"
     },
     {
       "id": "ITEM_RAW_CORN",
       "entity_type": "OBJECT",
       "name": "Raw Corn",
-      "description": "Raw corn for the popcorn mashine",
+      "description": "Golden kernels of popping corn for the Popcorn Machine.",
       "current_scene_id": "SWITCH_LAB",
       "image_url": "assets/01a18b89-cd56-72bd-a393-2c2e53bb548c_item-raw-corn_0703f726.jpg",
       "item_type": "DEFAULT",
@@ -2551,7 +2925,7 @@
       "id": "ITEM_SUGAR",
       "entity_type": "OBJECT",
       "name": "Sugar",
-      "description": "Sugar for popcorn",
+      "description": "Fine crystal sugar for glazing popcorn in the Popcorn Machine.",
       "current_scene_id": "SWITCH_LAB",
       "image_url": "assets/01a18b89-cd56-72bd-a393-2c2e53bb548c_item-sugar_77d6e870.jpg",
       "item_type": "DEFAULT",
@@ -2622,6 +2996,50 @@
       "on_read_script": "h = tw.time.hour\nd = tw.time.day\nif d == 1 and h < 12:\n    headline = \"EDITION DAY 1 (MORNING): Alex Vale Arrives at Test-Lab! Local bots brace for unprecedented quality assurance poking.\"\nelif d == 1 and h < 18:\n    headline = \"EDITION DAY 1 (AFTERNOON): Tachyon emissions detected in Time Machine Lab. Experts advise not stepping on the cat.\"\nelif d == 1:\n    headline = \"EDITION DAY 1 (EVENING): 18:00 Dusk Bell Rings! Schr\u00f6dinger the Dusk Cat spotted hunting temporal treats.\"\nelse:\n    headline = \"EDITION DAY \" + str(d) + \" (\" + time_lab_clock_str() + \"): Barnaby the Rooster hailed as interdimensional icon. Time travelers report dizziness!\"\ntw.story.narrate(\"You inspect the shimmering quantum ink of The Tomorrow Chronicle:\\n\\n\" + headline)"
     },
     {
+      "id": "ITEM_VENDING_COIN",
+      "entity_type": "OBJECT",
+      "name": "Vending Coin",
+      "description": "A heavy brass vending token stamped with a fizzing bottle emblem. Fits the Beverage Dispenser.",
+      "appearance": "shiny brass arcade vending token with a soda bottle emblem",
+      "current_scene_id": "SWITCH_LAB",
+      "image_url": "assets/5d56270d_item-vending-coin.webp",
+      "item_type": "PICKABLE",
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": true,
+      "is_final_state": false,
+      "inventory": [],
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0
+    },
+    {
+      "id": "ITEM_WARM_PRETZEL",
+      "entity_type": "OBJECT",
+      "name": "Warm Soft Pretzel",
+      "description": "A freshly defrosted, warm and fluffy salted pretzel. Smells heavenly.",
+      "appearance": "golden-brown warm soft pretzel with coarse salt",
+      "current_scene_id": "SWITCH_LAB",
+      "image_url": "assets/d693c888_item-warm-pretzel.webp",
+      "item_type": "CONSUMABLE",
+      "is_in_inventory": false,
+      "is_hidden": true,
+      "reveal_rule": "script",
+      "is_portable": true,
+      "is_final_state": false,
+      "inventory": [],
+      "metadata_json": {
+        "effects": {
+          "hp": 15,
+          "stamina": 10,
+          "mana": 0
+        }
+      },
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0
+    },
+    {
       "id": "ITEM_WORKING_REMOTE",
       "entity_type": "OBJECT",
       "name": "Working TV-Remote",
@@ -2661,6 +3079,12 @@
         "CHANNEL-SITCOM": "Sitcom Channel"
       },
       "switch_initial_state": "OFF",
+      "switch_disabled_states": [
+        "CHANNEL-SPORT",
+        "CHANNEL-NEWS",
+        "CHANNEL-SITCOM"
+      ],
+      "switch_status_text": "The TV has no electrical power yet.",
       "switch_transitions": [
         {
           "to": "CHANNEL-SPORT",
@@ -3206,16 +3630,24 @@
       ],
       "switch_state_labels": {},
       "switch_initial_state": "OFF",
+      "switch_disabled_states": [
+        "ON"
+      ],
+      "switch_status_text": "The TV needs some electrical power first.",
       "switch_transitions": [
         {
+          "from": "OFF",
           "to": "ON",
           "gates": {
-            "expression": "tw.player.has_item('ITEM_WORKING_REMOTE')",
-            "condition": "tw.player.has_item('ITEM_WORKING_REMOTE')"
+            "item": "",
+            "code": "",
+            "rule": "",
+            "expression": "tw.vars.get('power_on') == True and tw.player.has_item('ITEM_WORKING_REMOTE')"
           },
-          "from": "OFF",
-          "fail_message": "Nah. Maybe you need a working remote?",
-          "success_message": "You turned the TV on."
+          "fail_message": "Nah. Maybe you need power and a working remote?",
+          "success_message": "You turned the TV on.",
+          "on_success_script": "",
+          "on_failure_script": ""
         }
       ],
       "switch_outcomes": [],
@@ -3598,125 +4030,219 @@
       "required_scene_id": "",
       "required_defeated_npc_id": "",
       "guard_expression": "tw.vars.get('qa_signed_off', False) == True"
+    },
+    {
+      "key": "AWARD_GUILDMASTER_HEIR",
+      "title": "Guild Master's Heir",
+      "description": "Retrieved the Guild Master's Signet Ring from the depths of the Guild Treasury.",
+      "tier": "gold",
+      "requirement": "Pick up the Guild Master's Signet Ring in the Guild Treasury.",
+      "is_earned": false,
+      "required_item_id": "GUILDMASTER_RING",
+      "required_scene_id": "GUILD_VAULT",
+      "required_defeated_npc_id": "",
+      "guard_expression": ""
     }
   ],
   "sequences": [
     {
-      "id": "SEQ_1_ORIENTATION",
+      "id": "SEQ_ENTRY_HALL",
       "order": 1,
-      "title": "Orientation Walk",
-      "description": "Vera hands Alex a QA checklist. The first item: walk over to the Item Lab and confirm the facility's doors work.",
-      "walkthrough": "From the Entry Hall, take the exit 'To Item Lab' into the Workshop.",
-      "end_condition": "The tester enters the Item Lab (WORKSHOP).",
-      "exp_reward": 50,
+      "title": "Reception & Orientation",
+      "description": "Check in at the reception desk in the Entry Hall and review the facility test protocols.",
+      "walkthrough": "Talk to Vera the Reception Bot at the front desk.",
+      "end_condition": "Reception check-in completed.",
+      "exp_reward": 25,
       "required_item_id": "",
-      "required_scene_id": "WORKSHOP",
+      "required_scene_id": "ENTRY_HALL",
       "required_defeated_npc_id": "",
       "guard_expression": "",
-      "on_start_sequence_script": "tw.npcs.say_directed(\"RECEPTION_BOT\", \"slides a laminated QA checklist across the desk with a sigh and tells Alex that item one is simply walking into the Item Lab, which even a toaster could manage\")\n",
-      "on_start_sequence_text": "",
+      "on_start_sequence_script": "",
+      "on_start_sequence_text": "Welcome to the Reception & Orientation phase. Review test guidelines with Vera.",
       "on_end_sequence_script": "",
-      "on_end_sequence_text": "Checklist item 1 ticked: doors open, floors hold. Revolutionary.",
+      "on_end_sequence_text": "Reception protocol completed.",
       "helpers_script": "",
       "soft_rules": [],
       "scripts": []
     },
     {
-      "id": "SEQ_2_LOCKS_AND_KEYS",
+      "id": "SEQ_WORKSHOP",
       "order": 2,
-      "title": "Locks & Keys",
-      "description": "Checklist item two tests item-based locks: the door from the Item Lab to the locked room only opens with the Secret Room Key.",
-      "walkthrough": "Pick up the Secret Room Key in the Workshop, unlock 'The locked door' and walk into the locked room.",
-      "end_condition": "The tester enters the locked room (LOCKED_ROOM).",
+      "title": "Workshop & Item Lab",
+      "description": "Inspect crafting stations, combine ingredients, and examine stored tools in the Item Lab.",
+      "walkthrough": "Explore the workshop tables, containers, and workbench recipes.",
+      "end_condition": "Workshop exploration completed.",
+      "exp_reward": 50,
+      "required_item_id": "",
+      "required_scene_id": "WORKSHOP",
+      "required_defeated_npc_id": "",
+      "guard_expression": "",
+      "on_start_sequence_script": "",
+      "on_start_sequence_text": "You entered the Item Lab. Time to put crafting and containers through their paces.",
+      "on_end_sequence_script": "",
+      "on_end_sequence_text": "Workshop testing completed.",
+      "helpers_script": "",
+      "soft_rules": [],
+      "scripts": []
+    },
+    {
+      "id": "SEQ_LOCKED_ROOM",
+      "order": 3,
+      "title": "Restricted Storage Chamber",
+      "description": "Bypass the lock from the Item Lab and inspect the quarantined holding area.",
+      "walkthrough": "Unlock the door from the Workshop using the Secret Room Key and explore inside.",
+      "end_condition": "Restricted storage chamber inspected.",
       "exp_reward": 75,
       "required_item_id": "",
       "required_scene_id": "LOCKED_ROOM",
       "required_defeated_npc_id": "",
       "guard_expression": "",
       "on_start_sequence_script": "",
-      "on_start_sequence_text": "QA checklist, item 2: verify that the locked door in the Item Lab opens with the right key - and only with it.",
+      "on_start_sequence_text": "Restricted storage breached. Keep your wits about you.",
       "on_end_sequence_script": "",
-      "on_end_sequence_text": "Checklist item 2 ticked: the lock accepted its key.",
+      "on_end_sequence_text": "Chamber security cleared.",
       "helpers_script": "",
       "soft_rules": [],
       "scripts": []
     },
     {
-      "id": "SEQ_3_CASKET_TRIAL",
-      "order": 3,
+      "id": "SEQ_RIDDLE_LAB",
+      "order": 4,
       "title": "The Casket Trial",
-      "description": "Checklist item three tests deterministic script guards: Grimsby's casket puzzle in the Alchemy Lab must be solved.",
-      "walkthrough": "Go to the Alchemy Lab (RIDDLE_LAB), read the Guild Master's Diary, place each artifact into its matching casket and pull the Confirmation Lever.",
-      "end_condition": "The casket puzzle is solved (script variable lab_solved is True).",
+      "description": "Decipher Grimsby's riddle and place the artifacts into the five caskets in the Riddle Lab.",
+      "walkthrough": "Read the Guild Master's Diary, match items to caskets, and pull the Confirmation Lever.",
+      "end_condition": "The casket riddle is solved.",
       "exp_reward": 100,
       "required_item_id": "",
-      "required_scene_id": "",
+      "required_scene_id": "RIDDLE_LAB",
       "required_defeated_npc_id": "",
       "guard_expression": "tw.vars.get('lab_solved', False) == True",
       "on_start_sequence_script": "",
-      "on_start_sequence_text": "QA checklist, item 3: solve the casket puzzle in the Alchemy Lab. The gargoyle is part of the test. Allegedly.",
+      "on_start_sequence_text": "The Casket Trial is active. Solve Grimsby's riddle to uncover what lies behind the wall.",
       "on_end_sequence_script": "",
-      "on_end_sequence_text": "Checklist item 3 ticked: the guard expression fired.",
-      "helpers_script": "",
-      "soft_rules": [],
-      "scripts": [
-        {
-          "id": "SEQ3_GRIMSBY_HINT",
-          "name": "Grimsby greets the tester during the Casket Trial",
-          "trigger": "on_enter_scene",
-          "target_id": "RIDDLE_LAB",
-          "description": "Sequence script test: only runs while the Casket Trial is active.",
-          "code": "if not tw.vars.get(\"seq3_hint_given\", False):\n    tw.vars.set(\"seq3_hint_given\", True)\n    tw.npcs.say_directed(\"GARGOYLE_GRIMSBY\", \"grumbles that the diary on the table is not decoration and that pulling the lever before every casket is filled is a bad idea\")\n"
-        }
-      ]
-    },
-    {
-      "id": "SEQ_4_ARENA",
-      "order": 4,
-      "title": "Arena Certification",
-      "description": "Checklist item four tests the defeat rule: Training Guard Harlan must be beaten in the Combat Lab. Spark Mage Ilya joins as his sparring partner while team mode is on.",
-      "walkthrough": "Go to the Combat Lab, attack Training Guard Harlan and win the fight. Use the Arena Combat Console to turn team mode off for a one-on-one bout.",
-      "end_condition": "Training Guard Harlan (TRAINING_GUARD) is defeated.",
-      "exp_reward": 150,
-      "required_item_id": "",
-      "required_scene_id": "",
-      "required_defeated_npc_id": "TRAINING_GUARD",
-      "guard_expression": "",
-      "on_start_sequence_script": "",
-      "on_start_sequence_text": "QA checklist, item 4: defeat Training Guard Harlan in the Combat Lab. The console can switch off team mode if two opponents are too many.",
-      "on_end_sequence_script": "",
-      "on_end_sequence_text": "Checklist item 4 ticked: combat, loot and defeat handling verified.",
+      "on_end_sequence_text": "The casket trial is solved! The secret vault path is revealed.",
       "helpers_script": "",
       "soft_rules": [],
       "scripts": []
     },
     {
-      "id": "SEQ_5_SIGN_OFF",
+      "id": "SEQ_GUILD_VAULT",
       "order": 5,
-      "title": "QA Sign-off",
-      "description": "Final checklist item: the tester returns to Vera in the Entry Hall and signs off the QA report. Signing ends the test session.",
-      "walkthrough": "Return to the Entry Hall and tell Vera that testing is finished and you want to sign the QA report.",
-      "end_condition": "The tester signs the QA report with Vera in the Entry Hall (script variable qa_signed_off is True).",
-      "exp_reward": 200,
-      "required_item_id": "",
-      "required_scene_id": "",
+      "title": "The Guild Treasury",
+      "description": "Enter the concealed vault behind the gargoyle and retrieve the Guild Master's signet ring.",
+      "walkthrough": "Step through the secret passage from the Riddle Lab and claim the Guild Master's Signet Ring.",
+      "end_condition": "The signet ring is acquired.",
+      "exp_reward": 150,
+      "required_item_id": "GUILDMASTER_RING",
+      "required_scene_id": "GUILD_VAULT",
       "required_defeated_npc_id": "",
-      "guard_expression": "tw.vars.get('qa_signed_off', False) == True",
+      "guard_expression": "tw.inventory.has('GUILDMASTER_RING')",
       "on_start_sequence_script": "",
-      "on_start_sequence_text": "QA checklist, item 5: return to Vera in the Entry Hall and sign the QA report when you are done testing. Take your time - signing ends the session.",
+      "on_start_sequence_text": "You stepped into the ancient Guild Treasury. Treasures and old guild relics line the room.",
       "on_end_sequence_script": "",
-      "on_end_sequence_text": "QA report signed. Test session complete - thank you for breaking things responsibly.",
+      "on_end_sequence_text": "The Guild Master's Signet Ring is in your hands. The lineage recognizes you.",
       "helpers_script": "",
-      "soft_rules": [
-        {
-          "id": "SIGN_QA_REPORT",
-          "condition": "The player tells Vera the Reception Bot that testing is finished and asks to sign off the QA report.",
-          "guard_expression": "tw.scene.id == 'ENTRY_HALL'",
-          "max_triggers": 1,
-          "text": "",
-          "script": "tw.vars.set(\"qa_signed_off\", True)\ntw.npcs.say_directed(\"RECEPTION_BOT\", \"stamps the QA report with exaggerated force, declares Alex officially certified and visibly cheers up at the prospect of an empty lab\")\n"
-        }
-      ],
+      "soft_rules": [],
+      "scripts": []
+    },
+    {
+      "id": "SEQ_SWITCH_LAB",
+      "order": 6,
+      "title": "Switch & Circuitry Lab",
+      "description": "Test electrical levers, circuit breakers, and state latches in the Switch Lab.",
+      "walkthrough": "Interact with the power switches and verify circuit behaviors.",
+      "end_condition": "Switch mechanisms tested.",
+      "exp_reward": 50,
+      "required_item_id": "",
+      "required_scene_id": "SWITCH_LAB",
+      "required_defeated_npc_id": "",
+      "guard_expression": "",
+      "on_start_sequence_script": "",
+      "on_start_sequence_text": "Switch Lab online. Circuit switches and latches ready for inspection.",
+      "on_end_sequence_script": "",
+      "on_end_sequence_text": "Switch tests complete.",
+      "helpers_script": "",
+      "soft_rules": [],
+      "scripts": []
+    },
+    {
+      "id": "SEQ_COMBAT_LAB",
+      "order": 7,
+      "title": "Combat Training Arena",
+      "description": "Test combat encounters and battle mechanics against Grokh in the Combat Lab.",
+      "walkthrough": "Equip practice gear and spar with Grokh the caveman.",
+      "end_condition": "Combat trial finished.",
+      "exp_reward": 100,
+      "required_item_id": "",
+      "required_scene_id": "COMBAT_LAB",
+      "required_defeated_npc_id": "GROKH_CAVEMAN",
+      "guard_expression": "tw.npcs.is_defeated('GROKH_CAVEMAN')",
+      "on_start_sequence_script": "",
+      "on_start_sequence_text": "Combat Arena active. Ready your weapons and prepare for a sparring match.",
+      "on_end_sequence_script": "",
+      "on_end_sequence_text": "Combat trial concluded. Victorious in the arena.",
+      "helpers_script": "",
+      "soft_rules": [],
+      "scripts": []
+    },
+    {
+      "id": "SEQ_SOCIAL_HALL",
+      "order": 8,
+      "title": "Conversation & Social Hall",
+      "description": "Engage the laboratory staff and test interactive dialogue branching and social mechanics.",
+      "walkthrough": "Speak with NPCs in the Social Hall and explore dialogue choices.",
+      "end_condition": "Social interactions evaluated.",
+      "exp_reward": 50,
+      "required_item_id": "",
+      "required_scene_id": "SOCIAL_HALL",
+      "required_defeated_npc_id": "",
+      "guard_expression": "",
+      "on_start_sequence_script": "",
+      "on_start_sequence_text": "Social Hall entered. Converse with the researchers and test dialogue branches.",
+      "on_end_sequence_script": "",
+      "on_end_sequence_text": "Social dynamics successfully analyzed.",
+      "helpers_script": "",
+      "soft_rules": [],
+      "scripts": []
+    },
+    {
+      "id": "SEQ_TELEPORT_LAB",
+      "order": 9,
+      "title": "Teleportation Field",
+      "description": "Calibrate and trigger experimental matter displacement across test coordinates.",
+      "walkthrough": "Operate the teleport console and observe test transport cycles.",
+      "end_condition": "Teleport trials completed.",
+      "exp_reward": 75,
+      "required_item_id": "",
+      "required_scene_id": "TELEPORT_LAB",
+      "required_defeated_npc_id": "",
+      "guard_expression": "tw.vars.get('teleport_attempt', 0) >= 3",
+      "on_start_sequence_script": "",
+      "on_start_sequence_text": "Teleportation Lab online. Coordinate displacement coils humming.",
+      "on_end_sequence_script": "",
+      "on_end_sequence_text": "Teleport sequence stabilized.",
+      "helpers_script": "",
+      "soft_rules": [],
+      "scripts": []
+    },
+    {
+      "id": "SEQ_TIME_MACHINE_LAB",
+      "order": 10,
+      "title": "Temporal Distortion Lab",
+      "description": "Calibrate Professor Chronos's time manipulation console and test temporal shifts.",
+      "walkthrough": "Consult Professor Chronos and test dawn/dusk cycles on the console.",
+      "end_condition": "Temporal experiments verified.",
+      "exp_reward": 100,
+      "required_item_id": "",
+      "required_scene_id": "TIME_MACHINE_LAB",
+      "required_defeated_npc_id": "",
+      "guard_expression": "",
+      "on_start_sequence_script": "",
+      "on_start_sequence_text": "Temporal Distortion Lab active. Tachyon coils spinning at nominal speed.",
+      "on_end_sequence_script": "",
+      "on_end_sequence_text": "Temporal calibration finalized.",
+      "helpers_script": "",
+      "soft_rules": [],
       "scripts": []
     }
   ],
