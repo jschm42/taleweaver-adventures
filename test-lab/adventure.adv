@@ -6,7 +6,7 @@
     "title": "Test-Lab",
     "teaser": "A dedicated testing facility built to explore and benchmark TaleWeaver's engine capabilities\u2014from reactive storytelling and tactical combat to complex world puzzles and in-game image generation.",
     "cover_appearance": "clean stone and brass testing laboratory, workbench with gears, training arena doors, warm lighting",
-    "version": "1.2.4",
+    "version": "1.2.5",
     "creator": "Jean Schmitz",
     "copyright": "Copyright (c) 2026 by Jean Schmitz",
     "license": "CC BY-NC 4.0",
@@ -1306,7 +1306,7 @@
       "is_attackable": true,
       "is_killable": false,
       "inventory": [],
-      "on_interact_script": "msg = str(tw.turn.player_message or '').strip()\nif msg.startswith('/'):\n    pass\nelse:\n    msg_lower = msg.lower()\n    if any(w in msg_lower for w in ('paint', 'draw', 'sketch', 'picture', 'artwork')) and not msg_lower.startswith(('talk', 'inspect', 'look', 'examine')):\n        generate_custom_banana_art(msg)\n    else:\n        show_chimp_dialog()",
+      "on_interact_script": "msg = str(tw.turn.player_message or '').strip()\nlow = msg.lower()\nis_say = low.startswith(('/say', '/speak'))\nhead, sep, rest = low.partition(':')\n\n# \"/say to Pierre ...: ...\" addresses the other artist.\naddressed_elsewhere = is_say and bool(sep) and 'babu' not in head and 'chimp' not in head\nif is_say:\n    low = rest.strip() if sep else low.split(' ', 1)[-1].strip()\n\n# Paint requests and custom commissions are handled by SCRIPT_ART_LAB_DIRECT_REQUEST.\nasks_for_art = any(w in low for w in ('paint', 'draw', 'sketch', 'picture', 'artwork', 'caricature', 'portrait'))\nother_command = msg.startswith('/') and not is_say\nskip = tw.vars.get('awaiting_custom_art') or addressed_elsewhere or asks_for_art or other_command\n\nif not skip:\n    show_chimp_dialog()",
       "on_receive_item_script": "if 'ITEM_RIPE_BANANA' in received_item_ids:\n    tw.story.narrate(\"Babu lets out an ecstatic screech of gratitude, peels a banana in half a second, eats it in two bites, and smears his paint-covered knuckles across a blank canvas in sheer joy!\")\n    generate_custom_banana_art(\"a glorious golden banana feast\")\nelse:\n    tw.story.narrate(\"Babu sniffs the item curiously, examines it for any sign of yellow fruit, and sets it politely beside his paint pots.\")"
     },
     {
@@ -1354,7 +1354,7 @@
       "is_attackable": true,
       "is_killable": false,
       "inventory": [],
-      "on_interact_script": "msg = str(tw.turn.player_message or '').strip()\nif msg.startswith('/'):\n    pass\nelse:\n    msg_lower = msg.lower()\n    if any(w in msg_lower for w in ('paint', 'draw', 'sketch', 'caricature', 'portrait')) and not msg_lower.startswith(('talk', 'inspect', 'look', 'examine')):\n        generate_custom_caricature(msg)\n    else:\n        show_artist_dialog()"
+      "on_interact_script": "msg = str(tw.turn.player_message or '').strip()\nlow = msg.lower()\nis_say = low.startswith(('/say', '/speak'))\nhead, sep, rest = low.partition(':')\n\n# \"/say to Babu ...: ...\" addresses the other artist.\naddressed_elsewhere = is_say and bool(sep) and 'pierre' not in head and 'caricaturist' not in head\nif is_say:\n    low = rest.strip() if sep else low.split(' ', 1)[-1].strip()\n\n# Paint requests and custom commissions are handled by SCRIPT_ART_LAB_DIRECT_REQUEST.\nasks_for_art = any(w in low for w in ('paint', 'draw', 'sketch', 'picture', 'artwork', 'caricature', 'portrait'))\nother_command = msg.startswith('/') and not is_say\nskip = tw.vars.get('awaiting_custom_art') or addressed_elsewhere or asks_for_art or other_command\n\nif not skip:\n    show_artist_dialog()"
     },
     {
       "id": "PIP",
@@ -4580,7 +4580,7 @@
       "name": "Art Lab Direct Paint Commands",
       "trigger": "on_logic_pass_done",
       "target": null,
-      "code": "if tw.scene.id == 'ART_LAB':\n    msg = str(tw.turn.player_message or '').strip()\n    if not msg.startswith('/'):\n        msg_lower = msg.lower()\n        awaiting = tw.vars.get('awaiting_custom_art')\n        if awaiting == 'PIERRE':\n            tw.vars.delete('awaiting_custom_art')\n            generate_custom_caricature(msg)\n        elif awaiting == 'BABU':\n            tw.vars.delete('awaiting_custom_art')\n            generate_custom_banana_art(msg)\n        elif any(w in msg_lower for w in ('paint', 'draw', 'sketch', 'caricature', 'portrait')) and not msg_lower.startswith(('talk', 'inspect', 'look', 'examine')):\n            if 'babu' in msg_lower or 'chimp' in msg_lower:\n                generate_custom_banana_art(msg)\n            else:\n                generate_custom_caricature(msg)",
+      "code": "ART_WORDS = ('paint', 'draw', 'sketch', 'picture', 'artwork', 'caricature', 'portrait')\n\nmsg = str(tw.turn.player_message or '').strip()\naddressed = ''\n\n# \"/say to <NPC>: <request>\" -> remember the addressee, keep only the request text.\nif msg.lower().startswith(('/say', '/speak')):\n    head, sep, rest = msg.partition(':')\n    addressed = head.lower() if sep else ''\n    msg = rest.strip() if sep else msg.split(' ', 1)[-1].strip()\n\nlow = msg.lower()\nis_text = tw.scene.id == 'ART_LAB' and bool(msg) and not msg.startswith('/')\nawaiting = tw.vars.get('awaiting_custom_art') if is_text else None\nasks_for_art = (\n    is_text\n    and any(w in low for w in ART_WORDS)\n    and not low.startswith(('talk', 'inspect', 'look', 'examine'))\n)\n\n# Pick the artist: a pending commission wins, then the addressee, then a name in the text.\nif addressed:\n    wants_babu = 'babu' in addressed or 'chimp' in addressed\nelse:\n    wants_babu = 'babu' in low or 'chimp' in low\n\nif awaiting:\n    tw.vars.delete('awaiting_custom_art')\n    wants_babu = awaiting == 'BABU'\n\nif awaiting or asks_for_art:\n    if wants_babu:\n        generate_custom_banana_art(msg)\n    else:\n        generate_custom_caricature(msg)\n",
       "priority": 100,
       "is_active": true
     }
