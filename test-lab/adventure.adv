@@ -6,7 +6,7 @@
     "title": "Test-Lab",
     "teaser": "A compact three-room QA test lab for conversation, item mechanics, switches, and turn-based combat.",
     "cover_appearance": "clean stone and brass testing laboratory, workbench with gears, training arena doors, warm lighting",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "creator": "Jean Schmitz",
     "copyright": "Copyright (c) 2026 by Jean Schmitz",
     "license": "CC BY-NC 4.0",
@@ -35,6 +35,73 @@
       "instruction": "Narrate like a warm, articulate British storyteller by the fireside: inviting, gently theatrical and quietly mischievous. Use elegant, slightly formal phrasing, polite understatement and affectionate humour about the characters' small vanities.",
       "sample": "Now, it wasn't that Barnaby hated Mondays in particular. He simply objected to the rather rude manner in which they interrupted his perfectly good Sundays."
     },
+    "audio_tracks": [
+      {
+        "id": "f29e315ec797",
+        "name": "Late G Minor",
+        "prompt": "",
+        "url": "assets/f29e315ec797_d0d3977f.mp3",
+        "source": "uploaded",
+        "reference_scene_id": null,
+        "created_at": "2026-11-07T22:49:49+00:00"
+      },
+      {
+        "id": "db58c393ce02",
+        "name": "Desant na Koloseumu",
+        "prompt": "",
+        "url": "assets/db58c393ce02_41dea319.mp3",
+        "source": "uploaded",
+        "reference_scene_id": null,
+        "created_at": "2026-11-07T22:54:19+00:00"
+      },
+      {
+        "id": "GLOWBERTINE_CREAM",
+        "name": "Glowbertine Cream",
+        "prompt": "",
+        "url": "assets/8e6b92db3d42_a175c50c.mp3",
+        "source": "uploaded",
+        "reference_scene_id": null,
+        "created_at": "2026-11-08T07:27:50+00:00"
+      },
+      {
+        "id": "HEARTHFIRE_LULLABY",
+        "name": "Hearthfire Lullaby",
+        "prompt": "",
+        "url": "assets/HEARTHFIRE_LULLABY_e79f8c63.mp3",
+        "source": "uploaded",
+        "reference_scene_id": null,
+        "created_at": "2026-11-08T08:21:42+00:00"
+      },
+      {
+        "id": "MATIN_AU_CAFE",
+        "name": "Matin au Caf\u00e9",
+        "prompt": "",
+        "url": "assets/MATIN_AU_CAFE_94b891df.mp3",
+        "source": "uploaded",
+        "reference_scene_id": null,
+        "created_at": "2026-11-08T10:15:54+00:00"
+      },
+      {
+        "id": "STONE_ECHOES",
+        "name": "Stone Echoes",
+        "prompt": "",
+        "url": "assets/STONE_ECHOES_78baa52e.mp3",
+        "source": "uploaded",
+        "reference_scene_id": null,
+        "created_at": "2026-11-08T14:29:13+00:00"
+      },
+      {
+        "id": "LABORATORIUM",
+        "name": "Laboratorium",
+        "prompt": "",
+        "url": "assets/LABORATORIUM_5575a1dc.mp3",
+        "source": "uploaded",
+        "reference_scene_id": null,
+        "created_at": "2026-11-08T14:35:23+00:00"
+      }
+    ],
+    "audio_enabled": true,
+    "title_track_id": "db58c393ce02",
     "ui_theme": {
       "skin": "ancient"
     },
@@ -282,8 +349,9 @@
     {
       "id": "ENTRY_HALL",
       "label": "Entry Hall",
-      "description": "Entry hall of the Test-Lab. A narrow room of stainless-steel panels, hazard-striped floor tape, and a flickering fluorescent tube. Behind a scratched reception desk sits Vera the Reception Bot next to a glowing FAQ Info Console. Doorways lead to the Conversation Hall, the Object Workshop, the Combat Arena, the Switch Lab, the Dusty Alchemy Lab, and the Time Machine Lab, while a glowing teleporter hums against the wall on its way to the Teleportation Lab.",
+      "description": "Entry hall of the Test-Lab. A narrow room of stainless-steel panels, hazard-striped floor tape, and a flickering fluorescent tube. Behind a scratched reception desk sits Vera the Reception Bot next to a glowing FAQ Info Console and a 'What's New' noticeboard. Doorways lead to the Conversation Hall, the Object Workshop, the Combat Arena, the Switch Lab, the Dusty Alchemy Lab, the Time Machine Lab, and the colorful Art Lab, while a glowing teleporter hums against the wall on its way to the Teleportation Lab.",
       "image_url": "assets/01a18b89-cd56-72bd-a393-2c2e53bb548c_scene_8c51da45.jpg",
+      "audio_track_id": "f29e315ec797",
       "decorative_objects": [
         "stainless steel wall panel",
         "flickering fluorescent ceiling light",
@@ -294,16 +362,37 @@
         "numbered wall placard"
       ],
       "on_enter_scene_script": "if not tw.sequences.is_completed(\"SEQ_ENTRY_HALL\") and not tw.sequences.is_active(\"SEQ_ENTRY_HALL\"):\n    tw.sequences.start(\"SEQ_ENTRY_HALL\")\ngreet_at_reception()",
-      "on_enter_scene_text": "The door seals behind you with a soft hiss. A wall placard reads: TEST SESSION IN PROGRESS \u2014 NO SCHEDULED END. Four corridors and one humming teleporter wait for you to choose where the testing starts.",
+      "on_enter_scene_text": "The door seals behind you with a soft hiss. A wall placard reads: TEST SESSION IN PROGRESS \u2014 NO SCHEDULED END. Five corridors, an art studio passage, and one humming teleporter wait for you to choose where the testing starts.",
       "on_leave_scene_script": null,
       "on_leave_scene_text": null,
-      "helpers_script": "ENTRY_FAQ_TREE = {\n    \"dialogue_id\": \"entry_faq_console\",\n    \"npc_id\": \"RECEPTION_BOT\",\n    \"initial_node\": \"root\",\n    \"nodes\": {\n        \"root\": {\n            \"npc_text\": \"WELCOME TO THE TEST-LAB AUTOMATED FAQ TERMINAL (v4.3 - 'Please Read This Instead Of Talking To Vera' Edition). Select a topic with your fleshy human finger:\",\n            \"responses\": [\n                {\"text\": \"What is the 'Test-Lab' and why am I here?\", \"next_node\": \"what_is_test_lab\"},\n                {\"text\": \"What rooms and experiments are in this facility?\", \"next_node\": \"rooms_overview\"},\n                {\"text\": \"How do I win or lose in the Test-Lab?\", \"next_node\": \"win_lose\"},\n                {\"text\": \"What is the deal with the humming teleporter in the corner?\", \"next_node\": \"faq_teleport\"},\n                {\"text\": \"Why is Vera the Reception Bot so annoyed?\", \"next_node\": \"faq_vera\", \"once\": True},\n                {\"text\": \"Log off. I am ready to start testing.\", \"next_node\": None},\n            ],\n        },\n        \"what_is_test_lab\": {\n            \"npc_text\": \"There is no ancient prophecy, no dark lord, and no missing princess. You are Alex Vale, a QA test operator hired for one afternoon to poke every mechanic in the TaleWeaver engine--dialogs, containers, locks, crafting, switches, riddles, teleporters, time management, and turn-based combat--until you are satisfied they work as advertised.\",\n            \"responses\": [\n                {\"text\": \"What rooms can I visit?\", \"next_node\": \"rooms_overview\"},\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n                {\"text\": \"Got it. Close terminal.\", \"next_node\": None},\n            ],\n        },\n        \"rooms_overview\": {\n            \"npc_text\": \"Six doors and one questionable teleporter branch off from this Entry Hall. Which department's liability waiver would you like to read?\",\n            \"responses\": [\n                {\"text\": \"Time Machine Lab\", \"next_node\": \"rooms_time_lab\"},\n                {\"text\": \"Conversation Lab & Object Workshop\", \"next_node\": \"rooms_social_workshop\"},\n                {\"text\": \"Switch Lab & Dusty Alchemy Lab\", \"next_node\": \"rooms_switch_alchemy\"},\n                {\"text\": \"Combat Lab\", \"next_node\": \"rooms_combat\"},\n                {\"text\": \"Teleportation Lab\", \"next_node\": \"faq_teleport\"},\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n            ],\n        },\n        \"rooms_time_lab\": {\n            \"npc_text\": \"TIME MACHINE LAB: Headed by Professor Timothy Chronos. Dedicated to QA testing the in-game clock, turn pacing, pause states, and scheduled timers. Features the Chronos-5000 machine, Barnaby the Rooster (crows at 06:00), Schr\\u00f6dinger the Dusk Cat (meows at 18:00), a Paradox Hourglass, and The Tomorrow Chronicle.\",\n            \"responses\": [\n                {\"text\": \"Check the other rooms.\", \"next_node\": \"rooms_overview\"},\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n            ],\n        },\n        \"rooms_social_workshop\": {\n            \"npc_text\": \"CONVERSATION HALL: Four opinionated regulars sit around an oak table waiting for you to test free-form NPC chat, plus a wall panel that forces them to get angry, get happy, or burst into song. OBJECT WORKSHOP: Lockboxes, keypad codes (hint: read the note on the bench, it is literally 4217), crafting ingredients, and a locked room.\",\n            \"responses\": [\n                {\"text\": \"Check the other rooms.\", \"next_node\": \"rooms_overview\"},\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n            ],\n        },\n        \"rooms_switch_alchemy\": {\n            \"npc_text\": \"SWITCH LAB (TV ROOM): Repair a broken TV remote, make magic popcorn, and flip through LLM-powered TV channels.\",\n            \"responses\": [\n                {\"text\": \"Check the other rooms.\", \"next_node\": \"rooms_overview\"},\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n            ],\n        },\n        \"rooms_combat\": {\n            \"npc_text\": \"COMBAT ARENA: Home to Training Guard Harlan and Spark Mage Ilya. They are polite enough to wait until you swing first before beating you up in turn-based combat. Defeating them drops real loot, and no, you do not have to feel bad about it--they signed the form.\",\n            \"responses\": [\n                {\"text\": \"Check the other rooms.\", \"next_node\": \"rooms_overview\"},\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n            ],\n        },\n        \"win_lose\": {\n            \"npc_text\": \"LOSING: Let your HP hit zero in the Combat Arena or choke on Grimsby's riddle gas. WINNING: Nothing ends automatically. Explore in any order, break what you can, and tell the system whenever your QA session is complete.\",\n            \"responses\": [\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n                {\"text\": \"Fair enough. Close terminal.\", \"next_node\": None},\n            ],\n        },\n        \"faq_teleport\": {\n            \"npc_text\": \"Step onto the glowing teleporter pad in this hall to beam into the Teleportation Lab, where Professor Pip Fenwick is attempting to teleport Unit Seven out of the Conversation Hall. Spoiler alert: his targeting coil has a loose screw, so expect rodents and displaced senior citizens before he gets it right.\",\n            \"responses\": [\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n                {\"text\": \"I have to see this. Close terminal.\", \"next_node\": None},\n            ],\n        },\n        \"faq_vera\": {\n            \"npc_text\": \"Vera was built with a Class-9 Quantum Intelligence Core capable of calculating eleven-dimensional astrophysics, and management assigned her to hand out visitor badges and explain keypad code 4217 to QA testers. Frankly, it is a miracle she has not vented the hallway.\",\n            \"responses\": [\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n                {\"text\": \"I will leave her in peace. Close terminal.\", \"next_node\": None},\n            ],\n        },\n    },\n}\n\n\ndef greet_at_reception():\n    if not tw.vars.get(\"vera_greeted\", False):\n        tw.vars.set(\"vera_greeted\", True)\n        tw.story.direct(\n            \"Narrate how Vera the Reception Bot--a thoroughly exhausted, sarcastic chrome android slumped behind the reception desk--lets out a loud, static-laced mechanical sigh as Alex Vale arrives in the Entry Hall, tapping her clipboard with a metallic finger.\"\n        )\n        tw.npcs.say_directed(\n            \"RECEPTION_BOT\",\n            \"in an extremely annoyed, deadpan sarcastic tone, welcomes Alex to the Test-Lab, briefly explains that this is not a dramatic fantasy quest but a modular QA testing facility where each room tests a different engine feature (NPC conversations, locks and crafting, switches, riddles, combat, teleporters, and time management), and tells Alex to click the FAQ Info Console on her desk for details instead of asking her questions\",\n        )\n        return\n\n    tw.story.direct(\n        \"Briefly mention Vera the Reception Bot barely looking up from her desk as Alex returns to the Entry Hall.\"\n    )\n    tw.npcs.say_directed(\n        \"RECEPTION_BOT\",\n        \"makes a short, dryly sarcastic remark about Alex still being in one piece and reminds them the FAQ Info Console is still right there\",\n    )"
+      "helpers_script": "ENTRY_FAQ_TREE = {\n    \"dialogue_id\": \"entry_faq_console\",\n    \"npc_id\": \"RECEPTION_BOT\",\n    \"initial_node\": \"root\",\n    \"nodes\": {\n        \"root\": {\n            \"npc_text\": \"WELCOME TO THE TEST-LAB AUTOMATED FAQ TERMINAL (v4.4 - 'Please Read This Instead Of Talking To Vera' Edition). Select a topic with your fleshy human finger:\",\n            \"responses\": [\n                {\"text\": \"What is the 'Test-Lab' and why am I here?\", \"next_node\": \"what_is_test_lab\"},\n                {\"text\": \"What rooms and experiments are in this facility?\", \"next_node\": \"rooms_overview\"},\n                {\"text\": \"How do I win or lose in the Test-Lab?\", \"next_node\": \"win_lose\"},\n                {\"text\": \"What is the deal with the humming teleporter in the corner?\", \"next_node\": \"faq_teleport\"},\n                {\"text\": \"Why is Vera the Reception Bot so annoyed?\", \"next_node\": \"faq_vera\", \"once\": True},\n                {\"text\": \"Log off. I am ready to start testing.\", \"next_node\": None},\n            ],\n        },\n        \"what_is_test_lab\": {\n            \"npc_text\": \"There is no ancient prophecy, no dark lord, and no missing princess. You are Alex Vale, a QA test operator hired for one afternoon to poke every mechanic in the TaleWeaver engine--dialogs, containers, locks, crafting, switches, riddles, teleporters, time management, image generation, audio, and turn-based combat--until you are satisfied they work as advertised.\",\n            \"responses\": [\n                {\"text\": \"What rooms can I visit?\", \"next_node\": \"rooms_overview\"},\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n                {\"text\": \"Got it. Close terminal.\", \"next_node\": None},\n            ],\n        },\n        \"rooms_overview\": {\n            \"npc_text\": \"Seven doors and one questionable teleporter branch off from this Entry Hall. Which department's liability waiver would you like to read?\",\n            \"responses\": [\n                {\"text\": \"Art Lab (Image Generation)\", \"next_node\": \"rooms_art_lab\"},\n                {\"text\": \"Time Machine Lab\", \"next_node\": \"rooms_time_lab\"},\n                {\"text\": \"Conversation Lab & Object Workshop\", \"next_node\": \"rooms_social_workshop\"},\n                {\"text\": \"Switch Lab & Dusty Alchemy Lab\", \"next_node\": \"rooms_switch_alchemy\"},\n                {\"text\": \"Combat Lab\", \"next_node\": \"rooms_combat\"},\n                {\"text\": \"Teleportation Lab\", \"next_node\": \"faq_teleport\"},\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n            ],\n        },\n        \"rooms_art_lab\": {\n            \"npc_text\": \"ART LAB: Our brand new studio for testing in-game image generation scripting (tw.image.generate). Resident artists include Pierre the eccentric street caricaturist with absurd proportions, and Babu the chimpanzee prodigy who creates childlike banana-themed finger paintings. Features a physical toggle switch to swap between Simple Model and HQ Model generation.\",\n            \"responses\": [\n                {\"text\": \"Check the other rooms.\", \"next_node\": \"rooms_overview\"},\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n            ],\n        },\n        \"rooms_time_lab\": {\n            \"npc_text\": \"TIME MACHINE LAB: Headed by Professor Timothy Chronos. Dedicated to QA testing the in-game clock, turn pacing, pause states, and scheduled timers. Features the Chronos-5000 machine, Barnaby the Rooster (crows at 06:00), Schr\u00f6dinger the Dusk Cat (meows at 18:00), a Paradox Hourglass, and The Tomorrow Chronicle.\",\n            \"responses\": [\n                {\"text\": \"Check the other rooms.\", \"next_node\": \"rooms_overview\"},\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n            ],\n        },\n        \"rooms_social_workshop\": {\n            \"npc_text\": \"CONVERSATION HALL: Four opinionated regulars sit around an oak table waiting for you to test free-form NPC chat, plus a wall panel that forces them to get angry, get happy, or burst into song. OBJECT WORKSHOP: Lockboxes, keypad codes (hint: read the note on the bench, it is literally 4217), crafting ingredients, and a locked room.\",\n            \"responses\": [\n                {\"text\": \"Check the other rooms.\", \"next_node\": \"rooms_overview\"},\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n            ],\n        },\n        \"rooms_switch_alchemy\": {\n            \"npc_text\": \"SWITCH LAB (TV & RADIO ROOM): Repair a broken TV remote, tune the vintage radio, make magic popcorn, and flip through LLM-powered TV channels. DUSTY ALCHEMY LAB: A mysterious riddle room with caskets.\",\n            \"responses\": [\n                {\"text\": \"Check the other rooms.\", \"next_node\": \"rooms_overview\"},\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n            ],\n        },\n        \"rooms_combat\": {\n            \"npc_text\": \"COMBAT ARENA: Home to Training Guard Harlan and Spark Mage Ilya. They are polite enough to wait until you swing first before beating you up in turn-based combat. Defeating them drops real loot, and no, you do not have to feel bad about it--they signed the form.\",\n            \"responses\": [\n                {\"text\": \"Check the other rooms.\", \"next_node\": \"rooms_overview\"},\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n            ],\n        },\n        \"win_lose\": {\n            \"npc_text\": \"LOSING: Let your HP hit zero in the Combat Arena or choke on Grimsby's riddle gas. WINNING: Nothing ends automatically. Explore in any order, break what you can, and tell the system whenever your QA session is complete.\",\n            \"responses\": [\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n                {\"text\": \"Fair enough. Close terminal.\", \"next_node\": None},\n            ],\n        },\n        \"faq_teleport\": {\n            \"npc_text\": \"Step onto the glowing teleporter pad in this hall to beam into the Teleportation Lab, where Professor Pip Fenwick is attempting to teleport Unit Seven out of the Conversation Hall. Spoiler alert: his targeting coil has a loose screw, so expect rodents and displaced senior citizens before he gets it right.\",\n            \"responses\": [\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n                {\"text\": \"I have to see this. Close terminal.\", \"next_node\": None},\n            ],\n        },\n        \"faq_vera\": {\n            \"npc_text\": \"Vera was built with a Class-9 Quantum Intelligence Core capable of calculating eleven-dimensional astrophysics, and management assigned her to hand out visitor badges and explain keypad code 4217 to QA testers. Frankly, it is a miracle she has not vented the hallway.\",\n            \"responses\": [\n                {\"text\": \"Back to the main FAQ menu.\", \"next_node\": \"root\"},\n                {\"text\": \"I will leave her in peace. Close terminal.\", \"next_node\": None},\n            ],\n        },\n    },\n}\n\n\ndef greet_at_reception():\n    if not tw.vars.get(\"vera_greeted\", False):\n        tw.vars.set(\"vera_greeted\", True)\n        tw.story.direct(\n            \"Narrate how Vera the Reception Bot--a thoroughly exhausted, sarcastic chrome android slumped behind the reception desk--lets out a loud, static-laced mechanical sigh as Alex Vale arrives in the Entry Hall, tapping her clipboard with a metallic finger.\"\n        )\n        tw.npcs.say_directed(\n            \"RECEPTION_BOT\",\n            \"in an extremely annoyed, deadpan sarcastic tone, welcomes Alex to the Test-Lab, explains that this is a modular QA facility testing engine mechanics (dialogs, locks and crafting, switches, riddles, combat, teleporters, time pacing, dynamic music, and the new Art Lab image generation), points to the FAQ Info Console and the What's New noticeboard on her desk, and warns Alex not to ask her questions directly\",\n        )\n        return\n\n    tw.story.direct(\n        \"Briefly mention Vera the Reception Bot barely looking up from her desk as Alex returns to the Entry Hall.\"\n    )\n    tw.npcs.say_directed(\n        \"RECEPTION_BOT\",\n        \"makes a short, dryly sarcastic remark about Alex still being in one piece, reminding them that the FAQ Info Console and What's New bulletin are still right there\",\n    )"
+    },
+    {
+      "id": "ART_LAB",
+      "label": "Art Lab",
+      "description": "A brightly sunlit atelier smelling of oil paints, turpentine, chalk dust, and ripe bananas. On the left, Pierre the street caricaturist sketches by an easel surrounded by wildly warped portraits. On the right, Babu the chimpanzee sits cheerfully before a low canvas, dipping his knuckles into vibrant pots of finger paint and scattering yellow banana peel motifs everywhere. Mounted on the central pillar is the industrial Art Engine Quality Switch.",
+      "image_url": "assets/250da5a3_scene.webp",
+      "audio_track_id": "MATIN_AU_CAFE",
+      "decorative_objects": [
+        "wooden easels",
+        "paint-splattered drop cloths",
+        "charcoal sketch pads",
+        "jars of colorful pigments",
+        "banana peels",
+        "industrial conduit cables"
+      ],
+      "on_enter_scene_script": null,
+      "on_enter_scene_text": null,
+      "on_leave_scene_script": null,
+      "on_leave_scene_text": null,
+      "helpers_script": "def get_art_model():\n    state = tw.switches.get_state(\"SW_IMAGE_MODEL\", \"SIMPLE\")\n    if str(state).strip().upper() == \"HQ\":\n        return \"hq\"\n    return \"simple\"\n\n\ndef generate_custom_caricature(subject):\n    model = get_art_model()\n    subj = str(subject or \"something wonderful\").strip()\n    tw.story.narrate(\n        f\"Pierre flourishes his charcoal pencil with manic inspiration! He studies your request: *\\\"{subj}\\\"*, using the **{model.upper()}** engine...\"\n    )\n    prompt_builder = (\n        f\"You are Pierre, a flamboyant Parisian street caricaturist. The user requests: '{subj}'. \"\n        \"Write a single prompt for an image generator describing a hilarious street artist caricature with wildly exaggerated absurd proportions \"\n        \"(e.g. gigantic balloon-sized head, tiny squinting eyes, comically miniature body and limbs, colorful street marker sketch on paper). \"\n        \"Output ONLY the prompt text, nothing else.\"\n    )\n    art_prompt = tw.llm.ask(prompt_builder, model=\"simple\")\n    if not art_prompt:\n        art_prompt = (\n            f\"A funny street artist caricature of {subj}, huge exaggerated head, comically tiny body and legs, \"\n            \"colorful pastel and marker drawing, absurd proportions, street portrait style\"\n        )\n    caption = f\"Pierre's custom caricature: {subj}\"\n    url = tw.image.generate(\n        art_prompt,\n        model=model,\n        apply_style=False,\n        show_in_chat=True,\n        caption=caption,\n    )\n    if not url:\n        tw.story.narrate(\n            f\"Pierre flourishes his sketchpad with dramatic pride, revealing an absurd caricature of {subj}! (Image generation fallback: {caption})\"\n        )\n\n\ndef generate_custom_banana_art(subject):\n    model = get_art_model()\n    subj = str(subject or \"a yellow marvel\").strip()\n    tw.story.narrate(\n        f\"Babu hoots with wild primate joy, furiously dipping his knuckles into yellow and green finger paints to depict *\\\"{subj}\\\"*, using the **{model.upper()}** engine...\"\n    )\n    prompt_builder = (\n        f\"You are Babu, a playful chimpanzee artist who loves bananas. The user requests: '{subj}'. \"\n        \"Write a single prompt for an image generator describing a naive, charming kindergarten children's finger painting \"\n        \"incorporating bright yellow bananas into the subject, messy cheerful colorful crayons and gouache. \"\n        \"Output ONLY the prompt text, nothing else.\"\n    )\n    art_prompt = tw.llm.ask(prompt_builder, model=\"simple\")\n    if not art_prompt:\n        art_prompt = (\n            f\"A naive and charming children's finger painting of {subj} decorated with bright yellow bananas, \"\n            \"colorful kindergarten crayon art style, messy paint strokes\"\n        )\n    caption = f\"Babu's custom banana painting: {subj}\"\n    url = tw.image.generate(\n        art_prompt,\n        model=model,\n        apply_style=False,\n        show_in_chat=True,\n        caption=caption,\n    )\n    if not url:\n        tw.story.narrate(\n            f\"Babu chatters happily, proudly patting a messy finger-painted masterpiece of {subj} decorated with ripe bananas! (Image generation fallback: {caption})\"\n        )\n\n\ndef show_artist_dialog():\n    current_model = tw.switches.get_state(\"SW_IMAGE_MODEL\", \"SIMPLE\").upper()\n    tw.dialog.choose(\n        f\"Pierre peers at you through a frame formed by his thumbs. 'Ah, a magnificent silhouette! Such delightfully disproportionate possibilities! Which caricature masterpiece shall I sketch for you today?' (Current Engine: {current_model} Model)\",\n        [\n            \"Custom Commission: Tell Pierre what to draw!\",\n            \"Draw an absurd caricature of me with a giant balloon head!\",\n            \"Draw a caricature of Caretaker Edgar brandishing an oversized mop!\",\n            \"Draw a street caricature of Grokh the caveman wearing a tiny necktie!\",\n            \"Ask Pierre how his artistic process works.\",\n            \"Step away from the easel.\",\n        ],\n        on_choice=\"on_choose_artist_action\",\n        speaker=\"Pierre the Caricaturist\",\n    )\n\n\ndef show_chimp_dialog():\n    current_model = tw.switches.get_state(\"SW_IMAGE_MODEL\", \"SIMPLE\").upper()\n    tw.dialog.choose(\n        f\"Babu hoots with glee, slapping his paint-covered palms onto the canvas edge and offering you a bright yellow palette. What would you like him to paint? (Current Engine: {current_model} Model)\",\n        [\n            \"Custom Banana Painting: Tell Babu what to paint!\",\n            \"A giant banana rocket blasting off into outer space!\",\n            \"A royal knight crowned with a bunch of ripe bananas!\",\n            \"A cozy jungle sunset where all the trees are made of bananas!\",\n            \"Give Babu a friendly high-five and watch him paint.\",\n            \"Leave Babu to his banana masterpieces.\",\n        ],\n        on_choice=\"on_choose_chimp_action\",\n        speaker=\"Babu the Chimp Prodigy\",\n    )\n\n\ndef on_choose_artist_action(index):\n    model = get_art_model()\n    if index == 0:\n        tw.vars.set(\"awaiting_custom_art\", \"PIERRE\")\n        tw.story.narrate(\n            \"Pierre leans forward with intense focus, poising his charcoal pencil: \"\n            \"*'A custom commission! Magnificent! Tell me what to draw--type your request directly into the chat \"\n            \"(for example: \\\"Paint a picture of a dog\\\" or \\\"A cat wearing armor\\\"), and I shall capture its ridiculous proportions!'*\"\n        )\n    elif index == 1:\n        tw.story.narrate(\n            f\"Pierre grabs a stick of vine charcoal and feverishly sketches your likeness using the **{model.upper()}** engine...\"\n        )\n        prompt = (\n            \"A hilarious street artist caricature of an adventurer, huge bulbous giant head, \"\n            \"comically tiny squinting eyes, huge grinning mouth, miniature stick-figure body and tiny legs, \"\n            \"holding an oversized backpack, colorful street art marker and pastel sketch, exaggerated proportions, cartoonish caricature style\"\n        )\n        caption = \"Pierre's street caricature of the adventurer with absurd proportions\"\n        url = tw.image.generate(\n            prompt,\n            model=model,\n            apply_style=False,\n            show_in_chat=True,\n            caption=caption,\n        )\n        if not url:\n            tw.story.narrate(\n                f\"Pierre displays a proudly absurd street caricature with an enormous head and miniature legs! (Image generation fallback: {caption})\"\n            )\n    elif index == 2:\n        tw.story.narrate(\n            f\"Pierre winks theatrically, vigorously blending pastels on rough sketch paper using the **{model.upper()}** engine...\"\n        )\n        prompt = (\n            \"A funny street artist caricature of an elderly grumpy janitor in overalls, enormous bulbous nose, \"\n            \"comically gigantic industrial mop lance ten times bigger than his body, tiny spindly arms and legs, \"\n            \"colorful street marker sketch on paper, wildly exaggerated proportions\"\n        )\n        caption = \"Pierre's caricature of Caretaker Edgar and his colossal mop\"\n        url = tw.image.generate(\n            prompt,\n            model=model,\n            apply_style=False,\n            show_in_chat=True,\n            caption=caption,\n        )\n        if not url:\n            tw.story.narrate(\n                f\"Pierre holds up a caricature of Caretaker Edgar looking fiercely grumpy behind a broom the size of a telephone pole! (Image generation fallback: {caption})\"\n            )\n    elif index == 3:\n        tw.story.narrate(\n            f\"Pierre chuckles with artistic glee and begins scribbling with rapid marker strokes using the **{model.upper()}** engine...\"\n        )\n        prompt = (\n            \"A humorous street artist caricature of a prehistoric caveman with a massive exaggerated wild bearded jaw, \"\n            \"wearing a tiny red necktie, tiny caveman club, comically disproportionate head and tiny feet, expressive cartoon street portrait drawing\"\n        )\n        caption = \"Pierre's caricature of Grokh the caveman in formal attire\"\n        url = tw.image.generate(\n            prompt,\n            model=model,\n            apply_style=False,\n            show_in_chat=True,\n            caption=caption,\n        )\n        if not url:\n            tw.story.narrate(\n                f\"Pierre reveals a preposterous caricature of Grokh the caveman with a jaw wider than his shoulders and a miniature red necktie! (Image generation fallback: {caption})\"\n            )\n    elif index == 4:\n        tw.story.narrate(\n            \"Pierre flourishes his charcoal pencil in a wide arc: 'Mon ami, street art is pure unadulterated distortion! \"\n            \"Every person has a feature screaming to be magnified ten-fold! \"\n            \"You can choose a preset caricature or simply tell me what to draw in the chat! \"\n            \"And to toggle between lightning-fast sketches and high-definition brushwork, \"\n            \"simply flip the Art Engine Quality Switch on the wall!'\"\n        )\n    else:\n        tw.story.narrate(\n            \"Pierre bows low with dramatic flair: 'Take your time! The muse waits for no one, but I am patient!'\"\n        )\n\n\ndef on_choose_chimp_action(index):\n    model = get_art_model()\n    if index == 0:\n        tw.vars.set(\"awaiting_custom_art\", \"BABU\")\n        tw.story.narrate(\n            \"Babu chatters eagerly, patting his canvas with both sticky paws! \"\n            \"*Type what you would like Babu to paint into the chat (for example: \\\"A fluffy dog\\\" or \\\"A castle in space\\\"), \"\n            \"and he will transform it into a vibrant banana-themed finger painting!*\"\n        )\n    elif index == 1:\n        tw.story.narrate(\n            f\"Babu shrieks with excitement, smearing vibrant yellow paint across the canvas using the **{model.upper()}** engine...\"\n        )\n        prompt = (\n            \"A vibrant childlike kindergarten finger painting of a giant bright yellow banana rocket blasting off into starry space \"\n            \"with colorful crayon exhaust flames, cute messy finger-paint scribbles, bright cheerful colors, painted by a child\"\n        )\n        caption = \"Babu's finger-painted Banana Rocket blasting into space\"\n        url = tw.image.generate(\n            prompt,\n            model=model,\n            apply_style=False,\n            show_in_chat=True,\n            caption=caption,\n        )\n        if not url:\n            tw.story.narrate(\n                f\"Babu proudly pats a messy, joyful finger painting showing a bright yellow banana rocket rocketing past multicolored stars! (Image generation fallback: {caption})\"\n            )\n    elif index == 2:\n        tw.story.narrate(\n            f\"Babu gleefully dabs his knuckles into yellow, red, and blue pots of paint using the **{model.upper()}** engine...\"\n        )\n        prompt = (\n            \"A naive and charming children's crayon and finger-paint drawing of a smiling armored knight wearing a crown made of bright yellow bananas, \"\n            \"clumsy colorful brushstrokes, kindergarten art style, messy paint splatters\"\n        )\n        caption = \"Babu's crayon masterpiece: The Banana King Knight\"\n        url = tw.image.generate(\n            prompt,\n            model=model,\n            apply_style=False,\n            show_in_chat=True,\n            caption=caption,\n        )\n        if not url:\n            tw.story.narrate(\n                f\"Babu claps his sticky paws and presents a charming children's finger painting of a knight crowned with a bunch of bananas! (Image generation fallback: {caption})\"\n            )\n    elif index == 3:\n        tw.story.narrate(\n            f\"Babu swirls his palms around the canvas in wide, happy circles using the **{model.upper()}** engine...\"\n        )\n        prompt = (\n            \"A playful childlike finger painting of a tropical jungle sunset, giant yellow curved bananas growing as palm trees, \"\n            \"purple and orange crayon sky, cheerful naive children's drawing, vibrant gouache and finger marks\"\n        )\n        caption = \"Babu's jungle sunset where every tree is a banana\"\n        url = tw.image.generate(\n            prompt,\n            model=model,\n            apply_style=False,\n            show_in_chat=True,\n            caption=caption,\n        )\n        if not url:\n            tw.story.narrate(\n                f\"Babu chatters happily, revealing a vivid childlike painting of a jungle where every palm tree is a curved golden banana! (Image generation fallback: {caption})\"\n            )\n    elif index == 4:\n        tw.story.narrate(\n            \"You give Babu an enthusiastic high-five! He leaves a sticky yellow banana-paint handprint across your palm, \"\n            \"does a joyful backflip, and chatters with delight.\"\n        )\n    else:\n        tw.story.narrate(\n            \"Babu gives a gentle chimp grunt, scratching his chin with a paint-covered knuckle, and returns to peeling a banana.\"\n        )"
     },
     {
       "id": "COMBAT_LAB",
       "label": "Combat Lab",
       "description": "A spacious, padded training room built for combat and loot evaluation. White boundary lines mark the floor mats. Training Guard Harlan and Spark Mage Ilya spar as a team: attack one of them and the other joins the bout. Caretaker Edgar patrols the mats with his mop and wades into any fight that dirties them. Grokh the caveman only fights for himself and stays out of other bouts unless you attack him. Grandmaster Li hovers at the edge of the mat as referee and cannot be fought. The Arena Combat Console beside the entrance deploys or recalls the opponents and switches the team rules. For stress tests, the console can also release a swarm of arena rats through a floor grate: up to twenty frail rats that fight as one pack. The only door leads back to the Entry Hall.",
       "image_url": "assets/01a1842e-91c4-75fc-8323-d42e64857464_scene_a71b843f.jpg",
+      "audio_track_id": "db58c393ce02",
       "decorative_objects": [
         "padded floor mats",
         "white boundary lines",
@@ -322,6 +411,7 @@
       "label": "Guild Treasury",
       "description": "A hidden vaulted stone chamber lit by eternal blue witchlight. Ornate shelves and ironbound chests line the walls, and at the centre of the room stands a polished marble pedestal adorned with black velvet, built to safeguard the guild master's most precious relics.",
       "image_url": "assets/69c6f653_scene.webp",
+      "audio_track_id": null,
       "decorative_objects": [
         "eternal blue witchlight sconces",
         "ironbound stone chests",
@@ -341,6 +431,7 @@
       "label": "A locked room",
       "description": "Who knows what's in here?",
       "image_url": "assets/01a186c9-0a80-7d95-bc20-202984f42b50_scene_64d7792e.jpg",
+      "audio_track_id": null,
       "decorative_objects": [],
       "on_enter_scene_script": "if not tw.sequences.is_completed(\"SEQ_LOCKED_ROOM\") and not tw.sequences.is_active(\"SEQ_LOCKED_ROOM\"):\n    tw.sequences.start(\"SEQ_LOCKED_ROOM\")\ntw.story.direct(\"Give a funny explaination why this room ist still empty.\")\ntw.npcs.move_to_player(\"UNIT_SEVEN\", \"right in front of the player\")\ntw.npcs.say(\"UNIT_SEVEN\", \"Don't mind me. I am just here for the jump scare.\")",
       "on_enter_scene_text": null,
@@ -353,6 +444,7 @@
       "label": "Riddle Lab",
       "description": "A cramped alchemist's laboratory under a layer of dust. A massive oak table holds five open caskets in a row, numbered 1 to 5 from left to right, each made of a different material. Beside them five strange trinkets lie on a velvet cloth, next to an open parchment diary. A brass lever juts from the table's edge. Above the far wall a stone gargoyle bust watches everything with open contempt.",
       "image_url": "assets/01a18e10-5de1-7ab0-8ec6-02838b4afff8_scene_16bc8366.jpg",
+      "audio_track_id": "STONE_ECHOES",
       "decorative_objects": [
         "massive oak table",
         "velvet cloth",
@@ -372,6 +464,7 @@
       "label": "Conversation Lab",
       "description": "A brightly lit hall for social and NPC scripting experiments. In the center stands a round oak table with five chairs; four are occupied by Nora Quill, Bram Ironhand, Vesper Glass, and the automaton Unit Seven, while the fifth sits empty since Pip Fenwick wandered off to the Teleportation Lab. Clipped to the edge of the table is a laminated QA Social Hall Guide. Mounted on the north wall is the labeled Test Panel for mood, song, ongoing poison, and healing tests, and beside it stands the Crate of Absurdities.",
       "image_url": "assets/01a1842e-91c4-75fc-8323-d42e64857464_scene_d6a5daa7.jpg",
+      "audio_track_id": "HEARTHFIRE_LULLABY",
       "decorative_objects": [
         "round oak table",
         "five wooden chairs",
@@ -390,6 +483,7 @@
       "label": "Switch Lab",
       "description": "Cozy living room with a huge TV, a refrigerator, a popcorn machine, a microwave, and a beverage dispenser. The power in this room seems to be turned off. Maybe there is a fuse box? The only thing running is the atomic refrigerator.",
       "image_url": "assets/01a1842e-91c4-75fc-8323-d42e64857464_scene_8c42c2db.jpg",
+      "audio_track_id": "f29e315ec797",
       "decorative_objects": [
         "dead wall clock",
         "dark television screen",
@@ -401,7 +495,7 @@
       ],
       "on_enter_scene_script": "if not tw.sequences.is_completed(\"SEQ_SWITCH_LAB\") and not tw.sequences.is_active(\"SEQ_SWITCH_LAB\"):\n    tw.sequences.start(\"SEQ_SWITCH_LAB\")",
       "on_enter_scene_text": null,
-      "on_leave_scene_script": null,
+      "on_leave_scene_script": "tw.audio.release()",
       "on_leave_scene_text": null,
       "helpers_script": null
     },
@@ -410,6 +504,7 @@
       "label": "Teleportation Lab",
       "description": "Interdimensional teleportation laboratory. An elevated metal platform hums in the middle, surrounded by tangled bundles of cables and frost-covered cooling pipes. Monitors flicker on the walls, dangling electrode arms twitch over scorched floor panels. Professor Pip Fenwick dances between the consoles, criticizes the chalk formulas on the cooling tubes, and impatiently waves every visitor onto the marked plate.",
       "image_url": "assets/01a18b89-cd56-72bd-a393-2c2e53bb548c_scene_b32d2ba2.jpg",
+      "audio_track_id": "LABORATORIUM",
       "decorative_objects": [
         "raised metal platform",
         "tangled cable coils",
@@ -430,6 +525,7 @@
       "label": "Time Machine Lab",
       "description": "A futuristic testing laboratory dedicated to chronological mechanics. Copper coils hum along the vaulted ceiling, chalkboards are dense with timeline paradox equations, and wall-mounted chronometers click in synchronized cadence. At the center of the chamber stands the gleaming Chronos-5000 Time Machine, flanked by an observation periscope, a high-precision wall chronometer, and Professor Timothy Chronos pacing beside a clockwork rooster and a very sleepy dusk cat.",
       "image_url": "assets/01a196a6-e74f-723b-9a86-eb3133d70ade_scene_bbfad113.jpg",
+      "audio_track_id": "LABORATORIUM",
       "decorative_objects": [
         "humming copper temporal coil",
         "wall of ticking chronometers",
@@ -449,6 +545,7 @@
       "label": "Item Lab",
       "description": "A tidy, brightly lit room designed for testing item interactions, containers, locks, readable logs, crafting, and switch mechanics. A sturdy wooden workbench runs along the center of the room. Arranged around the bench are an unlocked Supply Crate, a locked Code Box with a keypad, a portable Bench Note, and a wall-mounted Shortcut Switch. A normal door leads west back to the Conversation Hall, while a heavy keyed door leads south to the Combat Arena.",
       "image_url": "assets/01a1842e-91c4-75fc-8323-d42e64857464_scene_5d9bfca0.jpg",
+      "audio_track_id": "f29e315ec797",
       "decorative_objects": [
         "sturdy wooden workbench",
         "tool pegboard",
@@ -592,6 +689,29 @@
       "code_to_unlock": "",
       "item_to_unlock": "",
       "rule_to_unlock": "",
+      "unlock_expression": null,
+      "on_open_exit_script": null,
+      "on_open_exit_text": null,
+      "on_exit_used_script": null,
+      "on_exit_used_text": null,
+      "on_unlock_success_script": null,
+      "on_unlock_success_text": null,
+      "on_unlock_failure_script": null,
+      "on_unlock_failure_text": null,
+      "is_bidirectional": true
+    },
+    {
+      "id": "01a1ba92-7972-7430-885e-3b83bb3287a2",
+      "from_scene_id": "ENTRY_HALL",
+      "to_scene_id": "ART_LAB",
+      "label": "Paint-splattered glass door",
+      "exit_type": "bidirectional",
+      "is_locked": false,
+      "is_revealed": true,
+      "lock_description": null,
+      "code_to_unlock": null,
+      "item_to_unlock": null,
+      "rule_to_unlock": null,
       "unlock_expression": null,
       "on_open_exit_script": null,
       "on_open_exit_text": null,
@@ -1168,6 +1288,28 @@
       "on_interact_script": "if tw.time.hour == 18:\n    tw.npcs.say(\"NPC_CAT\", \"MREEEOW! MIAUUU! It is 18:00! Dusk has fallen! Where is my temporal fish dinner?!\")\n    tw.story.narrate(\"Schr\u00f6dinger rubs vigorously against your shins, her amber chronometer collar chiming insistently.\")\nelse:\n    tw.npcs.say(\"NPC_CAT\", \"Purrrr... Wake me at 18:00. Not a minute earlier... (\" + time_lab_clock_str() + \")\")\n    tw.story.narrate(\"Schr\u00f6dinger opens one lazy slit of an emerald eye, turns around on the warm tachyon coil, and goes back to sleep.\")"
     },
     {
+      "id": "NPC_CHIMP_ARTIST",
+      "entity_type": "NPC",
+      "name": "Babu the Chimp Prodigy",
+      "description": "A joyful chimpanzee wearing a backwards baseball cap and a bib drenched in banana puree and finger paint. He sits cross-legged before a low canvas, dipping his knuckles into yellow, red, and blue gouache and compulsively drawing banana motifs in cheerful kindergarten style.",
+      "appearance": "lively chimpanzee in a paint-splattered bib and cap, surrounded by finger paint",
+      "current_scene_id": "ART_LAB",
+      "image_url": "assets/2015a040_npc-chimp-artist.webp",
+      "is_hidden": false,
+      "movement_type": "STATIONARY",
+      "moveable": false,
+      "allowed_scenes": [],
+      "goal": "Paint cheerful, naive children's pictures filled with bright yellow bananas.",
+      "character": "Playful, excitable, and affectionate primate painter whose creative universe revolves around bananas and finger painting.",
+      "hp": 20,
+      "max_hp": 20,
+      "is_attackable": true,
+      "is_killable": false,
+      "inventory": [],
+      "on_interact_script": "msg = str(tw.turn.player_message or '').strip()\nmsg_lower = msg.lower()\nif any(w in msg_lower for w in ('paint', 'draw', 'sketch', 'banana')) and not msg_lower.startswith(('talk', 'inspect', 'look', 'examine')):\n    generate_custom_banana_art(msg)\nelse:\n    show_chimp_dialog()",
+      "on_receive_item_script": "if 'ITEM_RIPE_BANANA' in received_item_ids:\n    tw.story.narrate(\"Babu lets out an ecstatic screech of gratitude, peels a banana in half a second, eats it in two bites, and smears the peel enthusiastically across a blank canvas!\")\nelse:\n    tw.story.narrate(\"Babu sniffs the item curiously, examines it for any sign of yellow fruit, and sets it politely beside his paint pots.\")"
+    },
+    {
       "id": "NPC_ROOSTER",
       "entity_type": "NPC",
       "name": "Barnaby the Chrono-Rooster",
@@ -1192,6 +1334,27 @@
         "attack_mode": "PASSIVE"
       },
       "on_interact_script": "if tw.time.hour == 6:\n    tw.npcs.say(\"NPC_ROOSTER\", \"KIKERIKI! COCK-A-DOODLE-DOO! Right on time! It is 06:00 in the morning!\")\n    tw.story.narrate(\"Barnaby puffs his polished brass feathers proudly, his pendulum tail swinging at top speed.\")\nelse:\n    tw.npcs.say(\"NPC_ROOSTER\", \"Tick-tock, cluck! It is not 06:00 yet! Current time is \" + time_lab_clock_str() + \". Come back at dawn or use the Time Machine!\")\n    tw.story.narrate(\"Barnaby consults his internal pendulum and clicks his brass beak dismissively.\")"
+    },
+    {
+      "id": "NPC_STREET_ARTIST",
+      "entity_type": "NPC",
+      "name": "Pierre the Caricaturist",
+      "description": "A flamboyant bohemian street artist in an oversized beret and paint-smeared smock. He studies facial features with intense theatrical squinting, ready to stretch skulls, balloon noses, and shrink torsos into grotesque, hilarious street caricatures.",
+      "appearance": "eccentric street caricaturist in a beret with charcoal fingers and an easel",
+      "current_scene_id": "ART_LAB",
+      "image_url": "assets/72cac108_npc-street-artist.webp",
+      "is_hidden": false,
+      "movement_type": "STATIONARY",
+      "moveable": false,
+      "allowed_scenes": [],
+      "goal": "Draw wild, exaggerated street caricatures of visitors with absurd proportions.",
+      "character": "Flamboyant, passionate, and dramatically expressive street artist obsessed with exaggerated anatomical proportions.",
+      "hp": 20,
+      "max_hp": 20,
+      "is_attackable": true,
+      "is_killable": false,
+      "inventory": [],
+      "on_interact_script": "msg = str(tw.turn.player_message or '').strip()\nmsg_lower = msg.lower()\nif any(w in msg_lower for w in ('paint', 'draw', 'sketch', 'caricature', 'portrait')) and not msg_lower.startswith(('talk', 'inspect', 'look', 'examine')):\n    generate_custom_caricature(msg)\nelse:\n    show_artist_dialog()"
     },
     {
       "id": "PIP",
@@ -1284,7 +1447,7 @@
         "special_actions": [],
         "attack_mode": "PASSIVE"
       },
-      "on_interact_script": "tw.npcs.say_directed('RECEPTION_BOT', 'lets out an exaggerated mechanical sigh, complains that management bolted the FAQ Info Console literally inches from her elbow so she would not have to repeat the Test-Lab orientation speech, and gives a brief, bitingly sarcastic summary of the facility')",
+      "on_interact_script": "tw.npcs.say_directed('RECEPTION_BOT', 'lets out an exaggerated mechanical sigh, points Alex to the FAQ Info Console and the fresh What\\'s New bulletin on her desk, and dryly mutters that management added an entire Art Lab with a painting chimpanzee just to see if the server would catch fire')",
       "on_receive_item_script": "tw.npcs.say_directed('RECEPTION_BOT', 'stares with profound digital exhaustion at the received item, stamps a red VOID form on it, and dryly asks if Alex is actively trying to overload the facility lost-and-found bin')"
     },
     {
@@ -1842,6 +2005,26 @@
       "hp_change": 0,
       "stamina_change": 0,
       "mana_change": 0
+    },
+    {
+      "id": "ART_STUDIO_GUIDE",
+      "entity_type": "OBJECT",
+      "name": "Art Lab QA Guide",
+      "description": "A laminated QA handbook detailing the in-game image generation test procedures, model switching, and prompt styling.",
+      "appearance": "laminated QA clipboard with a colorful brush-stroke logo",
+      "current_scene_id": "ART_LAB",
+      "image_url": "assets/90900c1a_art-studio-guide.webp",
+      "item_type": "READABLE",
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": true,
+      "is_final_state": false,
+      "inventory": [],
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0,
+      "text_log_content": "=== QA TEST LAB \u2014 ART & IMAGE GENERATION EXPERIMENTS ===\n\nWelcome to the Art Lab! In-game image generation test features:\n\n1. THE ARTISTS\n\u2022 Pierre the Caricaturist: Absurd street caricatures.\n\u2022 Babu the Chimp Prodigy: Joyful banana finger-paintings.\n\n2. CUSTOM PROMPT GENERATION (NEW!)\n\u2022 Type directly in chat: 'Paint a picture of a dog' or 'Pierre, draw a knight'.\n\u2022 Or choose 'Custom Commission' in the artist dialog to enter a subject.\n\u2022 The artist uses tw.llm.ask to craft an art prompt from your text and tw.image.generate to render it!\n\n3. MODEL SWITCHING\n\u2022 Toggle the Art Engine Quality Switch between Simple Model and HQ Model.",
+      "text_log_format": "DOCUMENT"
     },
     {
       "id": "BENCH_NOTE",
@@ -2925,6 +3108,27 @@
       "on_items_removed_script": "pm = tw.objects.get('ITEM_POPCORN_MACHINE')\nrequired = {'ITEM_RAW_CORN', 'ITEM_BUTTER', 'ITEM_SUGAR'}\ncurrent = set(pm.item_ids)\nif not required.issubset(current):\n    pm.disable_state('POP')\n    if tw.vars.get('power_on', False):\n        pm.set_status_text('Insert Raw Corn, Popcorn Butter, and Sugar into the 3 slots to unlock Pop Corn.')\n    else:\n        pm.set_status_text('The popcorn machine needs some electrical power first.')"
     },
     {
+      "id": "ITEM_RADIO",
+      "entity_type": "OBJECT",
+      "name": "Old radio",
+      "description": "An old radio",
+      "current_scene_id": "SWITCH_LAB",
+      "image_url": "assets/2a47c79f_item-radio.webp",
+      "item_type": "DEFAULT",
+      "wearable_slots": [],
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": false,
+      "combination_ingredients": [],
+      "is_final_state": false,
+      "stat_modifier_strength": 0,
+      "inventory": [],
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0,
+      "on_interact_script": "if tw.vars.get('power_on'):\n    tw.audio.stop_speech(fade=0.5)\n    tw.story.system(\"The radio cracks and starts to play.\")\n    tw.audio.play('GLOWBERTINE_CREAM', volume=0.6)\n    tw.story.skip_narration()\nelse:\n    tw.story.narrate(\"The radio is silent. Maybe it needs some power first?\")"
+    },
+    {
       "id": "ITEM_RAW_CORN",
       "entity_type": "OBJECT",
       "name": "Raw Corn",
@@ -2932,6 +3136,24 @@
       "current_scene_id": "SWITCH_LAB",
       "image_url": "assets/01a18b89-cd56-72bd-a393-2c2e53bb548c_item-raw-corn_0703f726.jpg",
       "item_type": "DEFAULT",
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": true,
+      "is_final_state": false,
+      "inventory": [],
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0
+    },
+    {
+      "id": "ITEM_RIPE_BANANA",
+      "entity_type": "OBJECT",
+      "name": "Bunch of Ripe Bananas",
+      "description": "A cluster of bright yellow bananas resting in a wooden bowl near Babu's easel. Perfectly ripe and prime inspiration for primate art.",
+      "appearance": "bunch of ripe yellow bananas in a carved wooden bowl",
+      "current_scene_id": "ART_LAB",
+      "image_url": "assets/ebc275d9_item-ripe-banana.webp",
+      "item_type": "CONSUMABLE",
       "is_in_inventory": false,
       "is_hidden": false,
       "is_portable": true,
@@ -3621,6 +3843,53 @@
       "rule_to_unlock": ""
     },
     {
+      "id": "SW_IMAGE_MODEL",
+      "entity_type": "OBJECT",
+      "name": "Art Engine Quality Switch",
+      "description": "A heavy industrial toggle switch mounted on the central pillar. A brass placard reads: 'MODEL SELECTOR \u2014 Toggle between Simple Model (fast sketching) and HQ Model (high-fidelity rendering)'. Flipping it switches the model used for generated artwork.",
+      "appearance": "heavy brass industrial toggle switch with a dual-position Simple/HQ indicator",
+      "current_scene_id": "ART_LAB",
+      "image_url": "assets/abc16db0_sw-image-model.webp",
+      "item_type": "SWITCH",
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": false,
+      "is_final_state": false,
+      "inventory": [],
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0,
+      "switch_states": [
+        "SIMPLE",
+        "HQ"
+      ],
+      "switch_state_labels": {
+        "SIMPLE": "Simple Model",
+        "HQ": "HQ Model"
+      },
+      "switch_initial_state": "SIMPLE",
+      "switch_disabled_states": [],
+      "switch_status_text": "",
+      "switch_transitions": [
+        {
+          "from": "SIMPLE",
+          "to": "HQ",
+          "success_message": "You flip the heavy toggle switch to HQ Model. The art engine hums with high-definition rendering coils!",
+          "on_success_script": "tw.vars.set('art_model_tier', 'hq')\ntw.story.system('Art Engine model switched to: HQ Model.')"
+        },
+        {
+          "from": "HQ",
+          "to": "SIMPLE",
+          "success_message": "You toggle the switch back to Simple Model. The art engine drops into swift sketch mode!",
+          "on_success_script": "tw.vars.set('art_model_tier', 'simple')\ntw.story.system('Art Engine model switched to: Simple Model.')"
+        }
+      ],
+      "switch_outcomes": [],
+      "on_success_script": "",
+      "on_failure_script": "",
+      "on_interact_script": "current = tw.switches.get_state('SW_IMAGE_MODEL', 'SIMPLE')\ntw.story.narrate(f\"The Art Engine Quality Switch is set to **{current} Model**. Use the switch controls to toggle between Simple Model and HQ Model.\")"
+    },
+    {
       "id": "SW_TV",
       "entity_type": "OBJECT",
       "name": "TV",
@@ -3870,6 +4139,26 @@
       "stamina_change": 0,
       "mana_change": 0,
       "on_interact_script": "teleport_unit_seven()"
+    },
+    {
+      "id": "WHATS_NEW_NOTICE",
+      "entity_type": "OBJECT",
+      "name": "What's New Bulletin",
+      "description": "A freshly printed QA changelog bulletin pinned to the reception desk noticeboard beside Vera. It summarizes recent test additions: the new Art Lab scene, the vintage radio in the Switch Lab, and the background music system.",
+      "appearance": "bulletin printout with bold 'WHAT'S NEW' lettering and colorful QA checkmarks",
+      "current_scene_id": "ENTRY_HALL",
+      "image_url": "assets/989c86c5_whats-new-notice.webp",
+      "item_type": "READABLE",
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": true,
+      "is_final_state": false,
+      "inventory": [],
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0,
+      "text_log_content": "=== WHAT'S NEW IN THE TEST-LAB ===\n\nWelcome back, QA Tester Alex Vale! New facilities & features wired for testing:\n\n1. NEW SCENE: ART LAB (IN-GAME IMAGE GENERATION)\n\u2022 Passage: Paint-splattered glass door in Entry Hall.\n\u2022 Scripting API: tw.image.generate(prompt, model=...)\n\u2022 Pierre the Caricaturist: Exaggerated street-style caricatures with absurd proportions.\n\u2022 Babu the Chimp Prodigy: Joyful, childlike finger paintings of bananas.\n\u2022 Art Engine Quality Switch: Heavy toggle to switch between Simple Model (fast sketch) and HQ Model (high-fidelity rendering).\n\n2. VINTAGE RADIO IN THE SWITCH-LAB\n\u2022 Antique radio receiver in the living room test suite alongside the TV and atomic fridge.\n\u2022 Test audio dial tuning and switch-controlled broadcasts.\n\n3. BACKGROUND MUSIC & AUDIO ENGINE\n\u2022 Dynamic background music generation and track library integration.\n\u2022 Custom atmospheric audio assigned per scene (e.g. Hearthfire Lullaby in Conversation Hall).",
+      "text_log_format": "DOCUMENT"
     }
   ],
   "quests": [
@@ -4009,7 +4298,7 @@
       "description": "Beamed in a rat, a grandmother and finally the right automaton. Third time lucky.",
       "tier": "silver",
       "requirement": "Unit Seven is teleported into the Teleportation Lab.",
-      "is_earned": false,
+      "is_earned": true,
       "required_item_id": "",
       "required_scene_id": "",
       "required_defeated_npc_id": "",
@@ -4283,6 +4572,15 @@
       "trigger": "on_logic_pass_done",
       "target": "*",
       "code": "if tw.vars.get(\"social_hall_poison_active\", False) and tw.scene.id == \"SOCIAL_HALL\":\n    living = [npc for npc in tw.scene.npcs if not npc.is_defeated and not npc.is_hidden]\n    if living:\n        for npc in living:\n            npc.damage(6)\n        tw.story.system(\n            \"Ongoing poison tick: the lingering green test-toxin deals 6 poison damage to all NPCs in the Conversation Hall.\"\n        )\n        tick_count = tw.vars.get(\"social_poison_tick_idx\", 0)\n        speaker_npc = living[tick_count % len(living)]\n        tw.vars.set(\"social_poison_tick_idx\", tick_count + 1)\n        tw.npcs.say_directed(\n            speaker_npc.id,\n            \"coughs or sparks and complains in character about the ongoing poison fumes still draining everyone's health until someone presses the heal button on the Test Panel\",\n        )\n",
+      "priority": 100,
+      "is_active": true
+    },
+    {
+      "id": "SCRIPT_ART_LAB_DIRECT_REQUEST",
+      "name": "Art Lab Direct Paint Commands",
+      "trigger": "on_logic_pass_done",
+      "target": null,
+      "code": "if tw.scene.id == 'ART_LAB':\n    msg = str(tw.turn.player_message or '').strip()\n    msg_lower = msg.lower()\n    awaiting = tw.vars.get('awaiting_custom_art')\n    if awaiting == 'PIERRE':\n        tw.vars.delete('awaiting_custom_art')\n        generate_custom_caricature(msg)\n    elif awaiting == 'BABU':\n        tw.vars.delete('awaiting_custom_art')\n        generate_custom_banana_art(msg)\n    elif any(w in msg_lower for w in ('paint', 'draw', 'sketch', 'caricature')):\n        if 'babu' in msg_lower or 'chimp' in msg_lower or 'banana' in msg_lower:\n            generate_custom_banana_art(msg)\n        else:\n            generate_custom_caricature(msg)",
       "priority": 100,
       "is_active": true
     }
