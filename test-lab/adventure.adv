@@ -4,9 +4,9 @@
   "adventure": {
     "origin_id": "24ea7f1e-4100-4693-b352-21c8ad5ae3bc",
     "title": "Test-Lab",
-    "teaser": "A dedicated testing facility built to explore and benchmark TaleWeaver's engine capabilities—from reactive storytelling and tactical combat to complex world puzzles and in-game image generation.",
+    "teaser": "A dedicated testing facility built to explore and benchmark TaleWeaver's engine capabilities\u2014from reactive storytelling and tactical combat to complex world puzzles and in-game image generation.",
     "cover_appearance": "clean stone and brass testing laboratory, workbench with gears, training arena doors, warm lighting",
-    "version": "1.2.3",
+    "version": "1.2.4",
     "creator": "Jean Schmitz",
     "copyright": "Copyright (c) 2026 by Jean Schmitz",
     "license": "CC BY-NC 4.0",
@@ -3126,7 +3126,7 @@
       "hp_change": 0,
       "stamina_change": 0,
       "mana_change": 0,
-      "on_interact_script": "if tw.vars.get('power_on'):\n    tw.audio.stop_speech(fade=0.5)\n    tw.story.system(\"The radio cracks and starts to play.\")\n    tw.audio.play('GLOWBERTINE_CREAM', volume=0.6)\n    tw.story.skip_narration()\nelse:\n    tw.story.narrate(\"The radio is silent. Maybe it needs some power first?\")"
+      "on_interact_script": "if tw.vars.get(\"radio_playing\", False) or tw.audio.is_playing:\n    tw.vars.set(\"radio_playing\", False)\n    tw.audio.stop(fade=1.0)\n    tw.story.system(\"You click the switch on the old radio, turning it off. Silence returns to the living room.\")\nelse:\n    if tw.vars.get(\"power_on\"):\n        tw.vars.set(\"radio_playing\", True)\n        tw.story.system(\"The radio cracks and starts to play.\")\n        tw.audio.play(\"GLOWBERTINE_CREAM\", volume=0.8)\n        tw.story.skip_narration()\n    else:\n        tw.story.narrate(\"The radio is silent. Maybe it needs some power first?\")"
     },
     {
       "id": "ITEM_RAW_CORN",
@@ -3331,17 +3331,17 @@
         {
           "to": "CHANNEL-SPORT",
           "gates": {},
-          "on_success_script": "if tw.switches.get_state(\"SW_TV\", \"OFF\") == \"OFF\":\n    tw.switches.set_state(\"SW_TV\", \"ON\")\n    \ntw.story.system(\"The TV flickers and switches to the Sports Channel.\")\n    \nsports = tw.llm.ask(\n    \"Write a short sports commentary like on a TV sports show.\",\n    model=\"simple\",\n)\ntw.story.narrate_raw(sports or \"Just static noise.\")"
+          "on_success_script": "if tw.switches.get_state(\"SW_TV\", \"OFF\") == \"OFF\":\n    tw.switches.set_state(\"SW_TV\", \"ON\")\n\nif tw.vars.get(\"radio_playing\", False) or tw.audio.is_playing:\n    tw.vars.set(\"radio_playing\", False)\n    tw.audio.stop(fade=0.5)\n\ntw.story.system(\"The TV flickers and switches to the Sports Channel.\")\n\nsports = tw.llm.ask(\n    \"Write a short sports commentary like on a TV sports show.\",\n    model=\"simple\",\n)\ntw.story.narrate(sports or \"Just static noise.\")"
         },
         {
           "to": "CHANNEL-NEWS",
           "gates": {},
-          "on_success_script": "if tw.switches.get_state(\"SW_TV\", \"OFF\") == \"OFF\":\n    tw.switches.set_state(\"SW_TV\", \"ON\")\n\ntw.story.system(\"The TV flickers and switches to the News Channel.\")\n    \nnews = tw.llm.ask(\n    \"Write some absurd news commentary like in a TV broadcast.\",\n    model=\"simple\",\n)\ntw.story.narrate_raw(news or \"Just static noise.\")"
+          "on_success_script": "if tw.switches.get_state(\"SW_TV\", \"OFF\") == \"OFF\":\n    tw.switches.set_state(\"SW_TV\", \"ON\")\n\nif tw.vars.get(\"radio_playing\", False) or tw.audio.is_playing:\n    tw.vars.set(\"radio_playing\", False)\n    tw.audio.stop(fade=0.5)\n\ntw.story.system(\"The TV flickers and switches to the News Channel.\")\n\nnews = tw.llm.ask(\n    \"Write some absurd news commentary like in a TV broadcast.\",\n    model=\"simple\",\n)\ntw.story.narrate(news or \"Just static noise.\")"
         },
         {
           "to": "CHANNEL-SITCOM",
           "gates": {},
-          "on_success_script": "if tw.switches.get_state(\"SW_TV\", \"OFF\") == \"OFF\":\n    tw.switches.set_state(\"SW_TV\", \"ON\")\n\ntw.story.system(\"The TV flickers and switches to the Sitcom Channel.\")\n    \nsitcom = tw.llm.ask(\n    \"Write some funny sitcom lines like in a TV broadcast.\",\n    model=\"simple\",\n)\ntw.story.narrate_raw(sitcom or \"Just static noise.\")"
+          "on_success_script": "if tw.switches.get_state(\"SW_TV\", \"OFF\") == \"OFF\":\n    tw.switches.set_state(\"SW_TV\", \"ON\")\n\nif tw.vars.get(\"radio_playing\", False) or tw.audio.is_playing:\n    tw.vars.set(\"radio_playing\", False)\n    tw.audio.stop(fade=0.5)\n\ntw.story.system(\"The TV flickers and switches to the Sitcom Channel.\")\n\nsitcom = tw.llm.ask(\n    \"Write some funny sitcom lines like in a TV broadcast.\",\n    model=\"simple\",\n)\ntw.story.narrate(sitcom or \"Just static noise.\")"
         },
         {
           "to": "OFF",
