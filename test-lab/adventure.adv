@@ -4,7 +4,7 @@
   "adventure": {
     "origin_id": "24ea7f1e-4100-4693-b352-21c8ad5ae3bc",
     "title": "Test-Lab",
-    "teaser": "A compact three-room QA test lab for conversation, item mechanics, switches, and turn-based combat.",
+    "teaser": "A dedicated testing facility built to explore and benchmark TaleWeaver's engine capabilities—from reactive storytelling and tactical combat to complex world puzzles and in-game image generation.",
     "cover_appearance": "clean stone and brass testing laboratory, workbench with gears, training arena doors, warm lighting",
     "version": "1.2.3",
     "creator": "Jean Schmitz",
