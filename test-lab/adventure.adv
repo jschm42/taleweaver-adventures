@@ -6,7 +6,7 @@
     "title": "Test-Lab",
     "teaser": "A dedicated testing facility built to explore and benchmark TaleWeaver's engine capabilities\u2014from reactive storytelling and tactical combat to complex world puzzles and in-game image generation.",
     "cover_appearance": "clean stone and brass testing laboratory, workbench with gears, training arena doors, warm lighting",
-    "version": "1.2.6",
+    "version": "1.2.7",
     "creator": "Jean Schmitz",
     "copyright": "Copyright (c) 2026 by Jean Schmitz",
     "license": "CC BY-NC 4.0",
@@ -563,7 +563,7 @@
   ],
   "exits": [
     {
-      "id": "01a1acce-3891-7866-8082-22f33a67efe3",
+      "id": "01a1bf00-51e0-73a4-9227-78988a7cc852",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "COMBAT_LAB",
       "label": "Old rusty gate",
@@ -586,7 +586,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a1acce-3892-7aad-8646-2b37505b8b75",
+      "id": "01a1bf00-51e1-7eee-907f-275694ccbdc5",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "SOCIAL_HALL",
       "label": "Hallway",
@@ -609,7 +609,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a1acce-3893-7ee1-8705-b9d54e23c9cc",
+      "id": "01a1bf00-51e2-7ae8-b046-0184c6e0bf73",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "SWITCH_LAB",
       "label": "Iron door",
@@ -632,7 +632,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a1acce-3894-7b8f-ba48-18c0dbb54b9b",
+      "id": "01a1bf00-51e3-7674-8604-254add3462fb",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "WORKSHOP",
       "label": "Wooden door",
@@ -655,7 +655,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a1acce-3895-7d4f-b206-839141d88639",
+      "id": "01a1bf00-51e4-7d75-a8cf-df70c0f83602",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "RIDDLE_LAB",
       "label": "Door with runes",
@@ -678,7 +678,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a1acce-3896-7dca-9cf9-2e1fce622f99",
+      "id": "01a1bf00-51e5-758c-bfc6-b79331a2beb1",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "TIME_MACHINE_LAB",
       "label": "Glowing door",
@@ -701,7 +701,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a1ba92-7972-7430-885e-3b83bb3287a2",
+      "id": "01a1bf00-51e6-7daf-90da-a67c269fcd16",
       "from_scene_id": "ENTRY_HALL",
       "to_scene_id": "ART_LAB",
       "label": "Paint-splattered glass door",
@@ -709,9 +709,9 @@
       "is_locked": false,
       "is_revealed": true,
       "lock_description": null,
-      "code_to_unlock": null,
-      "item_to_unlock": null,
-      "rule_to_unlock": null,
+      "code_to_unlock": "",
+      "item_to_unlock": "",
+      "rule_to_unlock": "",
       "unlock_expression": null,
       "on_open_exit_script": null,
       "on_open_exit_text": null,
@@ -724,7 +724,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a1acce-3897-7151-885e-d493f340cae9",
+      "id": "01a1bf00-51e7-7d56-92f1-10d2187aa4a1",
       "from_scene_id": "RIDDLE_LAB",
       "to_scene_id": "GUILD_VAULT",
       "label": "Secret passage behind the gargoyle",
@@ -747,7 +747,7 @@
       "is_bidirectional": true
     },
     {
-      "id": "01a1acce-3898-7f26-83b8-dc1991a6143b",
+      "id": "01a1bf00-51e8-733b-8503-362f1a473cd6",
       "from_scene_id": "WORKSHOP",
       "to_scene_id": "LOCKED_ROOM",
       "label": "The locked door",
@@ -876,7 +876,7 @@
           "id": "JANITOR_MOP",
           "name": "Edgar's Heavy Industrial Mop",
           "description": "A heavy two-handed industrial mop with a stout varnished ash handle and thick, absorbent grey yarn strands. Surprisingly balanced and packs a heavy bludgeoning blow.",
-          "image_url": "/data/adventures/library/01a1acce-3763-7509-8086-becc658db5bf/01a196a6-e74f-723b-9a86-eb3133d70ade_janitor-mop_a962cbe1.jpg",
+          "image_url": "/data/adventures/library/01a1bf00-4f42-776e-b19a-61836ccda4e4/01a196a6-e74f-723b-9a86-eb3133d70ade_janitor-mop_a962cbe1.jpg",
           "item_type": "WEAPON",
           "slot": "MainHand",
           "text_log_content": "A heavy two-handed industrial mop with a stout varnished ash handle and thick, absorbent grey yarn strands. Surprisingly balanced and packs a heavy bludgeoning blow.",
@@ -889,7 +889,7 @@
           "id": "JANITOR_SOAP",
           "name": "Flask of Industrial Floor Cleaner",
           "description": "A bottle of pungent, foaming floor detergent carried by Edgar. Consuming it restores 15 HP (though it leaves your mouth tasting of aggressive pine disinfectant).",
-          "image_url": "/data/adventures/library/01a1acce-3763-7509-8086-becc658db5bf/01a196a6-e74f-723b-9a86-eb3133d70ade_janitor-soap_715826c1.jpg",
+          "image_url": "/data/adventures/library/01a1bf00-4f42-776e-b19a-61836ccda4e4/01a196a6-e74f-723b-9a86-eb3133d70ade_janitor-soap_715826c1.jpg",
           "item_type": "CONSUMABLE",
           "text_log_content": "A bottle of pungent, foaming floor detergent carried by Edgar. Consuming it restores 15 HP (though it leaves your mouth tasting of aggressive pine disinfectant).",
           "hp_change": 0,
@@ -900,7 +900,7 @@
           "id": "JANITOR_KEYS",
           "name": "Edgar's Master Keyring",
           "description": "A heavy brass keyring holding dozens of labeled and unlabeled keys for utility closets and maintenance hatches across the testing facility.",
-          "image_url": "/data/adventures/library/01a1acce-3763-7509-8086-becc658db5bf/01a196a6-e74f-723b-9a86-eb3133d70ade_janitor-keys_7130c492.jpg",
+          "image_url": "/data/adventures/library/01a1bf00-4f42-776e-b19a-61836ccda4e4/01a196a6-e74f-723b-9a86-eb3133d70ade_janitor-keys_7130c492.jpg",
           "item_type": "PICKABLE",
           "text_log_content": "A heavy brass keyring holding dozens of labeled and unlabeled keys for utility closets and maintenance hatches across the testing facility.",
           "hp_change": 0,
@@ -1063,7 +1063,7 @@
           "id": "PRIMITIVE_SLING",
           "name": "Grokh's Hunting Slingshot",
           "description": "A supple leather sling crafted from braided mammoth hide and cured with woodsmoke. Whirls with lethal velocity to launch polished stones.",
-          "image_url": "/data/adventures/library/01a1acce-3763-7509-8086-becc658db5bf/01a196a6-e74f-723b-9a86-eb3133d70ade_primitive-sling_7ee59d17.jpg",
+          "image_url": "/data/adventures/library/01a1bf00-4f42-776e-b19a-61836ccda4e4/01a196a6-e74f-723b-9a86-eb3133d70ade_primitive-sling_7ee59d17.jpg",
           "item_type": "WEAPON",
           "slot": "MainHand",
           "text_log_content": "A supple leather sling crafted from braided mammoth hide and cured with woodsmoke. Whirls with lethal velocity to launch polished stones.",
@@ -1075,7 +1075,7 @@
           "id": "MAMMOTH_JERKY",
           "name": "Smoked Mammoth Jerky",
           "description": "Tough, salt-crusted strips of prehistoric mammoth meat. Hard to chew, but consuming it restores 20 HP.",
-          "image_url": "/data/adventures/library/01a1acce-3763-7509-8086-becc658db5bf/01a196a6-e74f-723b-9a86-eb3133d70ade_mammoth-jerky_8fb7afbf.jpg",
+          "image_url": "/data/adventures/library/01a1bf00-4f42-776e-b19a-61836ccda4e4/01a196a6-e74f-723b-9a86-eb3133d70ade_mammoth-jerky_8fb7afbf.jpg",
           "item_type": "CONSUMABLE",
           "text_log_content": "Tough, salt-crusted strips of prehistoric mammoth meat. Hard to chew, but consuming it restores 20 HP.",
           "hp_change": 0,
@@ -1086,7 +1086,7 @@
           "id": "KNAPPED_FLINT",
           "name": "Polished River Flint",
           "description": "A beautifully flaked, razor-sharp river flint core carried by Grokh as ammunition and a cutting tool.",
-          "image_url": "/data/adventures/library/01a1acce-3763-7509-8086-becc658db5bf/01a196a6-e74f-723b-9a86-eb3133d70ade_knapped-flint_bff287a3.jpg",
+          "image_url": "/data/adventures/library/01a1bf00-4f42-776e-b19a-61836ccda4e4/01a196a6-e74f-723b-9a86-eb3133d70ade_knapped-flint_bff287a3.jpg",
           "item_type": "PICKABLE",
           "text_log_content": "A beautifully flaked, razor-sharp river flint core carried by Grokh as ammunition and a cutting tool.",
           "hp_change": 0,
@@ -1304,9 +1304,14 @@
       "character": "Playful, excitable, and affectionate primate painter whose creative universe revolves around bananas and finger painting.",
       "hp": 20,
       "max_hp": 20,
+      "voice": "IKne3meq5aSn9XLyUdCD",
       "is_attackable": true,
       "is_killable": false,
       "inventory": [],
+      "metadata_json": {
+        "special_actions": [],
+        "attack_mode": "PASSIVE"
+      },
       "on_interact_script": "msg = str(tw.turn.player_message or '').strip()\nlow = msg.lower()\nis_say = low.startswith(('/say', '/speak'))\nhead, sep, rest = low.partition(':')\n\n# \"/say to Pierre ...: ...\" addresses the other artist.\naddressed_elsewhere = is_say and bool(sep) and 'babu' not in head and 'chimp' not in head\nif is_say:\n    low = rest.strip() if sep else low.split(' ', 1)[-1].strip()\n\n# Paint requests and custom commissions are handled by SCRIPT_ART_LAB_DIRECT_REQUEST.\nasks_for_art = any(w in low for w in ('paint', 'draw', 'sketch', 'picture', 'artwork', 'caricature', 'portrait'))\nother_command = msg.startswith('/') and not is_say\nskip = tw.vars.get('awaiting_custom_art') or addressed_elsewhere or asks_for_art or other_command\n\nif not skip:\n    show_chimp_dialog()",
       "on_receive_item_script": "if 'ITEM_RIPE_BANANA' in received_item_ids:\n    tw.story.narrate(\"Babu lets out an ecstatic screech of gratitude, peels a banana in half a second, eats it in two bites, and smears his paint-covered knuckles across a blank canvas in sheer joy!\")\n    generate_custom_banana_art(\"a glorious golden banana feast\")\nelse:\n    tw.story.narrate(\"Babu sniffs the item curiously, examines it for any sign of yellow fruit, and sets it politely beside his paint pots.\")"
     },
@@ -1353,9 +1358,14 @@
       "character": "Flamboyant, passionate, and dramatically expressive street artist obsessed with exaggerated anatomical proportions.",
       "hp": 20,
       "max_hp": 20,
+      "voice": "cPoqAvGWCPfCfyPMwe4z",
       "is_attackable": true,
       "is_killable": false,
       "inventory": [],
+      "metadata_json": {
+        "special_actions": [],
+        "attack_mode": "PASSIVE"
+      },
       "on_interact_script": "msg = str(tw.turn.player_message or '').strip()\nlow = msg.lower()\nis_say = low.startswith(('/say', '/speak'))\nhead, sep, rest = low.partition(':')\n\n# \"/say to Babu ...: ...\" addresses the other artist.\naddressed_elsewhere = is_say and bool(sep) and 'pierre' not in head and 'caricaturist' not in head\nif is_say:\n    low = rest.strip() if sep else low.split(' ', 1)[-1].strip()\n\n# Paint requests and custom commissions are handled by SCRIPT_ART_LAB_DIRECT_REQUEST.\nasks_for_art = any(w in low for w in ('paint', 'draw', 'sketch', 'picture', 'artwork', 'caricature', 'portrait'))\nother_command = msg.startswith('/') and not is_say\nskip = tw.vars.get('awaiting_custom_art') or addressed_elsewhere or asks_for_art or other_command\n\nif not skip:\n    show_artist_dialog()"
     },
     {
@@ -1485,7 +1495,7 @@
           "id": "MAGE_VIAL",
           "name": "Mage's Mana Vial",
           "description": "A crystalline vial of mana draught carried by Spark Mage Ilya. Consuming it restores 15 Mana.",
-          "image_url": "/data/adventures/library/01a1acce-3763-7509-8086-becc658db5bf/01a1842e-91c4-75fc-8323-d42e64857464_mage-vial_f7e1c4f0.jpg",
+          "image_url": "/data/adventures/library/01a1bf00-4f42-776e-b19a-61836ccda4e4/01a1842e-91c4-75fc-8323-d42e64857464_mage-vial_f7e1c4f0.jpg",
           "item_type": "CONSUMABLE",
           "text_log_content": "A crystalline vial of mana draught carried by Spark Mage Ilya. Consuming it restores 15 Mana.",
           "stat_modifier_strength": 0,
@@ -1502,7 +1512,7 @@
           "id": "MAGE_CHARM",
           "name": "Mage's Charm",
           "description": "A silver neck charm carried by Spark Mage Ilya. Equipping it in the Neck slot grants +1 Intelligence.",
-          "image_url": "/data/adventures/library/01a1acce-3763-7509-8086-becc658db5bf/01a1842e-91c4-75fc-8323-d42e64857464_mage-charm_47582e60.jpg",
+          "image_url": "/data/adventures/library/01a1bf00-4f42-776e-b19a-61836ccda4e4/01a1842e-91c4-75fc-8323-d42e64857464_mage-charm_47582e60.jpg",
           "item_type": "WEARABLE",
           "slot": "Neck",
           "text_log_content": "A silver neck charm carried by Spark Mage Ilya. Equipping it in the Neck slot grants +1 Intelligence.",
@@ -1659,7 +1669,7 @@
           "id": "GUARD_BANDAGE",
           "name": "Guard's Healing Vial",
           "description": "A compact healing vial carried by Training Guard Harlan. Consuming it restores 15 HP.",
-          "image_url": "/data/adventures/library/01a1acce-3763-7509-8086-becc658db5bf/01a1842e-91c4-75fc-8323-d42e64857464_guard-bandage_af297d45.jpg",
+          "image_url": "/data/adventures/library/01a1bf00-4f42-776e-b19a-61836ccda4e4/01a1842e-91c4-75fc-8323-d42e64857464_guard-bandage_af297d45.jpg",
           "item_type": "CONSUMABLE",
           "text_log_content": "A compact healing vial carried by Training Guard Harlan. Consuming it restores 15 HP.",
           "stat_modifier_strength": 0,
@@ -1676,7 +1686,7 @@
           "id": "GUARD_BADGE",
           "name": "Guard Badge",
           "description": "A stamped iron guard badge carried by Training Guard Harlan as a verifiable loot item.",
-          "image_url": "/data/adventures/library/01a1acce-3763-7509-8086-becc658db5bf/01a1842e-91c4-75fc-8323-d42e64857464_guard-badge_ad72aafa.jpg",
+          "image_url": "/data/adventures/library/01a1bf00-4f42-776e-b19a-61836ccda4e4/01a1842e-91c4-75fc-8323-d42e64857464_guard-badge_ad72aafa.jpg",
           "item_type": "PICKABLE",
           "text_log_content": "A stamped iron guard badge carried by Training Guard Harlan as a verifiable loot item.",
           "stat_modifier_strength": 0,
@@ -1693,7 +1703,7 @@
           "id": "GUARD_SWORD",
           "name": "Guard's Training Sword",
           "description": "A sturdy short training sword carried and equipped by Training Guard Harlan.",
-          "image_url": "/data/adventures/library/01a1acce-3763-7509-8086-becc658db5bf/01a1842e-91c4-75fc-8323-d42e64857464_guard-sword_cd82bf5b.jpg",
+          "image_url": "/data/adventures/library/01a1bf00-4f42-776e-b19a-61836ccda4e4/01a1842e-91c4-75fc-8323-d42e64857464_guard-sword_cd82bf5b.jpg",
           "item_type": "WEAPON",
           "slot": "MainHand",
           "text_log_content": "A sturdy short training sword carried and equipped by Training Guard Harlan.",
@@ -1914,6 +1924,331 @@
       "on_interact_script": "open_arena_panel()"
     },
     {
+      "id": "ARMORY_BUNNY_SLIPPERS",
+      "entity_type": "OBJECT",
+      "name": "Bunny Slippers of Haste",
+      "description": "Fluffy bunny slippers that hop on their own. Dexterity +2. They offer no protection whatsoever.",
+      "appearance": "fluffy white bunny slippers, floppy ears, pink felt noses, slightly singed soles",
+      "current_scene_id": "COMBAT_LAB",
+      "spatial_position": "inside the Equipment Locker",
+      "image_url": "assets/3458367c_armory-bunny-slippers.webp",
+      "item_type": "WEARABLE",
+      "wearable_slots": [
+        "Feet"
+      ],
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": true,
+      "is_final_state": false,
+      "stat_modifier_dexterity": 2,
+      "inventory": [],
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0
+    },
+    {
+      "id": "ARMORY_COLANDER_HELM",
+      "entity_type": "OBJECT",
+      "name": "Colander of Clear Thought",
+      "description": "A dented kitchen colander worn as a helmet. It filters out bad ideas: Armor Class +1 and Wisdom +2. Nobody takes you seriously in it: Charisma -2.",
+      "appearance": "dented aluminium colander, chin strap made of a shoelace, a little pasta still stuck in the holes",
+      "current_scene_id": "COMBAT_LAB",
+      "spatial_position": "inside the Equipment Locker",
+      "image_url": "assets/60d69c1a_armory-colander-helm.webp",
+      "item_type": "WEARABLE",
+      "wearable_slots": [
+        "Head"
+      ],
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": true,
+      "is_final_state": false,
+      "stat_modifier_wisdom": 2,
+      "stat_modifier_charisma": -2,
+      "stat_modifier_armor_class": 1,
+      "inventory": [],
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0
+    },
+    {
+      "id": "ARMORY_DUCK_LAUNCHER",
+      "entity_type": "OBJECT",
+      "name": "Rubber Duck Launcher",
+      "description": "A spring-loaded tube that fires squeaking rubber ducks at alarming speed. Deals 1d4+1 damage (Dexterity). Being hit by a duck is deeply humiliating: the target loses 1 Charisma.",
+      "appearance": "bright yellow plastic tube with a crank, bandolier of rubber ducks, googly-eyed sight",
+      "current_scene_id": "COMBAT_LAB",
+      "spatial_position": "inside the Equipment Locker",
+      "image_url": "assets/5f0d2eac_armory-duck-launcher.webp",
+      "item_type": "WEAPON",
+      "wearable_slots": [
+        "OffHand"
+      ],
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": true,
+      "is_final_state": false,
+      "inventory": [],
+      "metadata_json": {
+        "damage_dice": "1d4+1",
+        "weapon_cost_type": "stamina",
+        "weapon_cost_value": 10,
+        "weapon_category": "RANGED",
+        "weapon_hit_stat": "dexterity",
+        "weapon_effects": [
+          {
+            "target": "target",
+            "stat": "charisma",
+            "amount": "-1"
+          }
+        ]
+      },
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0
+    },
+    {
+      "id": "ARMORY_DWARVEN_CHAINMAIL",
+      "entity_type": "OBJECT",
+      "name": "Dwarven Chainmail",
+      "description": "Tight-woven dwarven rings, heavy and nearly impenetrable. Armor Class +4, but the weight costs you 1 Dexterity.",
+      "appearance": "dense steel chainmail shirt, bronze rings at the collar, leather padding underneath",
+      "current_scene_id": "COMBAT_LAB",
+      "spatial_position": "inside the Equipment Locker",
+      "image_url": "assets/37a5063d_armory-dwarven-chainmail.webp",
+      "item_type": "WEARABLE",
+      "wearable_slots": [
+        "Chest"
+      ],
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": true,
+      "is_final_state": false,
+      "stat_modifier_dexterity": -1,
+      "stat_modifier_armor_class": 4,
+      "inventory": [],
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0
+    },
+    {
+      "id": "ARMORY_EMBER_STAFF",
+      "entity_type": "OBJECT",
+      "name": "Ember Staff",
+      "description": "A charred oak staff crowned with a smouldering ember crystal. Hurls fire bolts for 1d6+1 damage (Intelligence) that keep burning for an extra 1d4. Costs mana.",
+      "appearance": "blackened oak staff, glowing orange crystal in iron claws, faint wisps of smoke",
+      "current_scene_id": "COMBAT_LAB",
+      "spatial_position": "inside the Equipment Locker",
+      "image_url": "assets/316201a6_armory-ember-staff.webp",
+      "item_type": "WEAPON",
+      "wearable_slots": [
+        "MainHand"
+      ],
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": true,
+      "is_final_state": false,
+      "inventory": [],
+      "metadata_json": {
+        "damage_dice": "1d6+1",
+        "weapon_cost_type": "mana",
+        "weapon_cost_value": 15,
+        "weapon_category": "MAGIC",
+        "weapon_hit_stat": "intelligence",
+        "weapon_effects": [
+          {
+            "target": "target",
+            "stat": "hp",
+            "amount": "-1d4"
+          }
+        ]
+      },
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0
+    },
+    {
+      "id": "ARMORY_ETERNAL_BAGUETTE",
+      "entity_type": "OBJECT",
+      "name": "Baguette of Unstoppable Freshness",
+      "description": "A rock-hard baguette that has refused to go stale for three hundred years. Deals 1d6 bludgeoning damage (Strength), and you nibble a crumb after every hit: heals you for 1d4.",
+      "appearance": "long golden-brown baguette, cracked crust hard as oak, a single bite mark at one end",
+      "current_scene_id": "COMBAT_LAB",
+      "spatial_position": "inside the Equipment Locker",
+      "image_url": "assets/8cdf7de1_armory-eternal-baguette.webp",
+      "item_type": "WEAPON",
+      "wearable_slots": [
+        "MainHand"
+      ],
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": true,
+      "is_final_state": false,
+      "inventory": [],
+      "metadata_json": {
+        "damage_dice": "1d6",
+        "weapon_cost_type": "stamina",
+        "weapon_cost_value": 10,
+        "weapon_category": "MELEE",
+        "weapon_hit_stat": "strength",
+        "weapon_effects": [
+          {
+            "target": "self",
+            "stat": "hp",
+            "amount": "1d4"
+          }
+        ]
+      },
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0
+    },
+    {
+      "id": "ARMORY_KITE_SHIELD",
+      "entity_type": "OBJECT",
+      "name": "Steel Kite Shield",
+      "description": "A tall kite shield painted with a faded griffin crest. Armor Class +2. Occupies your off hand.",
+      "appearance": "tall teardrop-shaped steel shield, faded red griffin crest, dented rim",
+      "current_scene_id": "COMBAT_LAB",
+      "spatial_position": "inside the Equipment Locker",
+      "image_url": "assets/f49e9ac6_armory-kite-shield.webp",
+      "item_type": "WEARABLE",
+      "wearable_slots": [
+        "OffHand"
+      ],
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": true,
+      "is_final_state": false,
+      "stat_modifier_armor_class": 2,
+      "inventory": [],
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0
+    },
+    {
+      "id": "ARMORY_LOCKER",
+      "entity_type": "OBJECT",
+      "name": "Equipment Locker",
+      "description": "A tall steel locker next to the empty weapon rack, stencilled 'TEST EQUIPMENT - RETURN AFTER USE'. It holds five weapons and five pieces of armor for trying out loadouts: proper adventuring gear and some highly questionable prototypes.",
+      "appearance": "tall dented steel locker, two doors, yellow stencilled lettering, padlock hanging open",
+      "current_scene_id": "COMBAT_LAB",
+      "image_url": "assets/6e26d20e_armory-locker.webp",
+      "item_type": "CONTAINER",
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": false,
+      "is_final_state": false,
+      "inventory": [
+        "ARMORY_RUNED_LONGSWORD",
+        "ARMORY_YEW_LONGBOW",
+        "ARMORY_EMBER_STAFF",
+        "ARMORY_ETERNAL_BAGUETTE",
+        "ARMORY_DUCK_LAUNCHER",
+        "ARMORY_DWARVEN_CHAINMAIL",
+        "ARMORY_KITE_SHIELD",
+        "ARMORY_COLANDER_HELM",
+        "ARMORY_SUMO_SUIT",
+        "ARMORY_BUNNY_SLIPPERS"
+      ],
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0,
+      "code_to_unlock": "",
+      "item_to_unlock": "",
+      "rule_to_unlock": ""
+    },
+    {
+      "id": "ARMORY_RUNED_LONGSWORD",
+      "entity_type": "OBJECT",
+      "name": "Runed Longsword",
+      "description": "A well-balanced longsword with faintly glowing runes along the fuller. A classic choice for anyone who likes to hit things hard. Deals 1d10 slashing damage (Strength).",
+      "appearance": "steel longsword, blue-glowing runes along the blade, wire-wrapped grip, brass pommel",
+      "current_scene_id": "COMBAT_LAB",
+      "spatial_position": "inside the Equipment Locker",
+      "image_url": "assets/479c723a_armory-runed-longsword.webp",
+      "item_type": "WEAPON",
+      "wearable_slots": [
+        "MainHand"
+      ],
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": true,
+      "is_final_state": false,
+      "inventory": [],
+      "metadata_json": {
+        "damage_dice": "1d10",
+        "weapon_cost_type": "stamina",
+        "weapon_cost_value": 20,
+        "weapon_category": "MELEE",
+        "weapon_hit_stat": "strength"
+      },
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0
+    },
+    {
+      "id": "ARMORY_SUMO_SUIT",
+      "entity_type": "OBJECT",
+      "name": "Inflatable Sumo Suit",
+      "description": "A wobbling inflatable sumo suit. Blows simply bounce off: Armor Class +3. Moving gracefully is out of the question: Dexterity -3. The crowd loves it: Charisma +1.",
+      "appearance": "enormous inflatable sumo suit, pink plastic, black belt print, tiny valve at the back",
+      "current_scene_id": "COMBAT_LAB",
+      "spatial_position": "inside the Equipment Locker",
+      "image_url": "assets/94d9b9d6_armory-sumo-suit.webp",
+      "item_type": "WEARABLE",
+      "wearable_slots": [
+        "Chest"
+      ],
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": true,
+      "is_final_state": false,
+      "stat_modifier_dexterity": -3,
+      "stat_modifier_charisma": 1,
+      "stat_modifier_armor_class": 3,
+      "inventory": [],
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0
+    },
+    {
+      "id": "ARMORY_YEW_LONGBOW",
+      "entity_type": "OBJECT",
+      "name": "Yew Longbow",
+      "description": "A tall longbow of seasoned yew with a quiver of goose-feathered arrows. Deals 1d8 piercing damage from range (Dexterity) and leaves targets winded.",
+      "appearance": "tall curved yew bow, waxed linen string, leather quiver with grey-feathered arrows",
+      "current_scene_id": "COMBAT_LAB",
+      "spatial_position": "inside the Equipment Locker",
+      "image_url": "assets/e91dae3c_armory-yew-longbow.webp",
+      "item_type": "WEAPON",
+      "wearable_slots": [
+        "MainHand"
+      ],
+      "is_in_inventory": false,
+      "is_hidden": false,
+      "is_portable": true,
+      "is_final_state": false,
+      "inventory": [],
+      "metadata_json": {
+        "damage_dice": "1d8",
+        "weapon_cost_type": "stamina",
+        "weapon_cost_value": 15,
+        "weapon_category": "RANGED",
+        "weapon_hit_stat": "dexterity",
+        "weapon_effects": [
+          {
+            "target": "target",
+            "stat": "stamina",
+            "amount": "-1d4"
+          }
+        ]
+      },
+      "hp_change": 0,
+      "stamina_change": 0,
+      "mana_change": 0
+    },
+    {
       "id": "ART_CLOCKWORK_HEART",
       "entity_type": "OBJECT",
       "name": "Clockwork Heart",
@@ -2025,7 +2360,7 @@
       "hp_change": 0,
       "stamina_change": 0,
       "mana_change": 0,
-      "text_log_content": "=== QA TEST LAB \u2014 ART & IMAGE GENERATION EXPERIMENTS ===\n\nWelcome to the Art Lab! In-game image generation test features:\n\n1. THE ARTISTS\n\u2022 Pierre the Caricaturist: Absurd street caricatures.\n\u2022 Babu the Chimp Prodigy: Joyful banana finger-paintings.\n\n2. CUSTOM PROMPT GENERATION (NEW!)\n\u2022 Type directly in chat: 'Paint a picture of a dog' or 'Pierre, draw a knight'.\n\u2022 Or choose 'Custom Commission' in the artist dialog to enter a subject.\n\u2022 The artist uses tw.llm.ask to craft an art prompt from your text and tw.image.generate to render it!\n\n3. MODEL SWITCHING\n\u2022 Toggle the Art Engine Quality Switch between Simple Model and HQ Model.",
+      "text_log_content": "=== QA TEST LAB \u2014 ART & IMAGE GENERATION EXPERIMENTS ===\n\nWelcome to the Art Lab! In-game image generation test features:\n\n1. THE ARTISTS\n\u2022 Pierre the Caricaturist: Absurd street caricatures.\n\u2022 Babu the Chimp Prodigy: Joyful banana finger-paintings.\n\n2. CUSTOM PROMPT GENERATION (NEW!)\n\u2022 Type directly in chat: 'Paint a picture of a dog' or 'Pierre, draw a knight'.\n\u2022 Or choose 'Custom Commission' in the artist dialog to enter a subject.\n\u2022 The artist uses tw.llm.ask to craft an art prompt from your",
       "text_log_format": "DOCUMENT"
     },
     {
@@ -3858,6 +4193,13 @@
       "is_portable": false,
       "is_final_state": false,
       "inventory": [],
+      "metadata_json": {
+        "discovery_visibility": {
+          "mentioned_in_scene": true,
+          "listed_in_discoveries": false,
+          "lootable": false
+        }
+      },
       "hp_change": 0,
       "stamina_change": 0,
       "mana_change": 0,
@@ -4094,7 +4436,7 @@
       "hp_change": 0,
       "stamina_change": 0,
       "mana_change": 0,
-      "text_log_content": "=== TIME MACHINE LAB QA GUIDE ===\nTests TaleWeaver's in-game clock, timers, and scheduled events.\n\n1. TIME ENGINE BASICS\n\u2022 Clock: Starts Day 1, 08:00. Tracks elapsed minutes.\n\u2022 Turns: Turns advance the clock (default: 5m/turn).\n\u2022 GM: Game Master adds extra time for long actions.\n\u2022 Scripts: Time jumps via tw.time.advance() / rewind().\n\u2022 Timers: Relative (after) & recurring (every) callbacks.\n\n2. EXPERIMENTS & OBJECTS\n\u2022 Chronos-5000 Console:\n  - Dawn (06:00): Jump to 06:00 (phases in Barnaby the Rooster).\n  - Dusk (18:00): Jump to 18:00 (phases in Schr\u00f6dinger the Cat).\n  - +/- 60m: Fast-forward or rewind by 1 hour.\n  - Pause / Resume: Freeze or resume the clock.\n  - Turn Pacing: Toggle 1m, 5m, or 30m per turn.\n  - Paradox Alarm: Arm a 10m countdown alarm.\n\u2022 Paradox Hourglass: Rewind 15m & heal 10 HP. Flip 3x for an award.\n\u2022 Tomorrow Chronicle: News ink shifts with the hour.\n\u2022 Master Chronometer: Displays real-time clock telemetry.",
+      "text_log_content": "=== TIME MACHINE LAB QA GUIDE ===\nTests TaleWeaver's in-game clock, timers, and scheduled events.\n\n1. TIME ENGINE BASICS\n\u2022 Clock: Starts Day 1, 08:00. Tracks elapsed minutes.\n\u2022 Turns: Turns advance the clock (default: 5m/turn).\n\u2022 GM: Game Master adds extra time for long actions.\n\u2022 Scripts: Time jumps via tw.time.advance() / rewind().\n\u2022 Timers: Relative (after) & recurring (every) callbacks.\n\n2. EXPERIMENTS & OBJECTS\n\u2022 Chronos-5000 Console:\n  - Dawn (06:00): Jump to 06:00 (phases in Barnaby the R",
       "text_log_format": "DOCUMENT"
     },
     {
@@ -4179,7 +4521,7 @@
       "hp_change": 0,
       "stamina_change": 0,
       "mana_change": 0,
-      "text_log_content": "=== WHAT'S NEW IN THE TEST-LAB ===\n\nWelcome back, QA Tester Alex Vale! New facilities & features wired for testing:\n\n1. NEW SCENE: ART LAB (IN-GAME IMAGE GENERATION)\n\u2022 Passage: Paint-splattered glass door in Entry Hall.\n\u2022 Scripting API: tw.image.generate(prompt, model=...)\n\u2022 Pierre the Caricaturist: Exaggerated street-style caricatures with absurd proportions.\n\u2022 Babu the Chimp Prodigy: Joyful, childlike finger paintings of bananas.\n\u2022 Art Engine Quality Switch: Heavy toggle to switch between Simple Model (fast sketch) and HQ Model (high-fidelity rendering).\n\n2. VINTAGE RADIO IN THE SWITCH-LAB\n\u2022 Antique radio receiver in the living room test suite alongside the TV and atomic fridge.\n\u2022 Test audio dial tuning and switch-controlled broadcasts.\n\n3. BACKGROUND MUSIC & AUDIO ENGINE\n\u2022 Dynamic background music generation and track library integration.\n\u2022 Custom atmospheric audio assigned per scene (e.g. Hearthfire Lullaby in Conversation Hall).",
+      "text_log_content": "=== WHAT'S NEW IN THE TEST-LAB ===\n\nWelcome back, QA Tester Alex Vale! New facilities & features wired for testing:\n\n1. NEW SCENE: ART LAB (IN-GAME IMAGE GENERATION)\n\u2022 Passage: Paint-splattered glass door in Entry Hall.\n\u2022 Scripting API: tw.image.generate(prompt, model=...)\n\u2022 Pierre the Caricaturist: Exaggerated street-style caricatures with absurd proportions.\n\u2022 Babu the Chimp Prodigy: Joyful, childlike finger paintings of bananas.\n\u2022 Art Engine Quality Switch: Heavy toggle to switch between Simp",
       "text_log_format": "DOCUMENT"
     }
   ],
@@ -4288,7 +4630,7 @@
       "description": "Successfully manipulated space-time and experienced dawn and dusk in the Time Machine Lab.",
       "tier": "silver",
       "requirement": "",
-      "is_earned": true
+      "is_earned": false
     },
     {
       "key": "AWARD_KEY_MASTER",
@@ -4320,7 +4662,7 @@
       "description": "Beamed in a rat, a grandmother and finally the right automaton. Third time lucky.",
       "tier": "silver",
       "requirement": "Unit Seven is teleported into the Teleportation Lab.",
-      "is_earned": true,
+      "is_earned": false,
       "required_item_id": "",
       "required_scene_id": "",
       "required_defeated_npc_id": "",
